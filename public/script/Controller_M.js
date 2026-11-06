@@ -302,7 +302,14 @@ function setupPreviewVideoLastFrame() {
   const vid = document.getElementById('ltPreviewVideo');
   if (!vid) return;
 
-  const sources = ['Graphic/lowerthird.webm', 'lowerthird.webm', 'Graphic/Lowerthird.webm'];
+  const sources = [
+    '../graphic/lowerthird.webm',
+    '../graphic/Lowerthird.webm',
+    '/graphic/lowerthird.webm',
+    'graphic/lowerthird.webm',
+    'Graphic/lowerthird.webm',
+    'lowerthird.webm'
+  ];
   let srcIdx = 0;
 
   vid.src = sources[srcIdx];

@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Livestream</title>
-        <link id="livestream-css" rel="stylesheet" href="Round1.css" />
+        <link id="livestream-css" rel="stylesheet" href="../css/Round1.css" />
         <style>
             /* Video Intro Phần Thi (intro_r1..r4.mp4) phủ kín toàn màn hình */
             #roundIntroVideo {
@@ -27,7 +27,7 @@
 
         <!-- Video Đồ họa nền Vòng 1 (KhoiDong.webm) -->
         <video id="graphic_r1" class="video-overlay" style="display: none;">
-            <source src="Graphic/KhoiDong.webm" type="video/webm">
+            <source src="../graphic/KhoiDong.webm" type="video/webm">
         </video>
         <div id="playerContainer"></div>
         <div id="questionText" class="question"></div>
@@ -75,7 +75,7 @@
 
                 const cssLink = document.getElementById('livestream-css');
                 if (cssLink) {
-                    cssLink.href = `${filePrefix}.css`;
+                    cssLink.href = `../css/${filePrefix}.css`;
                 }
 
                 const oldScript = document.getElementById('livestream-js');
@@ -86,7 +86,7 @@
                 const newScript = document.createElement('script');
                 newScript.id = 'livestream-js';
                 newScript.type = 'module';
-                newScript.src = `${filePrefix}.js?t=${Date.now()}`;
+                newScript.src = `../script/${filePrefix}.js?t=${Date.now()}`;
                 document.body.appendChild(newScript);
             }
 
@@ -117,6 +117,13 @@
                 const baseFile = customFile || `intro_${rLower}.mp4`;
 
                 const candidates = [
+                    `../graphic/${baseFile}`,
+                    `../graphic/${baseFile.toLowerCase()}`,
+                    `../graphic/intro_${rLower}.mp4`,
+                    `../graphic/Intro_${rLower}.mp4`,
+                    `../graphic/intro_${rUpper}.mp4`,
+                    `../graphic/Intro_${rUpper}.mp4`,
+                    `/graphic/${baseFile}`,
                     `Graphic/${baseFile}`,
                     baseFile,
                     `Graphic/intro_${rLower}.mp4`,
@@ -200,23 +207,23 @@
             // 3. BỘ PHÁT NHẠC SOUNDBOARD TRỰC TIẾP TRÊN MÀN LIVESTREAM
             // =====================================================================
             const SOUND_FILES = {
-                'intro':     'Sounds/HostEntrance.mp3',
-                'thinking':  'Sounds/ContestantEntrance.mp3',
-                'tick':      'Sounds/R1_intro.mp3',
-                'correct':   'Sounds/R2_intro.mp3',
-                'wrong':     'Sounds/R3_intro.mp3',
-                'buzz':      'Sounds/R4_intro.mp3',
-                'applause':  'Sounds/Vo_Tay.mp3',
-                'drum':      'Sounds/Trong_Tran.mp3',
+                'intro':     '../sounds/HostEntrance.mp3',
+                'thinking':  '../sounds/ContestantEntrance.mp3',
+                'tick':      '../sounds/R1_intro.mp3',
+                'correct':   '../sounds/R2_intro.mp3',
+                'wrong':     '../sounds/R3_intro.mp3',
+                'buzz':      '../sounds/R4_intro.mp3',
+                'applause':  '../sounds/Vo_Tay.mp3',
+                'drum':      '../sounds/Trong_Tran.mp3',
 
-                'intro_r1':  'Sounds/Intro_Vong1.mp3',
-                'intro_r2':  'Sounds/Intro_Vong2.mp3',
-                'intro_r3':  'Sounds/Intro_Vong3.mp3',
-                'intro_r4':  'Sounds/Intro_Vong4.mp3',
-                'congrats':  'Sounds/Chuc_Mung.mp3',
-                'champion':  'Sounds/Vo_Dich.mp3',
-                'warning':   'Sounds/Canh_Bao.mp3',
-                'ending':    'Sounds/Ket_Thuc.mp3'
+                'intro_r1':  '../sounds/Intro_Vong1.mp3',
+                'intro_r2':  '../sounds/Intro_Vong2.mp3',
+                'intro_r3':  '../sounds/Intro_Vong3.mp3',
+                'intro_r4':  '../sounds/Intro_Vong4.mp3',
+                'congrats':  '../sounds/Chuc_Mung.mp3',
+                'champion':  '../sounds/Vo_Dich.mp3',
+                'warning':   '../sounds/Canh_Bao.mp3',
+                'ending':    '../sounds/Ket_Thuc.mp3'
             };
 
             const audioCache = {};
@@ -275,6 +282,6 @@
         </script>
 
         <!-- NHÚNG SCRIPT ĐỘNG CHO LIVESTREAM (MẶC ĐỊNH Round1.js) -->
-        <script id="livestream-js" type="module" src="Round1.js"></script>
+        <script id="livestream-js" type="module" src="../script/Round1.js"></script>
     </body>
 </html>

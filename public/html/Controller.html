@@ -192,7 +192,7 @@
   </style>
 
   <!-- NHÚNG CSS RIÊNG CỦA TỪNG VÒNG (MẶC ĐỊNH VÒNG 1) -->
-  <link id="round-css" rel="stylesheet" href="Controller_R1.css" />
+  <link id="round-css" rel="stylesheet" href="../css/Controller_R1.css" />
 </head>
 <body>
 
@@ -407,7 +407,7 @@
       // 3. Thay đổi file CSS trên Controller (Controller_M.css, Controller_R1.css,...)
       const cssLink = document.getElementById('round-css');
       if (cssLink) {
-        cssLink.href = `Controller_${suffix}.css`;
+        cssLink.href = `../css/Controller_${suffix}.css`;
       }
 
       // 4. Thay đổi và thực thi lại file JS trên Controller (Controller_M.js, Controller_R1.js,...)
@@ -419,7 +419,7 @@
       const newScript = document.createElement('script');
       newScript.id = 'round-js';
       newScript.type = 'module';
-      newScript.src = `Controller_${suffix}.js?t=${Date.now()}`;
+      newScript.src = `../script/Controller_${suffix}.js?t=${Date.now()}`;
       document.body.appendChild(newScript);
 
       // 5. Đồng bộ sang màn hình Livestream qua Firebase để Livestream chạy Main.js & Main.css
@@ -430,28 +430,28 @@
     };
 
     // =========================================================================
-    // CẤU HÌNH DANH SÁCH FILE NHẠC SOUNDBOARD (THƯ MỤC Sounds/)
+    // CẤU HÌNH DANH SÁCH FILE NHẠC SOUNDBOARD (THƯ MỤC sounds/)
     // =========================================================================
     const SOUND_FILES = {
       // Hàng 1 (8 nút trên)
-      'intro':     'Sounds/HostEntrance.mp3',
-      'thinking':  'Sounds/ContestantEntrance.mp3',
-      'tick':      'Sounds/R1_intro.mp3',
-      'correct':   'Sounds/R2_intro.mp3',
-      'wrong':     'Sounds/R3_intro.mp3',
-      'buzz':      'Sounds/R4_intro.mp3',
-      'applause':  'Sounds/Vo_Tay.mp3',
-      'drum':      'Sounds/Trong_Tran.mp3',
+      'intro':     '../sounds/HostEntrance.mp3',
+      'thinking':  '../sounds/ContestantEntrance.mp3',
+      'tick':      '../sounds/R1_intro.mp3',
+      'correct':   '../sounds/R2_intro.mp3',
+      'wrong':     '../sounds/R3_intro.mp3',
+      'buzz':      '../sounds/R4_intro.mp3',
+      'applause':  '../sounds/Vo_Tay.mp3',
+      'drum':      '../sounds/Trong_Tran.mp3',
 
       // Hàng 2 (8 nút dưới)
-      'intro_r1':  'Sounds/Intro_Vong1.mp3',
-      'intro_r2':  'Sounds/Intro_Vong2.mp3',
-      'intro_r3':  'Sounds/Intro_Vong3.mp3',
-      'intro_r4':  'Sounds/Intro_Vong4.mp3',
-      'congrats':  'Sounds/Chuc_Mung.mp3',
-      'champion':  'Sounds/Vo_Dich.mp3',
-      'warning':   'Sounds/Canh_Bao.mp3',
-      'ending':    'Sounds/Ket_Thuc.mp3'
+      'intro_r1':  '../sounds/Intro_Vong1.mp3',
+      'intro_r2':  '../sounds/Intro_Vong2.mp3',
+      'intro_r3':  '../sounds/Intro_Vong3.mp3',
+      'intro_r4':  '../sounds/Intro_Vong4.mp3',
+      'congrats':  '../sounds/Chuc_Mung.mp3',
+      'champion':  '../sounds/Vo_Dich.mp3',
+      'warning':   '../sounds/Canh_Bao.mp3',
+      'ending':    '../sounds/Ket_Thuc.mp3'
     };
 
     // Lưu trạng thái bài nào đang phát
@@ -566,6 +566,6 @@
   </script>
 
   <!-- NHÚNG SCRIPT RIÊNG CỦA VÒNG (MẶC ĐỊNH VÒNG 1) -->
-  <script id="round-js" type="module" src="Controller_R1.js"></script>
+  <script id="round-js" type="module" src="../script/Controller_R1.js"></script>
 </body>
 </html>

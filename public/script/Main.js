@@ -35,8 +35,8 @@ function initMainLivestreamDOM() {
         const introVid = document.getElementById('mainIntroVideo');
         const ltVid = document.getElementById('mainLowerthirdVideo');
 
-        setVideoSourceWithFallback(introVid, ['Graphic/Intro.mp4', 'Intro.mp4', 'Graphic/intro.mp4', 'intro.mp4']);
-        setVideoSourceWithFallback(ltVid, ['Graphic/lowerthird.webm', 'lowerthird.webm', 'Graphic/Lowerthird.webm']);
+        setVideoSourceWithFallback(introVid, ['../graphic/intro.mp4', '../graphic/Intro.mp4', '/graphic/intro.mp4', 'graphic/intro.mp4', 'Graphic/Intro.mp4', 'Intro.mp4', 'Graphic/intro.mp4', 'intro.mp4']);
+        setVideoSourceWithFallback(ltVid, ['../graphic/lowerthird.webm', '../graphic/Lowerthird.webm', '/graphic/lowerthird.webm', 'graphic/lowerthird.webm', 'Graphic/lowerthird.webm', 'lowerthird.webm', 'Graphic/Lowerthird.webm']);
 
         introVid.addEventListener('ended', () => {
             introVid.pause();
