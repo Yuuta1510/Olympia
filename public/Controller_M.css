@@ -1,0 +1,434 @@
+/* ==========================================================================
+   1. ẨN THANH TRẠNG THÁI DƯỚI TAB Ở PHẦN MAIN & GIỮ STYLE NÚT CỘT PHẢI
+   ========================================================================== */
+.status-bar-container {
+  display: none !important;
+}
+
+.player-btn, .sidebar-action-btn {
+  background-color: var(--blue-badge);
+  border: 1.5px solid var(--white);
+  border-radius: 2px;
+  color: var(--white);
+  font-family: var(--font-main);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 1s ease, box-shadow 1s ease, color 1s ease, background-color 0.2s ease; 
+}
+
+.player-btn.active, .sidebar-action-btn.active {
+  border: 2px solid var(--yellow-border);
+  color: var(--yellow-border);
+  box-shadow: 0 0 8px rgba(255, 255, 0, 0.8);
+  transition: none; 
+}
+
+.player-btn.is-turn, .sidebar-action-btn.is-running {
+  background-color: #cc0000 !important;
+}
+
+.player-btn:hover, .sidebar-action-btn:hover {
+  background-color: var(--blue-hover);
+  transition: all 0.2s ease;
+}
+
+.sidebar-action-btn {
+  width: 100%;
+  flex: 1;
+  font-size: 13.5px;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   2. KHU VỰC THIẾT KẾ LOWERTHIRD TRỰC QUAN (MAIN WORKSPACE)
+   ========================================================================== */
+.main-content-grid {
+  width: 100%;
+  background-color: var(--black);
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+}
+
+.qa-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+
+.sidebar-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  height: 100%;
+}
+
+.lt-editor-workspace {
+  display: grid;
+  grid-template-columns: 1fr 330px;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Khung bọc giữ tỷ lệ 16:9 chuẩn xác với màn hình Livestream */
+.lt-preview-wrapper {
+  width: 100%;
+  height: 100%;
+  background-color: #050811;
+  border: 1.5px solid var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  padding: 6px;
+}
+
+.lt-canvas-16-9 {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-height: 100%;
+  background-color: #111827;
+  border: 1px dashed #475569;
+  overflow: hidden;
+  container-type: inline-size;
+  user-select: none;
+}
+
+.lt-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.lt-text-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+}
+
+/* MẶC ĐỊNH TRONG SUỐT HOÀN TOÀN KHI KHÔNG ĐỤNG TỚI */
+.lt-draggable-text {
+  position: absolute;
+  color: #ffffff;
+  font-family: var(--font-main);
+  font-weight: bold;
+  cursor: move;
+  white-space: pre-wrap;
+  padding: 2px 6px;
+  border: 1.5px solid transparent;
+  background-color: transparent;
+  border-radius: 3px;
+  line-height: 1.2;
+  z-index: 3;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Chỉ hiện viền mờ khi di chuột vào */
+.lt-draggable-text:hover {
+  border: 1.5px dashed rgba(56, 189, 248, 0.85);
+  background-color: rgba(56, 189, 248, 0.1);
+}
+
+/* Hiện viền vàng khi đang click chọn chỉnh sửa */
+.lt-draggable-text.selected {
+  border: 1.5px dashed var(--yellow-border);
+  background-color: rgba(255, 255, 0, 0.1);
+  z-index: 4;
+}
+
+/* Bảng công cụ điều chỉnh Preset & Text bên phải Preview */
+.lt-controls-panel {
+  background-color: #0b1120;
+  border: 1.5px solid var(--white);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.lt-section-box {
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 5px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.lt-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 6px;
+}
+
+.lt-panel-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.lt-btn-group {
+  display: flex;
+  gap: 4px;
+}
+
+.lt-small-btn {
+  background-color: var(--blue-badge);
+  color: var(--white);
+  border: 1px solid var(--white);
+  padding: 4px 8px;
+  font-family: var(--font-main);
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 3px;
+  cursor: pointer;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lt-small-btn:hover { background-color: var(--blue-hover); }
+.lt-small-btn.secondary { background-color: #0284c7; }
+.lt-small-btn.secondary:hover { background-color: #0369a1; }
+.lt-small-btn.danger { background-color: #b91c1c; }
+.lt-small-btn.danger:hover { background-color: #7f1d1d; }
+
+.lt-items-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-height: 68px;
+  overflow-y: auto;
+}
+
+.lt-item-chip {
+  background-color: #1e293b;
+  border: 1px solid #475569;
+  color: #e2e8f0;
+  padding: 4px 9px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: bold;
+  cursor: pointer;
+  max-width: 145px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lt-item-chip.active {
+  background-color: var(--blue-badge);
+  border-color: var(--yellow-border);
+  color: var(--yellow-border);
+}
+
+.lt-item-chip.preset-chip.active {
+  background-color: #0369a1;
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.5);
+}
+
+.lt-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lt-field-group label {
+  font-size: 11.5px;
+  color: #94a3b8;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+}
+
+.lt-field-group input[type="text"],
+.lt-field-group textarea,
+.lt-field-group input[type="number"] {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  color: var(--white);
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: bold;
+  outline: none;
+}
+
+.lt-field-group textarea {
+  resize: vertical;
+  min-height: 46px;
+}
+
+.lt-field-group input:focus,
+.lt-field-group textarea:focus {
+  border-color: #38bdf8;
+}
+
+.lt-coord-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   3. MODAL CẤU HÌNH CHUNG (GIỮ NGUYÊN)
+   ========================================================================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #0f172a;
+  border: 2px solid var(--navy-header);
+  border-radius: 8px;
+  width: 800px; 
+  max-width: 95%;
+  padding: 20px 25px;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 10px;
+}
+
+.modal-header h2 { font-size: 20px; color: #38bdf8; }
+
+.close-btn {
+  background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; transition: color 0.2s;
+}
+.close-btn:hover { color: #ff5252; }
+
+.config-group-title { font-size: 14px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.config-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.config-item label { font-size: 13px; font-weight: bold; color: #cbd5e1; }
+
+.config-item input, .config-item select {
+  background: #1e293b;
+  color: var(--white);
+  border: 1px solid #334155;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: var(--font-main);
+  font-weight: bold;
+  outline: none;
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 15px;
+}
+
+.player-score-card {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #4f5050;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 90px;
+}
+
+.player-score-name-wrapper {
+  background: linear-gradient(90deg, #00dafc, #007cbe); 
+  border-bottom: 2px solid #13007d;
+  padding: 8px 10px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.player-score-name {
+  color: #0d0055;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+  outline: none;
+  transform-origin: center;
+  display: inline-block;
+  flex-shrink: 0;
+  min-width: 20px;
+}
+
+.player-score-input {
+  flex: 1; 
+  width: 100%;
+  background-color: #0b004b; 
+  color: var(--white);
+  border: none;
+  text-align: center;
+  font-size: 36px !important; 
+  font-weight: bold;
+  outline: none;
+  font-family: var(--font-main);
+  padding-bottom: 10px;
+}
+
+.save-config-btn {
+  background: #0ea5e9;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  font-family: var(--font-main);
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+}

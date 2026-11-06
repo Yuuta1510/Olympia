@@ -1,0 +1,287 @@
+{
+  "games": {
+    "players": [
+      null,
+      {
+        "id": 1,
+        "info": "",
+        "name": "Nguyên Chương",
+        "score": 0
+      },
+      {
+        "id": 2,
+        "info": "",
+        "name": "Thanh Tùng",
+        "score": 0
+      },
+      {
+        "id": 3,
+        "info": "",
+        "name": "Bảo Khánh",
+        "score": 0
+      },
+      {
+        "id": 4,
+        "info": "",
+        "name": "Nhựt Lam",
+        "score": 0
+      }
+    ],
+    "round_1": {
+      "luot_chung": {
+        "diem_dung": 10,
+        "diem_sai": -5,
+        "so_cau": 12,
+        "thoi_gian": -1
+      },
+      "luot_rieng": {
+        "diem_dung": 10,
+        "diem_sai": 0,
+        "so_cau": 6,
+        "thoi_gian": -1
+      },
+      "so_luot_chung": 1,
+      "so_luot_rieng": 4
+    },
+    "round_2": {
+      "dap_an_thi_sinh": [
+        null,
+        "",
+        "",
+        "",
+        ""
+      ],
+      "diem_cnv": [
+        60,
+        50,
+        40,
+        30,
+        20,
+        10
+      ],
+      "point_ques": 10,
+      "so_hang_ngang": 4,
+      "thoi_gian_moi_cau": 15
+    },
+    "round_3": {
+      "dap_an_thi_sinh": [
+        null,
+        {
+          "answer": "",
+          "time": 0
+        },
+        {
+          "answer": "",
+          "time": 0
+        },
+        {
+          "answer": "",
+          "time": 0
+        },
+        {
+          "answer": "",
+          "time": 0
+        }
+      ],
+      "point_ques": [
+        40,
+        30,
+        20,
+        10
+      ],
+      "so_cau": 4,
+      "time_ques": [
+        20,
+        20,
+        30,
+        30
+      ]
+    },
+    "round_4": {
+      "kho_diem": [
+        20,
+        30
+      ],
+      "selected": [
+        20,
+        20,
+        30
+      ],
+      "so_cau": 3,
+      "time": {
+        "10": 10,
+        "20": 15,
+        "30": 20,
+        "40": 30
+      }
+    },
+    "tie_breaker": {
+      "player": [
+        {
+          "id": 1,
+          "name": "PLAYER 1"
+        },
+        {
+          "id": 2,
+          "name": "PLAYER 2"
+        }
+      ]
+    }
+  },
+  "questions": {
+    "round_1": [
+      null,
+      {
+        "cau_hoi": "\"Và ở đâu trên khắp ruộng đồng gò bãi/ Chẳng mang một dáng hình, một ao ước, một lối sống ông cha\" là đúc kết của nhà thơ nào?",
+        "dap_an": "Nguyễn Khoa Điềm"
+      },
+      {
+        "cau_hoi": "Tìm số chính phương lớn nhất có 3 chữ số.",
+        "dap_an": "961"
+      },
+      {
+        "cau_hoi": "Những năm 70 của thế kỷ trước, quốc gia nào đã tặng Việt Nam một số công trình quan trọng để phát triển kinh tế - xã hội như trại bò giống Ba Vì, xí nghiệp gà Lương Mỹ?",
+        "dap_an": "Cuba"
+      },
+      {
+        "cau_hoi": "Tại Việt Nam, các máy phát điện xoay chiều cung cấp điện có tần số ... Hz cho lưới điện quốc gia.",
+        "dap_an": "50"
+      },
+      {
+        "cau_hoi": "How many times has Vietnam been elected to the United Nations Human Rights Council?",
+        "dap_an": "Three"
+      },
+      {
+        "cau_hoi": "Tháng 8 năm 2025, nhà ngoại giao kỳ cựu nào đã được trao tặng danh hiệu Anh hùng Lao động nhằm ghi nhận công lao to lớn trong lĩnh vực đối ngoại, đóng góp trong sự nghiệp cách mạng của Đảng và của dân tộc ta?",
+        "dap_an": "Nguyễn Thị Bình"
+      },
+      {
+        "cau_hoi": "Ngày 8/9 hằng năm được Chính phủ quyết định là Ngày Tôn vinh ... trong cộng đồng người Việt Nam ở nước ngoài.",
+        "dap_an": "tiếng Việt"
+      },
+      {
+        "cau_hoi": "Theo Nghị quyết số 222/2025/QH15, Trung tâm tài chính quốc tế tại Việt Nam là khu vực có ranh giới địa lý xác định do Chính phủ thành lập đặt tại hai thành phố nào?",
+        "dap_an": "Thành phố Hồ Chí Minh, Đà Nẵng"
+      },
+      {
+        "cau_hoi": "Giải Nobel Hóa học 2025 được trao cho các nhà khoa học với công trình nghiên cứu tiên phong trong việc khám phá và phát triển các vật liệu MOFs, trong đó M là viết tắt của nhóm nguyên tố nào?",
+        "dap_an": "Kim loại"
+      },
+      {
+        "cau_hoi": "What is Vietnam's first international channel in English that officially went on air on September 7, 2025?",
+        "dap_an": "Vietnam Today"
+      },
+      {
+        "cau_hoi": "Năm nào trong thế kỷ XX gồm bốn chữ số lẻ khác nhau, chia hết cho 5 và chia 9 dư 4?",
+        "dap_an": "1975"
+      },
+      {
+        "cau_hoi": "Những câu thơ sau viết về người anh hùng nào: \"Đầu ngẩng cao bất khuất/ Ngay trong phút hy sinh/ Bây giờ dưới gốc dương/ Chị nằm nghe biển hát\" (Phan Thị Thanh Nhàn)?",
+        "dap_an": "Nguyễn Thị Bình"
+      },
+      {
+        "cau_hoi": "Buổi phát sóng đầu tiên của Vô tuyến Truyền hình Việt Nam ngày 7/9/1970 sử dụng loại tín hiệu gì để truyền hình ảnh và âm thanh?",
+        "dap_an": "Analog / Tương tự"
+      },
+      {
+        "cau_hoi": "540 độ là tổng số đo các góc trong của một đa giác lồi có bao nhiêu cạnh?",
+        "dap_an": "5"
+      },
+      {
+        "cau_hoi": "Nhà thơ nào đã thể hiện tư thế hiên ngang của người chiến sĩ Giải phóng quân qua các câu thơ: \"Anh chẳng để lại gì cho riêng Anh trước lúc lên đường/ Chỉ để lại cái dáng-đứng-Việt-Nam tạc vào thế kỷ\"?",
+        "dap_an": "Lê Anh Xuân"
+      },
+      {
+        "cau_hoi": "Up until 2025, how many times has Vietnam received the title for Asia's Leading Destination at the World Travel Awards?",
+        "dap_an": "Seven"
+      },
+      {
+        "cau_hoi": "Tuyến tùng có vai trò quan trọng với con người trong việc điều chỉnh nhịp thức - ngủ thông qua việc tiết ra loại hormone nào là chính?",
+        "dap_an": "Melatonine"
+      },
+      {
+        "cau_hoi": "\"Phòng ngừa cho những thế hệ tương lai khỏi thảm họa chiến tranh\" là quyết tâm được nêu ra trong văn kiện lịch sử nào được ký ngày 26/6/1945 tại San Francisco, Hoa Kỳ?",
+        "dap_an": "Hiến chương Liên Hợp Quốc"
+      },
+      {
+        "cau_hoi": "Cụm từ nào còn thiếu trong đoạn thơ sau, nhắc đến biệt danh của một lực lượng huyền thoại trong kháng chiến chống Mĩ: \"Tổ quốc tôi ba nghìn cây số biển/ Có con đường mòn rẽ sóng khơi xa/ Thuỷ thủ không tên, .../ Tượng đài trắng dựng lên sau ánh chớp sáng loà\" (Nguyễn Ngọc Phú)?",
+        "dap_an": "đoàn tàu không số"
+      },
+      {
+        "cau_hoi": "Ước nguyên tố lớn nhất của số 102102 là bao nhiêu?",
+        "dap_an": "17"
+      },
+      {
+        "cau_hoi": "Sau khi đánh bại quân Nam Hán trên sông Bạch Đằng, Ngô Quyền đã không thừa nhận chức quan nào do chính quyền phương Bắc đặt ra mà tự xưng Vương nhằm khẳng định tinh thần độc lập, tự chủ của nước ta?",
+        "dap_an": "Tiết độ sứ"
+      },
+      {
+        "cau_hoi": "Ngày 19/9/2025, Bộ Y tế đã khai trương Tổng đài điện thoại quốc gia về phòng, chống mua bán người với số điện thoại nào?",
+        "dap_an": "111"
+      },
+      {
+        "cau_hoi": "From 8:30 AM to 10:30 AM, how many degrees does the hour hand of a clock rotate?",
+        "dap_an": "Sixty"
+      },
+      {
+        "cau_hoi": "Ngày 13/8/2025, bệnh viện Hữu nghị Việt Đức đã công bố lần đầu tiên thực hiện thành công ca ghép đồng thời hai cơ quan nào ở người, đánh dấu một cột mốc quan trọng trong lĩnh vực ghép tạng tại Việt Nam?",
+        "dap_an": "Tim, phổi"
+      },
+      {
+        "cau_hoi": "Sau sắp xếp đơn vị hành chính cấp tỉnh năm 2025, đường bờ biển của nước ta kéo dài từ tỉnh nào đến tỉnh nào?",
+        "dap_an": "Quảng Ninh, An Giang"
+      },
+      {
+        "cau_hoi": "Người ta chứng minh được rằng chỉ có năm khối đa diện lồi và đều. Chúng được gọi chung tên theo nhà toán học nào?",
+        "dap_an": "Platon"
+      },
+      {
+        "cau_hoi": "Trong tác phẩm nào của nhà thơ Lưu Trọng Lư, hình ảnh người mẹ hiện lên lấp lánh với \"Nét cười đen nhánh sau tay áo\"?",
+        "dap_an": "Nắng mới"
+      },
+      {
+        "cau_hoi": "Thành phần của bột giặt sinh học có chứa enzyme để tăng khả năng loại bỏ các vết bẩn khác nhau, trong đó loại enzyme nào đóng vai trò chính giúp loại bỏ vết bẩn do dầu mỡ?",
+        "dap_an": "Lipase"
+      },
+      {
+        "cau_hoi": "Di tích lịch sử \"Bến phà II Long Đại\" - nơi chứng kiến sự hy sinh anh dũng của 16 thanh niên xung phong vào tháng 9 năm 1972, thuộc tỉnh nào hiện nay?",
+        "dap_an": "Quảng Trị"
+      },
+      {
+        "cau_hoi": "At the 2025 Nobel Prize, the Prize in Economic Sciences was awarded to three scholars \"for having explained ... economic growth\" (Acording to The Royal Swedish Academy of Sciences).",
+        "dap_an": "innovation-driven"
+      },
+      {
+        "cau_hoi": "Vắc xin Qdenga có khả năng phòng bệnh truyền nhiễm nguy hiểm nào?",
+        "dap_an": "Sốt xuất huyết"
+      },
+      {
+        "cau_hoi": "Liên Hợp Quốc đã công bố năm 2025 là \"Năm Quốc tế về Khoa học và Công nghệ ...\".",
+        "dap_an": "lượng tử"
+      },
+      {
+        "cau_hoi": "Kỳ thủ Việt Nam nào đã lần đầu tiên giành được chức vô địch nội dung cờ tiêu chuẩn đơn nam tại giải Vô địch Cờ tướng Thế giới 2025 tổ chức ở Thượng Hải, Trung Quốc?",
+        "dap_an": "Lại Lý Huynh"
+      },
+      {
+        "cau_hoi": "Ngày 26/10/1965, quân và dân trên đảo nào tại Hải Phòng đã bắn rơi chiếc máy bay Mĩ thứ 700 trên bầu trời miền Bắc?",
+        "dap_an": "Bạch Long Vĩ"
+      },
+      {
+        "cau_hoi": "Đại nhạc hội V Concert do VTV tổ chức vào tháng 8/2025 có chủ đề là gì?",
+        "dap_an": "Rạng rỡ Việt Nam"
+      },
+      {
+        "cau_hoi": "Thể hiện kinh nghiệm dự báo thiên tai, dân gian Việt Nam có câu: \"Được mùa ..., hạn nước lên\". Loại quả nào thuộc họ Bồ hòn được nhắc đến trong câu trên?",
+        "dap_an": "17"
+      }
+    ],
+    "round_2": [
+      null,
+      {
+        "cau_hoi": "Tìm mật mã gồm 4 chữ số dựa vào các hình ảnh sau...",
+        "dap_an": "1945"
+      }
+    ]
+  }
+}
