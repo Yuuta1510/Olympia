@@ -54,6 +54,7 @@
       flex-direction: column;
       width: 100%;
       height: 100%;
+      min-height: 0;
     }
 
     /* ==========================================================================
@@ -133,21 +134,28 @@
        ========================================================================== */
     .music-panel-container {
       width: 100%;
+      max-height: 38vh;
+      min-height: 0;
       background-color: var(--black);
       border-top: 2px solid var(--white);
       padding: 16px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      overflow-y: auto;
       border-bottom-left-radius: 0px;
       border-bottom-right-radius: 0px;
-      flex-shrink: 0;
+      flex: 0 1 auto;
+    }
+
+    .main-content-grid {
+      min-height: 0;
     }
 
     .music-grid {
       display: grid;
-      grid-template-columns: repeat(8, 1fr);
+      grid-template-columns: repeat(10, 1fr);
       gap: 8px;
       width: 100%;
     }
@@ -164,30 +172,32 @@
       justify-content: center;
       cursor: pointer;
       white-space: nowrap;
-      height: 42px;
-      font-size: 18px;
-      padding: 2px 4px;
+      height: 36px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: clamp(10px, 1vw, 14px);
+      padding: 2px 3px;
       text-transform: uppercase;
-      transition: border-color 1s ease, box-shadow 1s ease, color 1s ease, background-color 0.2s ease;
+      /* Đã bỏ transition ở đây */
     }
 
+    /* Di chuột lên: Chỉ hiện viền vàng, bỏ hover đổi nền xanh */
+    .music-trigger-btn:hover {
+      border-color: var(--yellow-border);
+    }
+
+    /* Nút vừa bấm xong: Xóa bóng mờ (shadow) */
     .music-trigger-btn.active {
+      border-color: var(--yellow-border);
       color: var(--yellow-border);
-      box-shadow: 0 0 8px rgba(255, 255, 0, 0.8);
-      transition: none;
     }
 
-    /* Trạng thái khi nhạc đang bật: Đổi nền sang đỏ cam nổi bật + chữ vàng */
+    /* Trạng thái khi nhạc đang bật: Đổi nền sang đỏ + chữ vàng, KHÔNG BÓNG MỜ */
     .music-trigger-btn.playing {
       background-color: #cc0000 !important;
       color: var(--yellow-border);
-      box-shadow: 0 0 10px rgba(255, 213, 0, 0.7);
-      transition: background-color 0.15s ease;
-    }
-
-    .music-trigger-btn:hover {
-      background-color: var(--blue-hover);
-      transition: all 0.2s ease;
+      border-color: white; /* Ẩn viền đi cho gọn */
     }
   </style>
 
@@ -216,63 +226,76 @@
         </button>
       </div>
 
-      <!-- 2. STATUS BAR -->
-      <div class="status-bar-container">
-        <div class="status-bar-left">
-          <div class="status-info-badge" id="roundBadge"><span id="roundText" class="badge-inner-text">LƯỢT RIÊNG 1</span></div>
-          <div class="status-info-badge" id="quesBadge"><span id="quesText" class="badge-inner-text">CÂU HỎI 1/...</span></div>
-          <div class="status-info-badge" id="timeBadge"><span id="timeText" class="badge-inner-text">THỜI GIAN: 60s</span></div>
-        </div>
-
-        <div class="status-bar-right">
-          <button class="player-btn" onclick="triggerAction(this, '1')"><span id="playerBtnText-1" class="badge-inner-text">P1 (0)</span></button>
-          <button class="player-btn" onclick="triggerAction(this, '2')"><span id="playerBtnText-2" class="badge-inner-text">P2 (0)</span></button>
-          <button class="player-btn" onclick="triggerAction(this, '3')"><span id="playerBtnText-3" class="badge-inner-text">P3 (0)</span></button>
-          <button class="player-btn" onclick="triggerAction(this, '4')"><span id="playerBtnText-4" class="badge-inner-text">P4 (0)</span></button>
-        </div>
-      </div>
-
-      <!-- 3. QUESTION & ANSWER AREA + SIDEBAR BUTTONS -->
       <div class="main-content-grid">
+        
+        <!-- Cột Trái: CÂU HỎI & ĐÁP ÁN -->
         <div class="qa-column">
-          <div class="question-box" id="preview-question">Đang tải câu hỏi...</div>
-          <div class="answer-box" id="preview-answer">...</div>
+          <!-- BOX CÂU HỎI -->
+          <div class="question-box">
+            <div class="question-header">
+              <span id="roundText">LƯỢT RIÊNG 1</span>
+              <span class="divider">-</span>
+              <span id="quesText">CÂU HỎI 1/...</span>
+              <span class="divider">-</span>
+              <span id="timeText">THỜI GIAN: 60s</span>
+              <button id="btnResetTime" onclick="resetTurnTime()" style="margin-left: auto; width: 40px; height: 32px; background: #dc2626; color: #fff; border: 1.5px solid #fff; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;" title="Reset thời gian đếm ngược về gốc">🔄</button>
+              <button id="btnPlayPauseTime" onclick="toggleTurnTime()" style="margin-left: auto; margin-right: 15px; width: 40px; height: 32px; background: #2563eb; color: #fff; border: 1.5px solid #fff; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">▶</button>
+            </div>
+            
+            <div class="question-content" id="preview-question">Đang tải câu hỏi...</div>
+            
+            <div class="question-actions">
+              <div class="left-actions">
+                <button class="action-btn dimmed" id="btn-graphic" onclick="triggerAction(this, 's')">ĐỒ HỌA</button>
+                <button class="action-btn dimmed" id="btn-players" onclick="triggerAction(this, '0')">TÊN TS</button>
+                <button class="action-btn dimmed" id="btn-question" onclick="triggerAction(this, 'q')">CÂU HỎI</button>
+                <button class="action-btn" onclick="triggerAction(this, 'p')">◀ LÙI</button>
+                <button class="action-btn" onclick="triggerAction(this, 'n')">CHUYỂN ▶</button>
+                <button class="action-btn" onclick="triggerAction(this, 'rb')">RESET CHUÔNG</button>
+                <button class="action-btn" onclick="triggerAudio(this, 'Main_Blanks_mp3')">BLANKS</button>
+                <button class="action-btn" style="background-color: #cc0000;" onclick="triggerAction(this, 'r')">RESET ĐỒ HỌA</button>
+              </div>
+              <div class="right-actions">
+                <div class="timer-5s-box" id="timer5s-display" onclick="triggerAction(this, 't5')" title="Đếm ngược 5s">5</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOX ĐÁP ÁN -->
+          <div class="answer-box">
+            <div class="answer-content" id="preview-answer">...</div>
+            
+            <div class="answer-actions">
+              <button class="action-btn score-btn add-btn" onclick="triggerScore(this, 'add')">ĐÚNG</button>
+              <button class="action-btn score-btn sub-btn" onclick="triggerScore(this, 'sub')">SAI</button>
+            </div>
+          </div>
         </div>
 
-        <div class="sidebar-column">
-          <button class="sidebar-action-btn" onclick="triggerAction(this, 's')">HIỆN ĐỒ HỌA</button>
-          <button class="sidebar-action-btn" onclick="triggerAction(this, 'q')">HIỆN CÂU HỎI</button>
-          <button class="sidebar-action-btn" onclick="triggerAction(this, 'n')">CHUYỂN CÂU HỎI</button>
-          <button class="sidebar-action-btn" onclick="triggerAction(this, '0')">HIỆN TÊN TS</button>
-          <button class="sidebar-action-btn" onclick="triggerScore(this, 'add')">CỘNG ĐIỂM</button>
-          <button class="sidebar-action-btn" onclick="triggerScore(this, 'sub')">TRỪ ĐIỂM</button>
-          <button class="sidebar-action-btn" onclick="triggerAction(this, 't5')">ĐẾM NGƯỢC 5S</button>
-          <button class="sidebar-action-btn" style="background-color: #cc0000;" onclick="triggerAction(this, 'r')">RESET ĐỒ HỌA</button>
-          <button class="sidebar-action-btn"></button>
+        <!-- Cột Phải: BẢNG ĐIỂM 4 THÍ SINH (DỌC) -->
+        <div class="players-column">
+          <div class="player-vertical-card" onclick="triggerAction(this, '1')" id="playerBtn-1">
+            <div class="player-v-name" id="playerBtnName-1">P1</div>
+            <div class="player-v-score" id="playerBtnScore-1">0</div>
+          </div>
+          <div class="player-vertical-card" onclick="triggerAction(this, '2')" id="playerBtn-2">
+            <div class="player-v-name" id="playerBtnName-2">P2</div>
+            <div class="player-v-score" id="playerBtnScore-2">0</div>
+          </div>
+          <div class="player-vertical-card" onclick="triggerAction(this, '3')" id="playerBtn-3">
+            <div class="player-v-name" id="playerBtnName-3">P3</div>
+            <div class="player-v-score" id="playerBtnScore-3">0</div>
+          </div>
+          <div class="player-vertical-card" onclick="triggerAction(this, '4')" id="playerBtn-4">
+            <div class="player-v-name" id="playerBtnName-4">P4</div>
+            <div class="player-v-score" id="playerBtnScore-4">0</div>
+          </div>
         </div>
       </div>
 
       <!-- 4. MUSIC PANEL / SOUNDBOARD (CỐ ĐỊNH) -->
       <div class="music-panel-container">
-        <div class="music-grid">
-          <button class="music-trigger-btn" data-sound="intro" onclick="triggerAudio(this, 'intro')">HOST ENTRANCE</button>
-          <button class="music-trigger-btn" data-sound="thinking" onclick="triggerAudio(this, 'thinking')">CONTESTANT ENTRANCE</button>
-          <button class="music-trigger-btn" data-sound="tick" onclick="triggerAudio(this, 'tick')">KHỞI ĐỘNG</button>
-          <button class="music-trigger-btn" data-sound="correct" onclick="triggerAudio(this, 'correct')">VƯỢT CHƯỚNG NGẠI VẬT</button>
-          <button class="music-trigger-btn" data-sound="wrong" onclick="triggerAudio(this, 'wrong')">TĂNG TỐC</button>
-          <button class="music-trigger-btn" data-sound="buzz" onclick="triggerAudio(this, 'buzz')">VỀ ĐÍCH</button>
-          <button class="music-trigger-btn" data-sound="applause" onclick="triggerAudio(this, 'applause')">Vỗ Tay</button>
-          <button class="music-trigger-btn" data-sound="drum" onclick="triggerAudio(this, 'drum')">Trống Trận</button>
-
-          <button class="music-trigger-btn" data-sound="intro_r1" onclick="triggerAudio(this, 'intro_r1')">Nhạc Vòng 1</button>
-          <button class="music-trigger-btn" data-sound="intro_r2" onclick="triggerAudio(this, 'intro_r2')">Nhạc Vòng 2</button>
-          <button class="music-trigger-btn" data-sound="intro_r3" onclick="triggerAudio(this, 'intro_r3')">Nhạc Vòng 3</button>
-          <button class="music-trigger-btn" data-sound="intro_r4" onclick="triggerAudio(this, 'intro_r4')">Nhạc Vòng 4</button>
-          <button class="music-trigger-btn" data-sound="congrats" onclick="triggerAudio(this, 'congrats')">Chúc Mừng</button>
-          <button class="music-trigger-btn" data-sound="champion" onclick="triggerAudio(this, 'champion')">Nhạc Vô Địch</button>
-          <button class="music-trigger-btn" data-sound="warning" onclick="triggerAudio(this, 'warning')">Cảnh Báo</button>
-          <button class="music-trigger-btn" data-sound="ending" onclick="triggerAudio(this, 'ending')">Nhạc Kết Thúc</button>
-        </div>
+        <div class="music-grid" id="musicGrid"></div>
       </div>
     </div>
   </div>
@@ -307,7 +330,8 @@
           <div>
             <div class="config-group-title">Cấu hình Lượt Riêng</div>
             <div class="config-grid" style="gap: 10px;">
-              <div class="config-item"><label>Số Câu</label><input type="number" id="lr_socau" value="6"></div>
+              <div class="config-item"><label>Số Lượt Riêng</label><input type="number" id="lr_soluot" value="4" min="0" max="6"></div>
+              <div class="config-item"><label>Số Câu/Lượt</label><input type="number" id="lr_socau" value="6"></div>
               <div class="config-item"><label>Thời gian (s)</label><input type="number" id="lr_thoigian" value="-1" title="-1 là vô hạn"></div>
               <div class="config-item"><label>Điểm Đúng</label><input type="number" id="lr_diemdung" value="10"></div>
               <div class="config-item"><label>Điểm Sai</label><input type="number" id="lr_diemsai" value="0"></div>
@@ -369,7 +393,7 @@
   <!-- SCRIPT CỐ ĐỊNH DÙNG CHUNG CHO MỌI VÒNG (ĐỒNG BỘ TAB SANG LIVESTREAM, SOUNDBOARD & KHÓA PIXEL) -->
   <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
@@ -432,64 +456,103 @@
     // =========================================================================
     // CẤU HÌNH DANH SÁCH FILE NHẠC SOUNDBOARD (THƯ MỤC sounds/)
     // =========================================================================
-    const SOUND_FILES = {
-      // Hàng 1 (8 nút trên)
-      'intro':     '../sounds/HostEntrance.mp3',
-      'thinking':  '../sounds/ContestantEntrance.mp3',
-      'tick':      '../sounds/R1_intro.mp3',
-      'correct':   '../sounds/R2_intro.mp3',
-      'wrong':     '../sounds/R3_intro.mp3',
-      'buzz':      '../sounds/R4_intro.mp3',
-      'applause':  '../sounds/Vo_Tay.mp3',
-      'drum':      '../sounds/Trong_Tran.mp3',
+    const soundIdForFileName = fileName => fileName.replace(/[^A-Za-z0-9_-]/g, '_');
+    const soundFileNames = [
+      'Main_HostEntrance.mp3', 'Main_ContestantEntrance.mp3',
+      'Main_Introduction1.mp3', 'Main_Introduction2.mp3', 'Main_Introduction3.mp3',
+      'Main_Introduction4.mp3', 'Main_Introduction5.mp3', 'Main_PointSummary.mp3',
+      'Main_15s.mp3', 'Main_1st.mp3', 'Main_2nd.mp3', 'Main_3rd.mp3', 'Main_4th.mp3', 
+      'Main_Award.mp3', 'Main_Blanks.mp3',
+      'Main_DLDN2008.mp3', 'Main_DLDN2010.mp3',
+      'Main_DLDN2010_Instrument.mp3', 
+      'R1_Intro.mp3', 'R1_Start.mp3', 'R1_Bed1.mp3', 'R1_Bed2.mp3', 'R1_End.mp3', 
+      'R2_Intro.mp3', 'R2_Right.mp3', 'R2_RightObs.mp3', 'R2_Wrong.mp3', 
+      'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
+      'R4_Intro.mp3', 'R4_Begin.mp3', 'R4_15s.mp3', 'R4_20s.mp3', 'R4_20sPrac.mp3', 'R4_30s.mp3',
+      'R4_30sPrac.mp3', 'R4_40sPrac.mp3', 'R4_60sPrac.mp3',
+      'R4_End.mp3'
+    ];
+    const SOUND_FILES = soundFileNames.reduce((files, fileName) => {
+      files[soundIdForFileName(fileName)] = `../sounds/${fileName}`;
+      return files;
+    }, {});
 
-      // Hàng 2 (8 nút dưới)
-      'intro_r1':  '../sounds/Intro_Vong1.mp3',
-      'intro_r2':  '../sounds/Intro_Vong2.mp3',
-      'intro_r3':  '../sounds/Intro_Vong3.mp3',
-      'intro_r4':  '../sounds/Intro_Vong4.mp3',
-      'congrats':  '../sounds/Chuc_Mung.mp3',
-      'champion':  '../sounds/Vo_Dich.mp3',
-      'warning':   '../sounds/Canh_Bao.mp3',
-      'ending':    '../sounds/Ket_Thuc.mp3'
+    const SOUND_LABELS = {
+      "Main_15s.mp3": "15s",
+      "Main_1st.mp3": "1st",
+      "Main_2nd.mp3": "2nd",
+      "Main_3rd.mp3": "3rd",
+      "Main_4th.mp3": "4th",
+      "Main_Award.mp3": "Award",
+      "Main_Blanks.mp3": "Blanks",
+      "Main_ContestantEntrance.mp3": "Contestant",
+      "Main_DLDN2008.mp3": "DLDN2008",
+      "Main_DLDN2010.mp3": "DLDN2010",
+      "Main_DLDN2010_Instrument.mp3": "DLDN2010_Inst",
+      "Main_HostEntrance.mp3": "Host Entrance",
+      "Main_Introduction1.mp3": "Intro1",
+      "Main_Introduction2.mp3": "Intro2",
+      "Main_Introduction3.mp3": "Intro3",
+      "Main_Introduction4.mp3": "Intro4",
+      "Main_Introduction5.mp3": "Intro5",
+      "Main_PointSummary.mp3": "PointSum",
+      "R1_Bed1.mp3": "Bed1",
+      "R1_Bed2.mp3": "Bed2",
+      "R1_End.mp3": "End Turn R1",
+      "R1_Intro.mp3": "Intro Round 1",
+      "R1_Start.mp3": "Start Turn R1",
+      "R2_Intro.mp3": "Intro Round 2",
+      "R2_Right.mp3": "Right",
+      "R2_RightObs.mp3": "RightObs",
+      "R2_Wrong.mp3": "Wrong",
+      "R3_Intro.mp3": "Intro Round 3",
+      "R3_Right.mp3": "Right",
+      "R3_Wrong.mp3": "Wrong",
+      "R4_15s.mp3": "15s",
+      "R4_20s.mp3": "20s",
+      "R4_20sPrac.mp3": "20sPrac",
+      "R4_30s.mp3": "30s",
+      "R4_30sPrac.mp3": "30sPrac",
+      "R4_40sPrac.mp3": "40sPrac",
+      "R4_60sPrac.mp3": "60sPrac",
+      "R4_Begin.mp3": "Begin Turn R4",
+      "R4_End.mp3": "End Turn R4",
+      "R4_Intro.mp3": "Intro Round 4"
     };
+
+    const musicGrid = document.getElementById('musicGrid');
+    soundFileNames.forEach((fileName, index) => {
+      const soundId = soundIdForFileName(fileName);
+      const button = document.createElement('button');
+      button.className = 'music-trigger-btn';
+      button.dataset.sound = soundId;
+      button.title = fileName;
+      // Lấy tên tự chọn, nếu không có thì gán số thứ tự (index + 1)
+      button.textContent = SOUND_LABELS[fileName] || (index + 1).toString();
+      button.addEventListener('click', () => triggerAudio(button, soundId));
+      musicGrid.appendChild(button);
+    });
 
     // Lưu trạng thái bài nào đang phát
     const playingState = {};
 
     window.triggerAudio = function(btn, soundId) {
-      const isCurrentlyPlaying = !!playingState[soundId];
-
-      if (isCurrentlyPlaying) {
-        // Nếu nhạc đó ĐANG CHẠY -> Bấm tiếp vào sẽ DỪNG NHẠC và trả nút về bình thường
-        playingState[soundId] = false;
-        if (btn) {
-          btn.classList.remove('playing');
-          btn.classList.remove('active');
-        }
-
-        set(ref(db, `games/soundboard_status/${soundId}`), false);
-        set(ref(db, 'games/soundboard'), {
-          soundId: soundId,
-          file: SOUND_FILES[soundId] || '',
-          action: 'stop',
-          timestamp: Date.now()
-        });
-      } else {
-        // Nếu nhạc ĐANG TẮT -> Bấm vào sẽ CHẠY NHẠC và đổi màu nút sang đỏ
-        playingState[soundId] = true;
-        if (btn) {
-          btn.classList.add('playing');
-        }
-
-        set(ref(db, `games/soundboard_status/${soundId}`), true);
-        set(ref(db, 'games/soundboard'), {
-          soundId: soundId,
-          file: SOUND_FILES[soundId] || '',
-          action: 'play',
-          timestamp: Date.now()
-        });
+      if (btn) {
+        btn.classList.add('active');
+        setTimeout(() => btn.classList.remove('active'), 100);
       }
+
+      // Đổi trạng thái trên Firebase để mọi controller cùng gửi chung lệnh play/stop.
+      const statusRef = ref(db, `games/soundboard_status/${soundId}`);
+      runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
+        const isPlaying = result.snapshot.val() === true;
+        return set(ref(db, 'games/soundboard'), {
+          soundId: soundId,
+          file: SOUND_FILES[soundId] || '',
+          action: isPlaying ? 'play' : 'stop',
+          timestamp: Date.now()
+        });
+      });
     };
 
     // Lắng nghe trạng thái từ Livestream gửi về (khi nhạc tự phát hết bài thì nút tự về màu bình thường)

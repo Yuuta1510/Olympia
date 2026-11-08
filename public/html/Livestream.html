@@ -19,15 +19,39 @@
                 background-color: transparent;
                 pointer-events: none;
             }
+
+            #enableSoundBtn {
+                position: fixed;
+                z-index: 10001;
+                left: 50%;
+                bottom: 24px;
+                transform: translateX(-50%);
+                padding: 14px 22px;
+                border: 2px solid #fff;
+                border-radius: 8px;
+                background: #b91c1c;
+                color: #fff;
+                font: 700 18px Arial, sans-serif;
+                cursor: pointer;
+                box-shadow: 0 4px 16px #0009;
+            }
+
+            #enableSoundBtn[hidden] {
+                display: none !important;
+            }
         </style>
     </head>
     <body>
         <!-- Video Intro Phần Thi cho 4 vòng (intro_r1.mp4 -> intro_r4.mp4) -->
         <video id="roundIntroVideo" playsinline preload="auto"></video>
+        <button id="enableSoundBtn" type="button" hidden>Bật âm thanh Livestream</button>
 
         <!-- Video Đồ họa nền Vòng 1 (KhoiDong.webm) -->
         <video id="graphic_r1" class="video-overlay" style="display: none;">
             <source src="../graphic/KhoiDong.webm" type="video/webm">
+        </video>
+        <video id="graphic_time" class="video-overlay" style="display: none; z-index: 1;">
+            <source src="../graphic/60s.webm" type="video/webm">
         </video>
         <div id="playerContainer"></div>
         <div id="questionText" class="question"></div>
@@ -206,32 +230,39 @@
             // =====================================================================
             // 3. BỘ PHÁT NHẠC SOUNDBOARD TRỰC TIẾP TRÊN MÀN LIVESTREAM
             // =====================================================================
-            const SOUND_FILES = {
-                'intro':     '../sounds/HostEntrance.mp3',
-                'thinking':  '../sounds/ContestantEntrance.mp3',
-                'tick':      '../sounds/R1_intro.mp3',
-                'correct':   '../sounds/R2_intro.mp3',
-                'wrong':     '../sounds/R3_intro.mp3',
-                'buzz':      '../sounds/R4_intro.mp3',
-                'applause':  '../sounds/Vo_Tay.mp3',
-                'drum':      '../sounds/Trong_Tran.mp3',
-
-                'intro_r1':  '../sounds/Intro_Vong1.mp3',
-                'intro_r2':  '../sounds/Intro_Vong2.mp3',
-                'intro_r3':  '../sounds/Intro_Vong3.mp3',
-                'intro_r4':  '../sounds/Intro_Vong4.mp3',
-                'congrats':  '../sounds/Chuc_Mung.mp3',
-                'champion':  '../sounds/Vo_Dich.mp3',
-                'warning':   '../sounds/Canh_Bao.mp3',
-                'ending':    '../sounds/Ket_Thuc.mp3'
-            };
+            const soundIdForFileName = fileName => fileName.replace(/[^A-Za-z0-9_-]/g, '_');
+            const soundFileNames = [
+                'Main_15s.mp3', 'Main_1st.mp3', 'Main_2nd.mp3', 'Main_3rd.mp3',
+                'Main_4th.mp3', 'Main_Award.mp3', 'Main_Blanks.mp3',
+                'Main_ContestantEntrance.mp3', 'Main_DLDN2008.mp3', 'Main_DLDN2010.mp3',
+                'Main_DLDN2010_Instrument.mp3', 'Main_HostEntrance.mp3',
+                'Main_Introduction1.mp3', 'Main_Introduction2.mp3', 'Main_Introduction3.mp3',
+                'Main_Introduction4.mp3', 'Main_Introduction5.mp3', 'Main_PointSummary.mp3',
+                'R1_Bed1.mp3', 'R1_Bed2.mp3', 'R1_End.mp3', 'R1_Intro.mp3', 'R1_60s.mp3',
+                'R1_Start.mp3', 'R2_Intro.mp3', 'R2_Right.mp3', 'R2_RightObs.mp3',
+                'R2_Wrong.mp3', 'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
+                'R4_15s.mp3', 'R4_20s.mp3', 'R4_20sPrac.mp3', 'R4_30s.mp3',
+                'R4_30sPrac.mp3', 'R4_40sPrac.mp3', 'R4_60sPrac.mp3', 'R4_Begin.mp3',
+                'R4_End.mp3', 'R4_Intro.mp3'
+            ];
+            const SOUND_FILES = soundFileNames.reduce((files, fileName) => {
+                files[soundIdForFileName(fileName)] = `../sounds/${fileName}`;
+                return files;
+            }, {});
 
             const audioCache = {};
+            const activeSounds = {};
+            const soundCommandVersions = {};
+            const activePlaybackVersions = {};
+            const enableSoundBtn = document.getElementById('enableSoundBtn');
+            let pendingAudioPlayback = null;
 
             function createAudioInstance(soundId, fileUrl) {
                 const audio = new Audio(fileUrl);
                 audio.preload = 'auto';
                 audio.onended = () => {
+                    if (!activeSounds[soundId] || activePlaybackVersions[soundId] !== soundCommandVersions[soundId]) return;
+                    activeSounds[soundId] = false;
                     set(ref(db, `games/soundboard_status/${soundId}`), false);
                 };
                 return audio;
@@ -241,7 +272,28 @@
                 audioCache[id] = createAudioInstance(id, SOUND_FILES[id]);
             });
 
-            set(ref(db, 'games/soundboard_status'), null);
+            enableSoundBtn.addEventListener('click', () => {
+                const pending = pendingAudioPlayback;
+                if (!pending || soundCommandVersions[pending.soundId] !== pending.commandVersion) {
+                    enableSoundBtn.hidden = true;
+                    pendingAudioPlayback = null;
+                    return;
+                }
+
+                // Gọi play trực tiếp trong thao tác click để trình duyệt cấp quyền phát tiếng.
+                pending.audio.currentTime = 0;
+                pending.audio.play().then(() => {
+                    if (soundCommandVersions[pending.soundId] !== pending.commandVersion) return;
+                    activeSounds[pending.soundId] = true;
+                    activePlaybackVersions[pending.soundId] = pending.commandVersion;
+                    pendingAudioPlayback = null;
+                    enableSoundBtn.hidden = true;
+                    set(ref(db, `games/soundboard_status/${pending.soundId}`), true);
+                }).catch(error => {
+                    console.warn(`Không thể bật âm thanh [${pending.fileUrl}] trên Livestream:`, error);
+                    enableSoundBtn.textContent = 'Không bật được âm thanh — nhấn để thử lại';
+                });
+            });
 
             let isInitialSoundLoad = true;
 
@@ -257,25 +309,47 @@
 
                 const soundId = data.soundId;
                 const fileUrl = data.file || SOUND_FILES[soundId];
+                const resolvedFileUrl = fileUrl ? new URL(fileUrl, document.baseURI).href : '';
 
-                if (fileUrl && (!audioCache[soundId] || !audioCache[soundId].src.endsWith(encodeURI(fileUrl)))) {
+                if (resolvedFileUrl && (!audioCache[soundId] || audioCache[soundId].src !== resolvedFileUrl)) {
                     audioCache[soundId] = createAudioInstance(soundId, fileUrl);
                 }
 
                 const audio = audioCache[soundId];
                 if (!audio) return;
 
-                if (data.action === 'stop') {
+                const shouldStop = data.action === 'stop';
+                const commandVersion = (soundCommandVersions[soundId] || 0) + 1;
+                soundCommandVersions[soundId] = commandVersion;
+                if (pendingAudioPlayback && pendingAudioPlayback.soundId === soundId) {
+                    pendingAudioPlayback = null;
+                    enableSoundBtn.hidden = true;
+                }
+
+                if (shouldStop) {
+                    activeSounds[soundId] = false;
                     audio.pause();
                     audio.currentTime = 0;
                     set(ref(db, `games/soundboard_status/${soundId}`), false);
                 } else {
+                    activeSounds[soundId] = true;
+                    activePlaybackVersions[soundId] = commandVersion;
                     audio.currentTime = 0;
                     audio.play().then(() => {
-                        set(ref(db, `games/soundboard_status/${soundId}`), true);
+                        if (activeSounds[soundId] && soundCommandVersions[soundId] === commandVersion) {
+                            set(ref(db, `games/soundboard_status/${soundId}`), true);
+                        }
                     }).catch(err => {
                         console.warn(`Không thể phát nhạc [${fileUrl}] trên Livestream:`, err);
-                        set(ref(db, `games/soundboard_status/${soundId}`), false);
+                        if (soundCommandVersions[soundId] === commandVersion) {
+                            activeSounds[soundId] = false;
+                            set(ref(db, `games/soundboard_status/${soundId}`), false);
+                            if (err.name === 'NotAllowedError') {
+                                pendingAudioPlayback = { soundId, audio, commandVersion, fileUrl };
+                                enableSoundBtn.textContent = `Bật âm thanh để phát ${soundId}`;
+                                enableSoundBtn.hidden = false;
+                            }
+                        }
                     });
                 }
             });

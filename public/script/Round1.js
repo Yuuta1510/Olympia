@@ -15,7 +15,6 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getDatabase(app);
 
-// --- GIỮ NGUYÊN CÁC HÀM compressText, drawAllPlayers, activePlayer, drawQuestion CỦA BẠN Ở ĐÂY ---
 function compressText(elementId, maxWidth, align) {
     const el = document.getElementById(elementId);
     if (!el) return;
@@ -105,6 +104,16 @@ function drawQuestion(textStr) {
 
 let timer5sInterval = null;
 let isInitialLoad = true;
+let turnTimeAudio = document.getElementById('audio_r1_clock');
+if (!turnTimeAudio) {
+    turnTimeAudio = document.createElement('audio');
+    turnTimeAudio.id = 'audio_r1_clock';
+    turnTimeAudio.preload = 'auto';
+    turnTimeAudio.style.display = 'none';
+    document.body.appendChild(turnTimeAudio);
+}
+
+let currentVideoDuration = -1;
 
 if (typeof window.currentRoundUnsubscribe === 'function') {
     window.currentRoundUnsubscribe();
@@ -123,19 +132,115 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
     if (data.action === 'show_graphic') {
         const videoEl = document.getElementById('graphic_r1');
         if (videoEl) {
+            // Logic chọn video dựa trên việc có giới hạn thời gian hay không
+            videoEl.src = data.isTimeLimited ? '../graphic/KhoiDongTime.webm' : '../graphic/KhoiDong.webm';
             videoEl.style.display = 'block';
             videoEl.currentTime = 0; 
-            videoEl.play().catch(err => console.error("Lỗi phát video:", err));
+            videoEl.play().catch(err => console.error("Lỗi phát video nền:", err));
+        }
+    } else if (data.action === 'hide_graphic') {
+        const videoEl = document.getElementById('graphic_r1');
+        const timeEl = document.getElementById('graphic_time');
+        if (videoEl) {
+            videoEl.style.display = 'none';
+            videoEl.pause();
+        }
+        if (timeEl) {
+            timeEl.style.display = 'none';
+            timeEl.pause();
+        }
+    } else if (data.action === 'play_turn_time') {
+        const timeEl = document.getElementById('graphic_time');
+        const reqDuration = data.duration || 60; // Số giây cấu hình (ví dụ 90)
+
+        // 1. Kiểm tra và tải nguồn Video & Audio mới nếu cần (Bóc tách độc lập)
+        if (currentVideoDuration !== reqDuration) {
+            currentVideoDuration = reqDuration;
+            
+            // Xử lý Video độc lập
+            if (timeEl) {
+                timeEl.src = `../graphic/${reqDuration}s.webm`;
+                timeEl.playbackRate = 1.0; // Reset speed mặc định
+                timeEl.onerror = () => {
+                    console.warn(`Không tìm thấy video ${reqDuration}s.webm, Fallback về 60s.webm`);
+                    timeEl.onerror = null; 
+                    timeEl.src = `../graphic/60s.webm`;
+                    timeEl.playbackRate = 60 / reqDuration;
+                    if (!timeEl.paused || data.action === 'play_turn_time') timeEl.play().catch(e => console.error(e));
+                };
+            }
+            
+            // Xử lý Audio độc lập
+            turnTimeAudio.src = `../sounds/R1_${reqDuration}s.mp3`;
+            turnTimeAudio.playbackRate = 1.0; // Reset speed mặc định
+            turnTimeAudio.onerror = () => {
+                console.warn(`Không tìm thấy audio R1_${reqDuration}s.mp3, Fallback về R1_60s.mp3`);
+                turnTimeAudio.onerror = null; 
+                turnTimeAudio.src = `../sounds/R1_60s.mp3`;
+                turnTimeAudio.playbackRate = 60 / reqDuration;
+                if (!turnTimeAudio.paused || data.action === 'play_turn_time') turnTimeAudio.play().catch(e => console.error(e));
+            };
+        } else {
+            // Nếu đã nạp file rồi, đảm bảo playbackRate được áp dụng đúng
+            if (timeEl) timeEl.playbackRate = timeEl.src.includes('60s.webm') && reqDuration !== 60 ? 60 / reqDuration : 1.0;
+            turnTimeAudio.playbackRate = turnTimeAudio.src.includes('60s.mp3') && reqDuration !== 60 ? 60 / reqDuration : 1.0;
+        }
+        
+        // Nếu có cờ đếm lại từ đầu, ép thời gian của clock và nhạc về 0
+        if (data.restart) {
+            if (timeEl) timeEl.currentTime = 0;
+            turnTimeAudio.currentTime = 0;
+        }
+
+        if (timeEl) {
+            timeEl.style.display = 'block';
+            if (timeEl.paused) {
+                timeEl.play().catch(err => console.error("Lỗi phát time video:", err));
+            }
+        }
+        
+        if (turnTimeAudio.paused) {
+            turnTimeAudio.play().catch(err => console.error("Lỗi phát nhạc turn time:", err));
+        }
+        
+    } else if (data.action === 'pause_turn_time') {
+        const timeEl = document.getElementById('graphic_time');
+        if (timeEl && !timeEl.paused) {
+            timeEl.pause();
+        }
+        if (!turnTimeAudio.paused) {
+            turnTimeAudio.pause();
+        }
+        
+    } else if (data.action === 'time_out') {
+        const timeEl = document.getElementById('graphic_time');
+        if (timeEl) {
+            timeEl.pause();
+        }
+        
+    } else if (data.action === 'stop_turn_time') {
+        const timeEl = document.getElementById('graphic_time');
+        if (timeEl) {
+            timeEl.pause();
         }
     } else if (data.action === 'show_players') {
         await drawAllPlayers(data.players);
         const bg = document.getElementById('active-bg');
         if (bg) bg.style.opacity = 0; 
+    } else if (data.action === 'hide_players') {
+        const container = document.getElementById('playerContainer');
+        if (container) container.style.display = 'none';
     } else if (data.action === 'active_player') {
         await drawAllPlayers(data.players);
         activePlayer(data.index); 
     } else if (data.action === 'show_question') {
         drawQuestion(data.text);
+    } else if (data.action === 'hide_question') {
+        const textQues = document.getElementById('questionText');
+        if (textQues) textQues.style.display = 'none';
+    } else if (data.action === 'reset_buzzers') {
+        const activeBackground = document.getElementById('active-bg');
+        if (activeBackground) activeBackground.style.opacity = 0;
     } else if (data.action === 'start_5s') {
         const timerBox = document.getElementById('timer5sBox');
         if (!timerBox) return;
@@ -161,11 +266,22 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
         if (timer5sInterval) clearInterval(timer5sInterval);
     } else if (data.action === 'reset_graphic') {
         const videoEl = document.getElementById('graphic_r1');
+        const timeEl = document.getElementById('graphic_time');
         if (videoEl) {
             videoEl.style.display = 'none';
             videoEl.pause();
             videoEl.currentTime = 0;
         }
+        if (timeEl) {
+            timeEl.style.display = 'none';
+            timeEl.pause();
+            timeEl.currentTime = 0;
+        }
+        
+        // Đảm bảo dọn dẹp âm thanh khi ấn Reset
+        turnTimeAudio.pause();
+        turnTimeAudio.currentTime = 0;
+        
         document.getElementById('playerContainer').style.display = 'none';
         document.getElementById('questionText').style.display = 'none';
         

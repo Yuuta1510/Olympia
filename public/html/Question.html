@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản Lý Kho Câu Hỏi - Game Olympia</title>
+  <style>
+    :root {
+      --navy-header: #000080;
+      --blue-badge: #000099;
+      --blue-hover: #000055;
+      --yellow-border: #FFFF00;
+      --white: #FFFFFF;
+      --black: #000000;
+      --font-main: "UTM Avo", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: var(--font-main);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 100%;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      background: var(--black);
+      border: 1.5px solid var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .header-bar {
+      background-color: var(--navy-header);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--white);
+    }
+
+    .header-bar h1 {
+      font-size: 18px;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 15px;
+      padding: 15px;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .form-column, .list-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      background: #1e293b;
+      color: var(--white);
+      border: 1px solid #334155;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: var(--font-main);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      height: 90px;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: #38bdf8;
+    }
+
+    .btn-save {
+      background-color: #0ea5e9;
+      color: var(--white);
+      border: none;
+      padding: 12px;
+      border-radius: 4px;
+      font-family: var(--font-main);
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background 0.2s;
+      margin-top: 5px;
+    }
+
+    .btn-save:hover {
+      background-color: #0284c7;
+    }
+
+    .table-wrapper {
+      flex: 1;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    /* Tùy chỉnh thanh cuộn cho danh sách câu hỏi */
+    .table-wrapper::-webkit-scrollbar {
+      width: 8px;
+    }
+    .table-wrapper::-webkit-scrollbar-track {
+      background: #0f172a;
+      border-radius: 4px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #334155;
+    }
+
+    th {
+      background-color: #0f172a;
+      color: #38bdf8;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    tr:hover {
+      background-color: rgba(56, 189, 248, 0.05);
+    }
+
+    .action-links button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-family: var(--font-main);
+    }
+
+    .btn-edit { color: #38bdf8; }
+    .btn-edit:hover { background: rgba(56, 189, 248, 0.1); }
+    
+    .btn-delete { color: #ef4444; }
+    .btn-delete:hover { background: rgba(239, 68, 68, 0.1); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="panel">
+      
+      <!-- HEADER -->
+      <div class="header-bar">
+        <h1>Quản lý & Nhập đề câu hỏi</h1>
+      </div>
+
+      <!-- NỘI DUNG CHÍNH -->
+      <div class="content-grid">
+        
+        <!-- Cột trái: Form Nhập / Sửa câu hỏi theo đúng cấu trúc phân chia -->
+        <div class="form-column">
+          <div class="form-group">
+            <label>Chọn Vòng Thi</label>
+            <select id="roundSelect" onchange="updateSubTurnOptions(); loadQuestionsForSelectedRound();">
+              <option value="round_1">Vòng 1: Khởi động</option>
+              <option value="round_2">Vòng 2: Vượt chướng ngại vật</option>
+              <option value="round_3">Vòng 3: Tăng tốc</option>
+              <option value="round_4">Vòng 4: Về đích</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Phân loại lượt (Dành riêng cho Khởi động)</label>
+            <select id="subTurnSelect" onchange="filterQuestionsBySubTurn()">
+              <option value="all">Toàn bộ câu hỏi vòng này</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>ID Câu hỏi (Mã số câu)</label>
+            <input type="number" id="quesId" placeholder="Ví dụ: 1, 2, 1001..." />
+          </div>
+
+          <div class="form-group">
+            <label>Nội dung câu hỏi</label>
+            <textarea id="quesContent" placeholder="Nhập nội dung câu hỏi..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Đáp án</label>
+            <input type="text" id="quesAnswer" placeholder="Nhập đáp án chính xác..." />
+          </div>
+
+          <button class="btn-save" onclick="saveQuestionToFirebase()">Lưu câu hỏi vào Database</button>
+        </div>
+
+        <!-- Cột phải: Danh sách câu hỏi đã lưu -->
+        <div class="list-column">
+          <div style="font-weight: bold; font-size: 14px; color: #38bdf8;" id="tableTitle">Danh sách câu hỏi hiện tại trong Database</div>
+          <div class="table-wrapper">
+            <table id="questionTable">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">ID</th>
+                  <th>Nội dung câu hỏi</th>
+                  <th style="width: 150px;">Đáp án</th>
+                  <th style="width: 100px; text-align: center;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="questionTableBody">
+                <!-- Dữ liệu được render tự động qua Firebase -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FIREBASE SCRIPT -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
+      authDomain: "olympia-d2f44.firebaseapp.com",
+      databaseURL: "https://olympia-d2f44-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "olympia-d2f44",
+      storageBucket: "olympia-d2f44.firebasestorage.app",
+      messagingSenderId: "18063059793",
+      appId: "1:18063059793:web:5dad7ce59006e779988170",
+      measurementId: "G-XVER3NDTXY"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let currentQuestionsData = {};
+    let round1ConfigData = { so_luot_rieng: 4, luot_rieng: { so_cau: 6 }, luot_chung: [{ so_cau: 12 }] };
+
+    // Lắng nghe cấu hình Khởi động từ Firebase để tính toán phân chia lượt riêng / chung chính xác
+    onValue(ref(db, 'games/round_1'), (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            round1ConfigData.so_luot_rieng = data.so_luot_rieng || 4;
+            if (data.luot_rieng) round1ConfigData.luot_rieng = data.luot_rieng;
+            if (data.luot_chung) round1ConfigData.luot_chung = Array.isArray(data.luot_chung) ? data.luot_chung : [data.luot_chung];
+            window.updateSubTurnOptions();
+        }
+    });
+
+    window.updateSubTurnOptions = function() {
+        const roundKey = document.getElementById('roundSelect').value;
+        const subSelect = document.getElementById('subTurnSelect');
+        
+        if (roundKey !== 'round_1') {
+            subSelect.innerHTML = `<option value="all">Toàn bộ câu hỏi vòng này</option>`;
+            subSelect.disabled = true;
+            return;
+        }
+
+        subSelect.disabled = false;
+        let html = `<option value="all">Toàn bộ câu hỏi Khởi Động</option>`;
+        
+        // Thêm các lượt riêng
+        let x = round1ConfigData.so_luot_rieng || 4;
+        for (let i = 1; i <= x; i++) {
+            html += `<option value="lr_${i}">Lượt riêng ${i}</option>`;
+        }
+        
+        // Thêm các lượt chung
+        let lcArr = round1ConfigData.luot_chung || [];
+        for (let j = 0; j < lcArr.length; j++) {
+            html += `<option value="lc_${j}">Lượt chung ${j + 1}</option>`;
+        }
+        subSelect.innerHTML = html;
+    };
+
+    // Lắng nghe dữ liệu câu hỏi theo vòng đang chọn
+    window.loadQuestionsForSelectedRound = function() {
+      const roundKey = document.getElementById('roundSelect').value;
+      const dbRef = ref(db, `questions/${roundKey}`);
+
+      onValue(dbRef, (snapshot) => {
+        if (snapshot.exists()) {
+          currentQuestionsData = snapshot.val();
+        } else {
+          currentQuestionsData = {};
+        }
+        window.filterQuestionsBySubTurn();
+      }, { onlyOnce: true });
+    };
+
+    window.filterQuestionsBySubTurn = function() {
+        const roundKey = document.getElementById('roundSelect').value;
+        const subVal = document.getElementById('subTurnSelect').value;
+        const tbody = document.getElementById('questionTableBody');
+        tbody.innerHTML = '';
+
+        let filteredEntries = [];
+        
+        if (roundKey === 'round_1' && subVal !== 'all') {
+            let A = parseInt(round1ConfigData.luot_rieng.so_cau) || 6;
+            let X = parseInt(round1ConfigData.so_luot_rieng) || 4;
+            let startIdx = 1;
+            let endIdx = 9999;
+
+            if (subVal.startsWith('lr_')) {
+                let pIdx = parseInt(subVal.split('_')[1]);
+                startIdx = (pIdx - 1) * A + 1;
+                endIdx = pIdx * A;
+            } else if (subVal.startsWith('lc_')) {
+                let lcIdx = parseInt(subVal.split('_')[1]);
+                startIdx = X * A + 1;
+                for(let i = 0; i < lcIdx; i++) {
+                    startIdx += parseInt(round1ConfigData.luot_chung[i]?.so_cau || 12);
+                }
+                let currentB = parseInt(round1ConfigData.luot_chung[lcIdx]?.so_cau || 12);
+                endIdx = startIdx + currentB - 1;
+            }
+
+            for (const [id, qObj] of Object.entries(currentQuestionsData)) {
+                let numId = parseInt(id);
+                if (!isNaN(numId) && numId >= startIdx && numId <= endIdx) {
+                    filteredEntries.push([id, qObj]);
+                }
+            }
+        } else {
+            for (const [id, qObj] of Object.entries(currentQuestionsData)) {
+                if (!qObj || typeof qObj !== 'object') continue;
+                filteredEntries.push([id, qObj]);
+            }
+        }
+
+        if (filteredEntries.length > 0) {
+          // Sắp xếp tăng dần theo ID câu hỏi
+          filteredEntries.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+
+          for (const [id, qObj] of filteredEntries) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><b>${id}</b></td>
+              <td>${qObj.cau_hoi || ''}</td>
+              <td>${qObj.dap_an || ''}</td>
+              <td style="text-align: center;" class="action-links">
+                <button class="btn-edit" onclick="editQuestion('${id}')">Sửa</button>
+                <button class="btn-delete" onclick="deleteQuestion('${id}')">Xóa</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          }
+        } else {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8;">Không có câu hỏi nào trong danh mục này.</td></tr>`;
+        }
+    };
+
+    // Lưu hoặc cập nhật câu hỏi lên Firebase
+    window.saveQuestionToFirebase = function() {
+      const roundKey = document.getElementById('roundSelect').value;
+      const qId = document.getElementById('quesId').value.trim();
+      const content = document.getElementById('quesContent').value.trim();
+      const answer = document.getElementById('quesAnswer').value.trim();
+
+      if (!qId || !content || !answer) {
+        alert("Vui lòng điền đầy đủ ID, Nội dung câu hỏi và Đáp án!");
+        return;
+      }
+
+      const qRef = ref(db, `questions/${roundKey}/${qId}`);
+      set(qRef, {
+        cau_hoi: content,
+        dap_an: answer
+      }).then(() => {
+        alert(`Đã lưu thành công câu hỏi ID: ${qId}!`);
+        document.getElementById('quesId').value = '';
+        document.getElementById('quesContent').value = '';
+        document.getElementById('quesAnswer').value = '';
+        window.loadQuestionsForSelectedRound();
+      }).catch((error) => {
+        console.error("Lỗi khi lưu:", error);
+        alert("Có lỗi xảy ra khi lưu câu hỏi.");
+      });
+    };
+
+    // Đưa dữ liệu lên form để sửa
+    window.editQuestion = function(id) {
+      const qObj = currentQuestionsData[id];
+      if (qObj) {
+        document.getElementById('quesId').value = id;
+        document.getElementById('quesContent').value = qObj.cau_hoi || '';
+        document.getElementById('quesAnswer').value = qObj.dap_an || '';
+        document.getElementById('quesId').focus();
+      }
+    };
+
+    // Xóa câu hỏi khỏi Database
+    window.deleteQuestion = function(id) {
+      if (confirm(`Bạn có chắc chắn muốn xóa câu hỏi ID: ${id} không?`)) {
+        const roundKey = document.getElementById('roundSelect').value;
+        const qRef = ref(db, `questions/${roundKey}/${id}`);
+        remove(qRef).then(() => {
+          window.loadQuestionsForSelectedRound();
+        });
+      }
+    };
+
+    // Khởi chạy load dữ liệu lần đầu khi mở trang
+    window.addEventListener('load', () => {
+      window.loadQuestionsForSelectedRound();
+    });
+  </script>
+</body>
+</html>

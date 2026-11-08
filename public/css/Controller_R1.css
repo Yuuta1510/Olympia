@@ -1,152 +1,200 @@
-/* ==========================================================================
-   1. THANH TRẠNG THÁI VÒNG 1 (STATUS BAR CONTAINER)
-   ========================================================================== */
-.status-bar-container {
-  width: 100%;
-  background-color: var(--black);
-  padding: 8px 8px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border-bottom: 1px solid #333333;
-}
-
-.status-bar-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.status-info-badge {
-  height: 36px;
-  background-color: var(--blue-badge);
-  border: 1.5px solid var(--white);
-  border-radius: 2px;
-  color: var(--white);
-  font-family: var(--font-main);
-  font-size: 18px;
-  font-weight: 700;
-  padding: 6px 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.status-bar-right {
-  display: flex;
-  flex: 1;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 4px;
-}
-
-#roundBadge { width: 160px; flex: none; overflow: hidden; }
-#quesBadge  { width: 200px; flex: none; overflow: hidden; }
-#timeBadge  { width: 250px; flex: none; overflow: hidden; }
-
-.badge-inner-text {
-  display: inline-block;
-  white-space: nowrap;
-  transform-origin: center;
-  flex-shrink: 0;
-}
+/* Ẩn status bar nếu còn sót lại ở file nào khác */
+.status-bar-container { display: none !important; }
 
 /* ==========================================================================
-   2. NÚT THÍ SINH & NÚT ĐIỀU KHIỂN BÊN PHẢI VÒNG 1
-   ========================================================================== */
-.player-btn, .sidebar-action-btn {
-  background-color: var(--blue-badge);
-  border: 1.5px solid var(--white);
-  border-radius: 2px;
-  color: var(--white);
-  font-family: var(--font-main);
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: border-color 1s ease, box-shadow 1s ease, color 1s ease, background-color 0.2s ease; 
-}
-
-.player-btn.active, .sidebar-action-btn.active {
-  border: 2px solid var(--yellow-border);
-  color: var(--yellow-border);
-  box-shadow: 0 0 8px rgba(255, 255, 0, 0.8);
-  transition: none; 
-}
-
-.player-btn.is-turn {
-  background-color: #cc0000 !important;
-}
-
-.player-btn:hover, .sidebar-action-btn:hover {
-  background-color: var(--blue-hover);
-  transition: all 0.2s ease;
-}
-
-.player-btn {
-  flex: 1;
-  padding: 0 10px;
-  height: 36px;
-  font-size: 18px;
-  min-width: 0; 
-  overflow: hidden; 
-}
-
-.sidebar-action-btn {
-  width: 100%;
-  flex: 1;
-  font-size: 13.5px;
-  text-transform: uppercase;
-}
-
-/* ==========================================================================
-   3. KHU VỰC CÂU HỎI & ĐÁP ÁN VÒNG 1
+   CHIA CỘT MAIN CONTENT
    ========================================================================== */
 .main-content-grid {
   width: 100%;
   background-color: var(--black);
-  padding: 8px;
+  padding: 10px;
   display: grid;
-  grid-template-columns: 1fr 180px;
-  gap: 8px;
-  flex: 1; 
+  grid-template-columns: 1fr 220px; /* QA to bên trái, Bảng điểm 220px bên phải */
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
 }
 
 .qa-column {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   height: 100%;
 }
 
+/* ==========================================================================
+   BOX CÂU HỎI & ĐÁP ÁN
+   ========================================================================== */
 .question-box, .answer-box {
-  width: 100%;
   background-color: var(--black);
   border: 1.5px solid var(--white);
-  padding: 16px 20px;
-  color: var(--white);
-  font-family: var(--font-main);
-  font-weight: 700;
-  text-align: left;
-}
-
-.question-box { flex: 1; font-size: 26px; }
-.answer-box { height: 150px; font-size: 26px; }
-
-.sidebar-column {
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.question-box { flex: 7; } /* Cột câu hỏi cao hơn */
+.answer-box { flex: 3; }
+
+/* Header của Box Câu hỏi */
+.question-header {
+  background-color: var(--white);
+  color: var(--black);
+  height: 60px;
+  padding: 2px 0px 0px 15px;
+  font-weight: bold;
+  font-size: 30px;
+  display: flex;
+  justify-content: flex-start; /* Căn lề trái */
+  align-items: center;
+  gap: 20px;
+}
+.question-header .divider { color: #888; }
+
+.question-content, .answer-content {
+  padding: 15px 20px;
+  font-size: 40px;
+  font-weight: bold;
+  color: var(--white);
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Vùng chứa nút bấm */
+.question-actions, .answer-actions {
+  display: flex;
   justify-content: space-between;
-  gap: 6px;
+  align-items: flex-end;
+  padding: 10px 15px;
+}
+.answer-actions { justify-content: flex-end; gap: 10px; }
+
+.left-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Nút bấm chức năng */
+.action-btn {
+  background-color: var(--blue-badge);
+  border: 1.5px solid var(--white);
+  color: var(--white);
+  font-weight: 800;
+  
+  /* Cố định tuyệt đối kích cỡ của nút */
+  width: 130px; 
+  height: 40px; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0; 
+  white-space: nowrap; /* Không cho chữ rớt dòng */
+
+  cursor: pointer;
+  font-family: var(--font-main);
+  font-size: 13.5px;
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+.action-btn:hover { background-color: var(--blue-hover); }
+.action-btn.dimmed {
+  background-color: #000033; /* Xanh nền tối lại */
+  border-color: #555555;
+  color: #888888;
+}
+.action-btn.dimmed:hover { 
+  background-color: #000055; 
+}
+
+/* Nút Điểm */
+.score-btn { font-size: 15px;}
+.add-btn { background-color: #008000; }
+.add-btn:hover { background-color: #005500; }
+.sub-btn { background-color: #cc0000; }
+.sub-btn:hover { background-color: #990000; }
+
+/* Khung đếm ngược 5s */
+.timer-5s-box {
+  width: 55px;
+  height: 55px;
+  background-color: var(--black);
+  border: 3px solid var(--yellow-border);
+  color: var(--yellow-border);
+  font-size: 32px;
+  font-weight: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.timer-5s-box:hover { background-color: rgba(255, 255, 0, 0.15); }
+.timer-5s-box.running {
+  background-color: var(--yellow-border);
+  color: var(--black);
+}
+
+/* ==========================================================================
+   CỘT BẢNG ĐIỂM (BÊN PHẢI)
+   ========================================================================== */
+.players-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   height: 100%;
+}
+
+.player-vertical-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #4f5050;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #0b004b;
+}
+
+/* Di chuột lên thẻ: Đổi viền */
+.player-vertical-card:hover { 
+  border-color: #00dafc; 
+}
+
+/* Trạng thái đang hoạt động (Đến lượt): Nền đỏ */
+.player-vertical-card.is-turn {
+  background-color: #cc0000;
+  border-color: #cc0000; /* Bỏ viền vàng, chỉ giữ nền đỏ */
+}
+
+.player-v-name {
+  background: linear-gradient(90deg, #00dafc, #007cbe); 
+  border-bottom: 2px solid #13007d;
+  padding: 5px 0px 0px 0px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 900;
+  color: #0d0055;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  height: 50px;
+}
+.player-vertical-card.is-turn .player-v-name {
+  background: var(--yellow-border);
+}
+
+.player-v-score {
+  /* Nếu muốn cố định chiều cao bằng px thay vì flex: 1, bạn sửa thành: */
+  height: 100px; 
+  padding: 25px 0px 0px 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 70px;
+  font-weight: bold;
+  color: var(--white);
 }
 
 /* ==========================================================================
@@ -166,7 +214,7 @@
   background: #0f172a;
   border: 2px solid var(--navy-header);
   border-radius: 8px;
-  width: 800px; 
+  width: 800px;
   max-width: 95%;
   padding: 20px 25px;
   color: var(--white);

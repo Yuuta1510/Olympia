@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getDatabase, ref, onValue, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
@@ -56,7 +56,7 @@ window.addEventListener('load', () => {
 
 const channel = {
   postMessage: function(data) {
-    update(ref(db, 'games/commands'), {
+    return update(ref(db, 'games/commands'), {
       ...data,
       timestamp: Date.now()
     });
@@ -71,8 +71,11 @@ let activePlayerIndex = null;
 let isPlayersShown = false;
 let ctrlTimerInterval = null;
 let isTimer5sRunning = false;
-
-let lr_config = { so_cau: 6, thoi_gian: -1, diem_dung: 10, diem_sai: 0 };
+let currentTurnTime = -1;
+let currentRemainingTime = -1;
+let isTurnTimePlaying = false;
+let turnTimerInterval = null;
+let lr_config = { so_luot: 4, so_cau: 6, thoi_gian: -1, diem_dung: 10, diem_sai: 0 };
 let lc_configs = [{ so_cau: 12, thoi_gian: -1, diem_dung: 10, diem_sai: -5 }];
 
 // --- RENDER DYNAMIC LƯỢT CHUNG ---
@@ -97,13 +100,27 @@ window.renderLuotChungConfigs = function() {
 };
 
 window.updateTurnStatusOptions = function() {
-    let num = parseInt(document.getElementById('numLuotChung').value) || 0;
+    let numLC = parseInt(document.getElementById('numLuotChung').value) || 0;
+    // Lấy số lượt riêng (ưu tiên từ Input, nếu chưa có lấy từ cấu hình mặc định)
+    let lrInput = document.getElementById('lr_soluot');
+    let numLR = lrInput ? (parseInt(lrInput.value) || 4) : (lr_config.so_luot || 4);
+
     let select = document.getElementById('turnStatus');
+    if (!select) return;
+    
     let currentVal = select.value;
-    let opts = `<option value="rieng">Lượt Riêng</option>`;
-    for(let i=0; i<num; i++){
+    let opts = '';
+    
+    // Tự động sinh Option cho từng Lượt Riêng
+    for(let i = 1; i <= numLR; i++) {
+        opts += `<option value="rieng_${i}">Lượt Riêng ${i}</option>`;
+    }
+    
+    // Tự động sinh Option cho từng Lượt Chung
+    for(let i = 0; i < numLC; i++) {
         opts += `<option value="chung_${i}">Lượt Chung ${i+1}</option>`;
     }
+    
     select.innerHTML = opts;
     if(select.querySelector(`option[value="${currentVal}"]`)) {
         select.value = currentVal;
@@ -112,14 +129,19 @@ window.updateTurnStatusOptions = function() {
 
 // --- HÀM JUMP NHANH ---
 window.jumpToTurn = function(val) {
-    let X = parseInt(document.getElementById('numPlayers').value) || 4;
+    let LR_Count = parseInt(lr_config.so_luot) || 4; 
     let A = parseInt(lr_config.so_cau) || 0;
     
-    if (val === 'rieng') {
-        currentQuesIndex = 1;
+    if (val.startsWith('rieng_')) {
+        let pIdx = parseInt(val.split('_')[1]);
+        if (A > 0) {
+            currentQuesIndex = (pIdx - 1) * A + 1;
+        } else {
+            currentQuesIndex = 1;
+        }
     } else if (val.startsWith('chung_')) {
         let lcIdx = parseInt(val.split('_')[1]);
-        let startIndex = X * A + 1;
+        let startIndex = (LR_Count * A) + 1; 
         for(let i = 0; i < lcIdx; i++) {
             startIndex += parseInt(lc_configs[i]?.so_cau || 0);
         }
@@ -138,32 +160,30 @@ function updateQAPreview() {
         document.getElementById('preview-answer').innerText = "...";
     }
     
-    let X = parseInt(document.getElementById('numPlayers').value) || 4;
-    let A = parseInt(lr_config.so_cau) || 0; 
-    
+    let X = parseInt(document.getElementById('numPlayers').value) || 4;   
+    let LR_Count = parseInt(lr_config.so_luot); // Nếu undefined, mặc định hoặc lấy từ input
+    if (isNaN(LR_Count)) LR_Count = 4;
+    let A = parseInt(lr_config.so_cau) || 0;
+
     let turnName = "";
     let relativeQues = 0;
     let totalTurnQues = 0;
     let turnTime = -1;
 
-    if (A > 0 && currentQuesIndex <= (X * A)) {
+    if (A > 0 && LR_Count > 0 && currentQuesIndex <= (LR_Count * A)) {
         let playerIndex = Math.ceil(currentQuesIndex / A); 
         turnName = `LƯỢT RIÊNG ${playerIndex}`;
         relativeQues = currentQuesIndex - ((playerIndex - 1) * A); 
         totalTurnQues = A;
         turnTime = lr_config.thoi_gian;
         
-        activePlayerIndex = playerIndex;
-
-        document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('is-turn'));
-        let targetBtn = document.querySelectorAll('.player-btn')[playerIndex - 1];
-        if (targetBtn) targetBtn.classList.add('is-turn');
-
         let statusSelect = document.getElementById('turnStatus');
-        if(statusSelect && statusSelect.value !== "rieng") statusSelect.value = "rieng";
+        if(statusSelect && statusSelect.value !== `rieng_${playerIndex}`) {
+            statusSelect.value = `rieng_${playerIndex}`;
+        }
 
     } else if (lc_configs && lc_configs.length > 0) {
-        let remainingIndex = currentQuesIndex - (A > 0 ? X * A : 0);
+        let remainingIndex = currentQuesIndex - ((A > 0 && LR_Count > 0) ? (LR_Count * A) : 0);
         let foundLC = false;
         
         for(let i = 0; i < lc_configs.length; i++) {
@@ -184,16 +204,12 @@ function updateQAPreview() {
         }
         
         if (!foundLC) { turnName = "KẾT THÚC"; relativeQues = 0; totalTurnQues = 0; }
-        activePlayerIndex = null;
-        document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('is-turn'));
     }
     else {
         turnName = "KẾT THÚC"; relativeQues = 0; totalTurnQues = 0;
-        activePlayerIndex = null;
-        document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('is-turn'));
     }
 
-    let timeStr = (turnTime === -1 || turnTime === undefined) ? "VÔ HẠN" : `${turnTime}s`;
+    let timeStr = (turnTime === -1 || turnTime === undefined) ? "VÔ HẠN" : `${Number(turnTime).toFixed(1)}s`;
     const roundSpan = document.getElementById('roundText');
     const quesSpan = document.getElementById('quesText');
     const timeSpan = document.getElementById('timeText');
@@ -202,95 +218,318 @@ function updateQAPreview() {
     if (quesSpan) quesSpan.innerText = (totalTurnQues > 0) ? `CÂU HỎI ${relativeQues}/${totalTurnQues}` : "HẾT CÂU HỎI";
     if (timeSpan) timeSpan.innerText = `THỜI GIAN: ${timeStr}`;
 
+    if (!isTurnTimePlaying) {
+        currentTurnTime = turnTime;
+        if (currentRemainingTime === -1 || currentRemainingTime <= 0 || currentTurnTime !== turnTime) {
+            currentRemainingTime = turnTime;
+        }
+        
+        let displayTimeStr = "VÔ HẠN";
+        if (currentRemainingTime !== -1 && currentRemainingTime !== undefined) {
+            displayTimeStr = (currentRemainingTime > 0) ? `${Number(currentRemainingTime).toFixed(1)}s` : "HẾT GIỜ";
+        }
+        if (timeSpan) timeSpan.innerText = `THỜI GIAN: ${displayTimeStr}`;
+    } else {
+        currentTurnTime = turnTime;
+    }
+    const btnPlayTime = document.getElementById('btnPlayPauseTime');
+    const btnResetTime = document.getElementById('btnResetTime');
+    if (btnPlayTime && btnResetTime) {
+        if (turnTime !== -1 && turnTime !== undefined) {
+            btnPlayTime.style.display = 'inline-block';
+            btnResetTime.style.display = 'inline-block';
+            btnPlayTime.innerText = isTurnTimePlaying ? '⏸' : '▶';
+        } else {
+            btnPlayTime.style.display = 'none';
+            btnResetTime.style.display = 'none';
+        }
+    }
     window.compressBadgeText('roundText');
     window.compressBadgeText('quesText');
     window.compressBadgeText('timeText');
 }
 
+function isCommonQuestion(questionIndex) {
+    const LR_Count = parseInt(lr_config.so_luot) || 0;
+    const individualQuestionCount = parseInt(lr_config.so_cau) || 0;
+    let remainingIndex = questionIndex - (individualQuestionCount > 0 && LR_Count > 0 ? LR_Count * individualQuestionCount : 0);
+
+    if (remainingIndex <= 0) return false;
+
+    for (const config of lc_configs) {
+        const questionCount = parseInt(config.so_cau) || 0;
+        if (questionCount > 0 && remainingIndex <= questionCount) return true;
+        remainingIndex -= questionCount;
+    }
+
+    return false;
+}
+
+// Thêm 2 biến này vào cụm khai báo biến toàn cục (cùng chỗ với isPlayersShown)
+let isGraphicShown = false;
+let isQuestionShown = false;
+
 // --- HÀM NÚT ĐIỀU KHIỂN ---
 window.triggerAction = function(btn, keyStr) {
+  let resetBuzzersForNextQuestion = false;
+  
+  const btnGraphic = document.getElementById('btn-graphic');
+  const btnPlayers = document.getElementById('btn-players');
+  const btnQuestion = document.getElementById('btn-question');
+
   if(btn) {
     btn.classList.add('active');
     
     if (keyStr >= '1' && keyStr <= '6') {
-        document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('is-turn'));
-        btn.classList.add('is-turn');
+        document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
+        const targetBtn = document.getElementById(`playerBtn-${keyStr}`);
+        if(targetBtn) targetBtn.classList.add('is-turn');
         activePlayerIndex = parseInt(keyStr);
         isPlayersShown = true;
+        if (btnPlayers) btnPlayers.classList.remove('dimmed'); // Sáng nút TÊN TS
     } else if (keyStr === '0') {
-        document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('is-turn'));
+        document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
         activePlayerIndex = null;
-        isPlayersShown = true;
+        isPlayersShown = !isPlayersShown; 
     } else if (keyStr === 'r') {
-        document.querySelectorAll('.player-btn').forEach(b => b.classList.remove('is-turn'));
+        document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
         activePlayerIndex = null;
         isPlayersShown = false;
+        isGraphicShown = false;
+        isQuestionShown = false;
+        // Tối cả 3 nút khi Reset
+        if (btnGraphic) btnGraphic.classList.add('dimmed');
+        if (btnPlayers) btnPlayers.classList.add('dimmed');
+        if (btnQuestion) btnQuestion.classList.add('dimmed');
+    } else if (keyStr === 'r' || keyStr === 'rb') { // Thêm 'rb' vào khối tắt sáng thẻ
+        document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
+        activePlayerIndex = null;
+        if (keyStr === 'r') {
+            isPlayersShown = false;
+            isGraphicShown = false;
+            isQuestionShown = false;
+            if (btnGraphic) btnGraphic.classList.add('dimmed');
+            if (btnPlayers) btnPlayers.classList.add('dimmed');
+            if (btnQuestion) btnQuestion.classList.add('dimmed');
+        }
+    } if (keyStr === 'r') {
+        channel.postMessage({ action: 'stop_turn_time' });
+        isTurnTimePlaying = false;
+        if (turnTimerInterval) clearInterval(turnTimerInterval);
+        currentRemainingTime = currentTurnTime; // Reset bộ đếm về gốc
     }
-
     setTimeout(() => { btn.classList.remove('active'); }, 50);
   }
 
-  if (keyStr >= '1' && keyStr <= '6') {
-      let pIdx = parseInt(keyStr);
-      let A = parseInt(lr_config.so_cau) || 0;
-      if (A > 0) {
-          currentQuesIndex = (pIdx - 1) * A + 1;
-          updateQAPreview();
-      }
-  } 
-  else if (keyStr === 'n') {
-      currentQuesIndex++;
-      updateQAPreview();
+  // --- Chạy tiếng Buzz nếu bấm gọi thí sinh trong Lượt Chung ---
+  if (keyStr >= '1' && keyStr <= '6' && isCommonQuestion(currentQuesIndex)) {
+      update(ref(db, 'games/soundboard'), {
+          soundId: 'r1_buzzed',
+          file: '../sounds/R1_Buzzed.mp3',
+          action: 'play',
+          timestamp: Date.now()
+      });
   }
 
-  if (keyStr === 's') channel.postMessage({ action: 'show_graphic' });
-  else if (keyStr === '0') channel.postMessage({ action: 'show_players', players: globalPlayers });
-  else if (keyStr >= '1' && keyStr <= '6') channel.postMessage({ action: 'active_player', index: parseInt(keyStr), players: globalPlayers });
-  else if (keyStr === 'q' || keyStr === 'n') {
-      if (round1Questions && round1Questions[currentQuesIndex]) channel.postMessage({ action: 'show_question', text: round1Questions[currentQuesIndex].cau_hoi });
-  } else if (keyStr === 'r') channel.postMessage({ action: 'reset_graphic' });
+  // --- Xử lý nút Lùi/Tiến Câu Hỏi ---
+  if (keyStr === 'p') {
+      if(currentQuesIndex > 1) {
+          currentQuesIndex--;
+          updateQAPreview();
+      }
+  }
+  if (keyStr === 'n') {
+      currentQuesIndex++;
+      updateQAPreview();
+      resetBuzzersForNextQuestion = isCommonQuestion(currentQuesIndex);
+      if (resetBuzzersForNextQuestion) {
+          activePlayerIndex = null;
+          document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
+      }
+  }
+
+  // --- Xử lý đồ họa Toggle (S) ---
+  if (keyStr === 'r') {
+      channel.postMessage({ action: 'stop_turn_time' });
+      isTurnTimePlaying = false;
+      const btnPlayTime = document.getElementById('btnPlayPauseTime');
+      if (btnPlayTime) btnPlayTime.innerText = '▶';
+      currentRemainingTime = currentTurnTime;
+  }
+  if (keyStr === 's') {
+      isGraphicShown = !isGraphicShown;
+      if (isGraphicShown) {
+          channel.postMessage({ action: 'show_graphic', isTimeLimited: (currentTurnTime !== -1 && currentTurnTime !== undefined) });
+          if (btnGraphic) btnGraphic.classList.remove('dimmed');
+      } else {
+          channel.postMessage({ action: 'hide_graphic' });
+          if (btnGraphic) btnGraphic.classList.add('dimmed');
+      }
+  }
+  
+  else if (keyStr === '0') {
+      if (isPlayersShown) {
+          channel.postMessage({ action: 'show_players', players: globalPlayers });
+          if (btnPlayers) btnPlayers.classList.remove('dimmed');
+      } else {
+          channel.postMessage({ action: 'hide_players' });
+          if (btnPlayers) btnPlayers.classList.add('dimmed');
+      }
+  } 
+  else if (keyStr >= '1' && keyStr <= '6') {
+      channel.postMessage({ action: 'active_player', index: parseInt(keyStr), players: globalPlayers });
+  } 
+  
+  // --- Xử lý Câu hỏi Toggle (Q) ---
+  else if (keyStr === 'q') {
+      isQuestionShown = !isQuestionShown;
+      if (isQuestionShown) {
+          if (round1Questions && round1Questions[currentQuesIndex]) {
+              channel.postMessage({ action: 'show_question', text: round1Questions[currentQuesIndex].cau_hoi });
+          }
+          if (btnQuestion) btnQuestion.classList.remove('dimmed');
+      } else {
+          channel.postMessage({ action: 'hide_question' });
+          if (btnQuestion) btnQuestion.classList.add('dimmed');
+      }
+  }
+  else if (keyStr === 'n' || keyStr === 'p') {
+      // Khi lùi/chuyển, nếu câu hỏi đang hiển thị, tự động đồng bộ đẩy câu mới lên màn hình
+      if (isQuestionShown && round1Questions && round1Questions[currentQuesIndex]) {
+          const showQuestion = () => channel.postMessage({ action: 'show_question', text: round1Questions[currentQuesIndex].cau_hoi });
+          if (keyStr === 'n' && resetBuzzersForNextQuestion) {
+              channel.postMessage({ action: 'reset_buzzers' }).then(showQuestion);
+          } else {
+              showQuestion();
+          }
+      }
+  } 
+  
+  // --- Reset Đồ Họa ---
+  else if (keyStr === 'r') {
+      channel.postMessage({ action: 'reset_graphic' });
+  }
+  else if (keyStr === 'r') {
+      channel.postMessage({ action: 'reset_graphic' });
+  }
+  else if (keyStr === 'rb') {
+      // Gửi lệnh reset chuông sang Livestream
+      channel.postMessage({ action: 'reset_buzzers' });
+  }
+  
+  // --- Đếm ngược 5s ---
   else if (keyStr === 't5') {
-      const timeSpan = document.getElementById('timeText');
+      const timerBtn = document.getElementById('timer5s-display');
 
       if (isTimer5sRunning) {
           channel.postMessage({ action: 'stop_5s' }); 
           if (ctrlTimerInterval) clearInterval(ctrlTimerInterval);
           isTimer5sRunning = false;
-          updateQAPreview();
+          if (timerBtn) {
+              timerBtn.innerText = '5';
+              timerBtn.classList.remove('running');
+          }
       } else {
           channel.postMessage({ action: 'start_5s' }); 
           isTimer5sRunning = true;
           if (ctrlTimerInterval) clearInterval(ctrlTimerInterval);
           
           let timeLeft = 5;
-          if (timeSpan) {
-              timeSpan.innerText = `THỜI GIAN: ${timeLeft}s`;
-              window.compressBadgeText('timeText');
+          if (timerBtn) {
+              timerBtn.innerText = timeLeft;
+              timerBtn.classList.add('running');
           }
           
           ctrlTimerInterval = setInterval(() => {
               timeLeft--;
               if (timeLeft > 0) {
-                  if (timeSpan) {
-                      timeSpan.innerText = `THỜI GIAN: ${timeLeft}s`;
-                      window.compressBadgeText('timeText');
-                  }
+                  if (timerBtn) timerBtn.innerText = timeLeft;
               } else {
-                  if (timeSpan) {
-                      timeSpan.innerText = `HẾT GIỜ`;
-                      window.compressBadgeText('timeText');
+                  if (timerBtn) {
+                      timerBtn.innerText = '0';
+                      timerBtn.classList.remove('running');
                   }
                   clearInterval(ctrlTimerInterval);
                   isTimer5sRunning = false;
                   setTimeout(() => {
-                      if (!isTimer5sRunning) updateQAPreview();
+                      if (!isTimer5sRunning && timerBtn) timerBtn.innerText = '5';
                   }, 1500);
               }
           }, 1000);
       }
   }
 };
+window.resetTurnTime = function() {
+    if (currentTurnTime === -1 || currentTurnTime === undefined) return;
+    
+    // Dừng đếm ngược cục bộ nếu đang chạy (KHÔNG gửi lệnh ngắt nhạc sang Livestream)
+    if (isTurnTimePlaying) {
+        clearInterval(turnTimerInterval);
+        isTurnTimePlaying = false;
+        const btnPlayTime = document.getElementById('btnPlayPauseTime');
+        if (btnPlayTime) btnPlayTime.innerText = '▶';
+    }
 
+    // Trả giao diện về đúng số giây ban đầu
+    currentRemainingTime = currentTurnTime;
+    const timeSpan = document.getElementById('timeText');
+    if (timeSpan) {
+        timeSpan.innerText = `THỜI GIAN: ${currentRemainingTime.toFixed(1)}s`;
+        window.compressBadgeText('timeText');
+    }
+};
+window.toggleTurnTime = function() {
+    if (currentTurnTime === -1 || currentTurnTime === undefined) return;
+    const btn = document.getElementById('btnPlayPauseTime');
+    const timeSpan = document.getElementById('timeText');
+    
+    let isRestarting = false;
+    // Thay đổi: Nhận diện khởi động lại khi hết giờ HOẶC khi đã bị reset về bằng gốc
+    if (currentRemainingTime <= 0 || currentRemainingTime === currentTurnTime) {
+        currentRemainingTime = currentTurnTime;
+        isRestarting = true;
+    }
+
+    isTurnTimePlaying = !isTurnTimePlaying;
+    
+    if (isTurnTimePlaying) {
+        // ĐANG CHẠY:
+        btn.innerText = '⏸';
+        channel.postMessage({ action: 'play_turn_time', duration: currentTurnTime, restart: isRestarting });
+
+        // Sử dụng mốc thời gian thực (Timestamp) để chống sai số/trễ nhịp hoàn toàn so với video
+        const startTime = Date.now();
+        const startRemaining = currentRemainingTime;
+
+        if (turnTimerInterval) clearInterval(turnTimerInterval);
+        
+        // Lặp mỗi 50ms để số thập phân chạy siêu mượt
+        turnTimerInterval = setInterval(() => {
+            const elapsed = (Date.now() - startTime) / 1000;
+            currentRemainingTime = startRemaining - elapsed;
+
+            if (currentRemainingTime > 0) {
+                if (timeSpan) timeSpan.innerText = `THỜI GIAN: ${currentRemainingTime.toFixed(1)}s`;
+            } else {
+                currentRemainingTime = 0;
+                if (timeSpan) timeSpan.innerText = `HẾT GIỜ`;
+                clearInterval(turnTimerInterval);
+                isTurnTimePlaying = false;
+                btn.innerText = '▶';
+                
+                // Gửi lệnh time_out: Dừng nhưng KHÔNG ẨN video 60s
+                channel.postMessage({ action: 'time_out' });
+            }
+            window.compressBadgeText('timeText');
+        }, 50);
+        
+    } else {
+        // ĐANG TẠM DỪNG:
+        btn.innerText = '▶';
+        channel.postMessage({ action: 'pause_turn_time' });
+        if (turnTimerInterval) clearInterval(turnTimerInterval);
+    }
+};
 window.triggerScore = function(btn, type) {
     if(btn) {
         btn.classList.add('active');
@@ -305,7 +544,7 @@ window.triggerScore = function(btn, type) {
     let selectVal = document.getElementById('turnStatus').value;
     let dDung = 0, dSai = 0;
     
-    if (selectVal === 'rieng') {
+    if (selectVal.startsWith('rieng')) {
         dDung = Number(document.getElementById('lr_diemdung').value);
         dSai = Number(document.getElementById('lr_diemsai').value);
     } else if (selectVal.startsWith('chung_')) {
@@ -318,6 +557,12 @@ window.triggerScore = function(btn, type) {
     let currentScore = globalPlayers[activePlayerIndex]?.score || 0;
     
     window.updateScoreDB(activePlayerIndex, currentScore + delta);
+    update(ref(db, 'games/soundboard'), {
+        soundId: type === 'add' ? 'r1_correct' : 'r1_wrong',
+        file: type === 'add' ? '../sounds/R1_Right.mp3' : '../sounds/R1_Wrong.mp3',
+        action: 'play',
+        timestamp: Date.now()
+    });
     console.log(`Đã ${type === 'add' ? 'cộng' : 'trừ'} ${Math.abs(delta)} điểm cho P${activePlayerIndex}`);
 };
 
@@ -343,11 +588,14 @@ onValue(ref(db, 'games/players'), (snapshot) => {
         
         for (let i = 1; i <= 4; i++) {
             if (players[i]) {
-                const spanEl = document.getElementById(`playerBtnText-${i}`);
-                if (spanEl) {
-                    spanEl.innerText = `${players[i].name} (${players[i].score})`;
-                    window.compressBadgeText(`playerBtnText-${i}`);
-                }
+                // Ánh xạ sang UI Bảng dọc mới
+                const nameEl = document.getElementById(`playerBtnName-${i}`);
+                const scoreEl = document.getElementById(`playerBtnScore-${i}`);
+                
+                if (nameEl) nameEl.innerText = players[i].name;
+                if (scoreEl) scoreEl.innerText = players[i].score;
+                
+                // Đồng bộ modal config
                 const scoreInput = document.getElementById(`config-score-${i}`);
                 const nameLabel = document.getElementById(`config-name-${i}`);
                 
@@ -384,6 +632,7 @@ onValue(ref(db, 'games/round_1'), (snapshot) => {
         const data = snapshot.val();
         if(data.luot_rieng) {
             lr_config = data.luot_rieng;
+            if (document.getElementById('lr_soluot')) document.getElementById('lr_soluot').value = lr_config.so_luot !== undefined ? lr_config.so_luot : 4;
             document.getElementById('lr_socau').value = lr_config.so_cau;
             document.getElementById('lr_diemdung').value = lr_config.diem_dung;
             document.getElementById('lr_diemsai').value = lr_config.diem_sai;
@@ -416,6 +665,7 @@ window.saveRoundConfig = function() {
 
   const round1Config = {
     luot_rieng: {
+      so_luot: document.getElementById('lr_soluot') ? Number(document.getElementById('lr_soluot').value) : 4,
       so_cau: Number(document.getElementById('lr_socau').value),
       diem_dung: Number(document.getElementById('lr_diemdung').value),
       diem_sai: Number(document.getElementById('lr_diemsai').value),
