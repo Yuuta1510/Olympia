@@ -1,634 +1,627 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
-  <title>Bảng Điều Khiển Game Show</title>
-  
-  <!-- CSS CỐ ĐỊNH DÙNG CHUNG CHO MỌI VÒNG (KHUNG, TAB BAR, SOUNDBOARD) -->
-  <style>
-    :root {
-      --navy-header: #000080;
-      --blue-badge: #000099;
-      --blue-hover: #000055;
-      --yellow-border: #FFFF00;
-      --white: #FFFFFF;
-      --black: #000000;
-      --font-main: "UTM Avo", Arial, sans-serif;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <title>Olympia - Controller</title>
+    <style>
+      :root {
+        --navy-header: #000080;
+        --blue-badge: #000099;
+        --blue-hover: #000055;
+        --yellow-border: #FFFF00;
+        --white: #FFFFFF;
+        --black: #000000;
+        --font-main: "UTM Avo";
+      }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-    html, body {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      background-color: #0f172a;
-      color: #f8fafc;
-      font-family: var(--font-main);
-    }
+      html, body {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background-color: #0f172a;
+        color: #f8fafc;
+        font-family: var(--font-main);
+      }
 
-    body {
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
+      body {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
 
-    .container {
-      max-width: none;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transform-origin: top left;
-      flex-shrink: 0;
-    }
+      .container {
+        max-width: none;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transform-origin: top left;
+        flex-shrink: 0;
+      }
 
-    .game-control-panel {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-    }
+      .game-control-panel {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+      }
 
-    /* ==========================================================================
-       1. THANH HEADER TAB (TOP NAVBAR - DÙNG CHUNG)
-       ========================================================================== */
-    .top-navbar {
-      width: 100%;
-      height: 48px;
-      background-color: var(--navy-header);
-      display: flex;
-      align-items: flex-end;
-      padding: 6px 12px 0px 12px;
-      gap: 4px;
-      border-top-left-radius: 0px;
-      border-top-right-radius: 0px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
+      /* Thanh tab dieu khien */
+      .top-navbar {
+        width: 100%;
+        height: 48px;
+        background-color: var(--navy-header);
+        display: flex;
+        align-items: flex-end;
+        padding: 6px 12px 0px 12px;
+        gap: 4px;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
 
-    .header-tab-btn {
-      height: 32px;
-      width: 200px;
-      background-color: white;
-      color: var(--navy-header);
-      font-family: var(--font-main);
-      font-size: 14px;
-      font-weight: 800;
-      text-transform: uppercase;
-      padding: 6px 10px;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      border: 1px solid #CCCCCC;
-      border-bottom: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap;
-      transition: all 0.3s ease;
-    }
+      /* Tab dieu khien */
+      .header-tab-btn {
+        height: 32px;
+        width: 200px;
+        background-color: white;
+        color: var(--navy-header);
+        font-family: var(--font-main);
+        font-size: 14px;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 6px 10px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        border: 1px solid #CCCCCC;
+        border-bottom: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+      }
 
-    .header-tab-btn.active {
-      background-color: rgb(255, 213, 0);
-      border-color: var(--white);
-      opacity: 1;
-    }
+      .header-tab-btn.active {
+        background-color: rgb(255, 213, 0);
+        border-color: var(--white);
+        opacity: 1;
+      }
 
-    .header-tab-btn:hover {
-      background-color: #b3b3b3;
-    }
+      .header-tab-btn:hover {
+        background-color: #b3b3b3;
+      }
 
-    .settings-icon-btn {
-      display: flex;
-      background: transparent;
-      border: none;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      color: white;
-      transition: all 0.4s ease;
-      cursor: pointer;
-      margin-left: auto;
-      margin-bottom: 6px;
-      outline: none;
-      flex-shrink: 0;
-    }
+      /* Nut settings */
+      .settings-icon-btn {
+        display: flex;
+        background: transparent;
+        border: none;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        color: white;
+        transition: all 0.4s ease;
+        cursor: pointer;
+        margin-left: auto;
+        margin-bottom: 6px;
+        outline: none;
+        flex-shrink: 0;
+      }
 
-    .settings-icon-btn:hover {
-      color: #00ccff;
-      transform: rotate(90deg);
-    }
+      .settings-icon-btn:hover {
+        color: #00ccff;
+        transform: rotate(90deg);
+      }
 
-    /* ==========================================================================
-       4. KHU VỰC CHẠY NHẠC (SOUNDBOARD - DÙNG CHUNG)
-       ========================================================================== */
-    .music-panel-container {
-      width: 100%;
-      max-height: 38vh;
-      min-height: 0;
-      background-color: var(--black);
-      border-top: 2px solid var(--white);
-      padding: 16px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      overflow-y: auto;
-      border-bottom-left-radius: 0px;
-      border-bottom-right-radius: 0px;
-      flex: 0 1 auto;
-    }
+      /* soundboard */
+      .music-panel-container {
+        width: 100%;
+        max-height: 38vh;
+        min-height: 0;
+        background-color: var(--black);
+        border-top: 2px solid var(--white);
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        overflow-y: auto;
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+        flex: 0 1 auto;
+      }
 
-    .main-content-grid {
-      min-height: 0;
-    }
+      .main-content-grid {
+        min-height: 0;
+      }
 
-    .music-grid {
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      gap: 8px;
-      width: 100%;
-    }
+      .music-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 8px;
+        width: 100%;
+      }
 
-    .music-trigger-btn {
-      background-color: var(--blue-badge);
-      border: 1.5px solid var(--white);
-      border-radius: 2px;
-      color: var(--white);
-      font-family: var(--font-main);
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      white-space: nowrap;
-      height: 36px;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-size: clamp(10px, 1vw, 14px);
-      padding: 2px 3px;
-      text-transform: uppercase;
-      /* Đã bỏ transition ở đây */
-    }
+      .music-trigger-btn {
+        background-color: var(--blue-badge);
+        border: 1.5px solid var(--white);
+        border-radius: 2px;
+        color: var(--white);
+        font-family: var(--font-main);
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        white-space: nowrap;
+        height: 36px;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: clamp(10px, 1vw, 14px);
+        padding: 2px 3px;
+        text-transform: uppercase;
+      }
 
-    /* Di chuột lên: Chỉ hiện viền vàng, bỏ hover đổi nền xanh */
-    .music-trigger-btn:hover {
-      border-color: var(--yellow-border);
-    }
+      .music-trigger-btn:hover {
+        border-color: var(--yellow-border);
+      }
 
-    /* Nút vừa bấm xong: Xóa bóng mờ (shadow) */
-    .music-trigger-btn.active {
-      border-color: var(--yellow-border);
-      color: var(--yellow-border);
-    }
+      .music-trigger-btn.active {
+        border-color: var(--yellow-border);
+        color: var(--yellow-border);
+      }
 
-    /* Trạng thái khi nhạc đang bật: Đổi nền sang đỏ + chữ vàng, KHÔNG BÓNG MỜ */
-    .music-trigger-btn.playing {
-      background-color: #cc0000 !important;
-      color: var(--yellow-border);
-      border-color: white; /* Ẩn viền đi cho gọn */
-    }
-  </style>
-
-  <!-- NHÚNG CSS RIÊNG CỦA TỪNG VÒNG (MẶC ĐỊNH VÒNG 1) -->
-  <link id="round-css" rel="stylesheet" href="../css/Controller_R1.css" />
-</head>
-<body>
-
-  <div class="container" id="mainContainer">
-    <div class="game-control-panel">
-      
-      <!-- 1. HEADER TAB BAR (CỐ ĐỊNH) -->
-      <div class="top-navbar">
-        <button class="header-tab-btn" onclick="selectTab(this, 'M')">MAIN</button>
-        <button class="header-tab-btn active" onclick="selectTab(this, 'R1')">KHỞI ĐỘNG</button>
-        <button class="header-tab-btn" onclick="selectTab(this, 'R2')">VƯỢT CHƯỚNG NGẠI VẬT</button>
-        <button class="header-tab-btn" onclick="selectTab(this, 'R3')">TĂNG TỐC</button>
-        <button class="header-tab-btn" onclick="selectTab(this, 'R4')">VỀ ĐÍCH</button>
-        <button class="header-tab-btn" onclick="selectTab(this, 'SF')">CÂU HỎI PHỤ</button>
-        
-        <button id="open-option-btn" class="settings-icon-btn" title="Cài đặt / Option" onclick="openConfig()">
+      .music-trigger-btn.playing {
+        background-color: #cc0000 !important;
+        color: var(--yellow-border);
+        border-color: white;
+      }
+    </style>
+    <link id="round-css" rel="stylesheet" href="../css/Controller_R1.css" />
+  </head>
+  <body>
+    <div class="container" id="mainContainer">
+      <div class="game-control-panel">
+        <div class="top-navbar">
+          <button class="header-tab-btn" onclick="selectTab(this, 'M')">MAIN</button>
+          <button class="header-tab-btn active" onclick="selectTab(this, 'R1')">KHỞI ĐỘNG</button>
+          <button class="header-tab-btn" onclick="selectTab(this, 'R2')">VƯỢT CHƯỚNG NGẠI VẬT</button>
+          <button class="header-tab-btn" onclick="selectTab(this, 'R3')">TĂNG TỐC</button>
+          <button class="header-tab-btn" onclick="selectTab(this, 'R4')">VỀ ĐÍCH</button>
+          <button class="header-tab-btn" onclick="selectTab(this, 'R5')">CÂU HỎI PHỤ</button>
+          <button id="open-option-btn" class="settings-icon-btn" title="Settings" onclick="openConfig()">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
-        </button>
-      </div>
-
-      <div class="main-content-grid">
-        
-        <!-- Cột Trái: CÂU HỎI & ĐÁP ÁN -->
-        <div class="qa-column">
-          <!-- BOX CÂU HỎI -->
-          <div class="question-box">
-            <div class="question-header">
-              <span id="roundText">LƯỢT RIÊNG 1</span>
-              <span class="divider">-</span>
-              <span id="quesText">CÂU HỎI 1/...</span>
-              <span class="divider">-</span>
-              <span id="timeText">THỜI GIAN: 60s</span>
-              <button id="btnResetTime" onclick="resetTurnTime()" style="margin-left: auto; width: 40px; height: 32px; background: #dc2626; color: #fff; border: 1.5px solid #fff; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;" title="Reset thời gian đếm ngược về gốc">🔄</button>
-              <button id="btnPlayPauseTime" onclick="toggleTurnTime()" style="margin-left: auto; margin-right: 15px; width: 40px; height: 32px; background: #2563eb; color: #fff; border: 1.5px solid #fff; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">▶</button>
-            </div>
-            
-            <div class="question-content" id="preview-question">Đang tải câu hỏi...</div>
-            
-            <div class="question-actions">
-              <div class="left-actions">
-                <button class="action-btn dimmed" id="btn-graphic" onclick="triggerAction(this, 's')">ĐỒ HỌA</button>
-                <button class="action-btn dimmed" id="btn-players" onclick="triggerAction(this, '0')">TÊN TS</button>
-                <button class="action-btn dimmed" id="btn-question" onclick="triggerAction(this, 'q')">CÂU HỎI</button>
-                <button class="action-btn" onclick="triggerAction(this, 'p')">◀ LÙI</button>
-                <button class="action-btn" onclick="triggerAction(this, 'n')">CHUYỂN ▶</button>
-                <button class="action-btn" onclick="triggerAction(this, 'rb')">RESET CHUÔNG</button>
-                <button class="action-btn" onclick="triggerAudio(this, 'Main_Blanks_mp3')">BLANKS</button>
-                <button class="action-btn" style="background-color: #cc0000;" onclick="triggerAction(this, 'r')">RESET ĐỒ HỌA</button>
-              </div>
-              <div class="right-actions">
-                <div class="timer-5s-box" id="timer5s-display" onclick="triggerAction(this, 't5')" title="Đếm ngược 5s">5</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- BOX ĐÁP ÁN -->
-          <div class="answer-box">
-            <div class="answer-content" id="preview-answer">...</div>
-            
-            <div class="answer-actions">
-              <button class="action-btn score-btn add-btn" onclick="triggerScore(this, 'add')">ĐÚNG</button>
-              <button class="action-btn score-btn sub-btn" onclick="triggerScore(this, 'sub')">SAI</button>
-            </div>
-          </div>
+          </button>
         </div>
 
-        <!-- Cột Phải: BẢNG ĐIỂM 4 THÍ SINH (DỌC) -->
-        <div class="players-column">
-          <div class="player-vertical-card" onclick="triggerAction(this, '1')" id="playerBtn-1">
-            <div class="player-v-name" id="playerBtnName-1">P1</div>
-            <div class="player-v-score" id="playerBtnScore-1">0</div>
-          </div>
-          <div class="player-vertical-card" onclick="triggerAction(this, '2')" id="playerBtn-2">
-            <div class="player-v-name" id="playerBtnName-2">P2</div>
-            <div class="player-v-score" id="playerBtnScore-2">0</div>
-          </div>
-          <div class="player-vertical-card" onclick="triggerAction(this, '3')" id="playerBtn-3">
-            <div class="player-v-name" id="playerBtnName-3">P3</div>
-            <div class="player-v-score" id="playerBtnScore-3">0</div>
-          </div>
-          <div class="player-vertical-card" onclick="triggerAction(this, '4')" id="playerBtn-4">
-            <div class="player-v-name" id="playerBtnName-4">P4</div>
-            <div class="player-v-score" id="playerBtnScore-4">0</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. MUSIC PANEL / SOUNDBOARD (CỐ ĐỊNH) -->
-      <div class="music-panel-container">
-        <div class="music-grid" id="musicGrid"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL CẤU HÌNH VÒNG -->
-  <div class="modal-overlay" id="configModal">
-    <div class="modal-content" id="configModalContent">
-      <div class="modal-header">
-        <h2>&#9881; TÙY CHỈNH THÔNG SỐ TRẬN ĐẤU</h2>
-        <button class="close-btn" onclick="closeConfig()">✖</button>
-      </div>
-      
-      <div class="config-grid">
-        <!-- Cột Trái -->
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-          <div>
-            <div class="config-group-title">Cấu hình chung</div>
-            <div class="config-grid" style="gap: 10px;">
-              <div class="config-item">
-                <label>Số Thí Sinh</label>
-                <input type="number" id="numPlayers" value="4" min="2" max="6">
+        <div class="main-content-grid">
+          <div class="qa-column">
+            <div class="question-box">
+              <div class="question-header">
+                <span id="roundText">LƯỢT RIÊNG 1</span>
+                <span class="divider">-</span>
+                <span id="quesText">CÂU HỎI 1/...</span>
+                <span class="divider">-</span>
+                <span id="timeText">THỜI GIAN: 60s</span>
+                <button id="btnResetTime" onclick="resetTurnTime()" style="margin-left:auto; width: 40px; height: 32px; background: #dc2626; color: white; border: 1.5px solid white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">🔄</button>
+                <button id="btnPlayPauseTime" onclick="toggleTurnTime()" style="margin-left: auto; margin-right: 15px; width: 40px; height: 32px; background: #2563eb; color: white; border: 1.5px solid white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">▶</button>
               </div>
-              <div class="config-item">
-                <label>Trạng thái lượt:</label>
-                <select id="turnStatus" onchange="jumpToTurn(this.value)">
-                  <option value="rieng">Lượt Riêng</option>
-                </select>
-              </div>
-            </div>
-          </div>
 
-          <div>
-            <div class="config-group-title">Cấu hình Lượt Riêng</div>
-            <div class="config-grid" style="gap: 10px;">
-              <div class="config-item"><label>Số Lượt Riêng</label><input type="number" id="lr_soluot" value="4" min="0" max="6"></div>
-              <div class="config-item"><label>Số Câu/Lượt</label><input type="number" id="lr_socau" value="6"></div>
-              <div class="config-item"><label>Thời gian (s)</label><input type="number" id="lr_thoigian" value="-1" title="-1 là vô hạn"></div>
-              <div class="config-item"><label>Điểm Đúng</label><input type="number" id="lr_diemdung" value="10"></div>
-              <div class="config-item"><label>Điểm Sai</label><input type="number" id="lr_diemsai" value="0"></div>
-            </div>
-          </div>
-          
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div class="config-group-title" style="margin-bottom: 0;">Cấu hình Lượt Chung</div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <label style="font-size: 13px; font-weight: bold; color: #94a3b8;">Số lượt:</label>
-                    <input type="number" id="numLuotChung" value="1" min="0" max="4" style="width: 50px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 4px; padding: 4px; text-align: center;" onchange="renderLuotChungConfigs()">
+              <div class="question-content" id="preview-question">Loading></div>
+
+              <div class="question-actions">
+                <div class="left-actions">
+                  <button class="action-btn dimmed" id="btn-graphic" onclick="triggerAction(this, 's')">ĐỒ HỌA</button>
+                  <button class="action-btn dimmed" id="btn-players" onclick="triggerAction(this, '0')">THÍ SINH</button>
+                  <button class="action-btn dimmed" id="btn-question" onclick="triggerAction(this, 'q')">CÂU HỎI</button>
+                  <button class="action-btn" onclick="triggerAction(this, 'p')">◀ Q</button>
+                  <button class="action-btn" onclick="triggerAction(this, 'n')">Q ▶</button>
+                  <button class="action-btn" onclick="triggerAction(this, 'rb')">RESET CHUÔNG</button>
+                  <button class="action-btn" onclick="triggerAudio(this, 'Main_Blanks_mp3')">BLANK</button>
+                  <button class="action-btn" style="background-color: #cc0000;" onclick="triggerAction(this, 'r')">RESET ĐỒ HỌA</button>
                 </div>
+
+                <div class="right-actions">
+                  <div class="timer-5s-box" id="timer5s-display" onclick="triggerAction(this, 't5')">5</div>
+                </div>
+              </div>
             </div>
-            <div id="luotChungList" class="custom-scroll" style="display: flex; flex-direction: column; gap: 15px; max-height: 180px; overflow-y: auto; padding-right: 5px;">
+
+            <div class="answer-box">
+              <div class="answer-content" id="preview-answer">...</div>
+              <div class="answer-actions">
+                <button class="action-btn score-btn add-btn" onclick="triggerScore(this, 'add')">ĐÚNG</button>
+                <button class="action-btn score-btn sub-btn" onclick="triggerScore(this, 'sub')">SAI</button>
+              </div>
+            </div>
+          </div>
+          <div class="players-column">
+            <div class="player-vertical-card" onclick="triggerAction(this, '1')" id="playerBtn-1">
+              <div class="player-v-name" id="playerBtnName-1">P1</div>
+              <div class="player-v-score" id="playerBtnScore-1">0</div>
+            </div>
+            <div class="player-vertical-card" onclick="triggerAction(this, '2')" id="playerBtn-2">
+              <div class="player-v-name" id="playerBtnName-2">P2</div>
+              <div class="player-v-score" id="playerBtnScore-2">0</div>
+            </div>
+            <div class="player-vertical-card" onclick="triggerAction(this, '3')" id="playerBtn-3">
+              <div class="player-v-name" id="playerBtnName-3">P3</div>
+              <div class="player-v-score" id="playerBtnScore-3">0</div>
+            </div>
+            <div class="player-vertical-card" onclick="triggerAction(this, '4')" id="playerBtn-4">
+              <div class="player-v-name" id="playerBtnName-4">P4</div>
+              <div class="player-v-score" id="playerBtnScore-4">0</div>
             </div>
           </div>
         </div>
 
-        <!-- Cột Phải: Lưới bảng điểm 4 thí sinh -->
-        <div>
-          <div class="config-group-title">Quản lý điểm số nhanh</div>
-          <div class="players-grid">
-            <div class="player-score-card">
-              <div class="player-score-name-wrapper">
-                <div class="player-score-name" contenteditable="true" id="config-name-1" oninput="compressConfigName(1)" onblur="updateNameDB(1, this.innerText)">P1</div>
-              </div>
-              <input class="player-score-input" type="number" id="config-score-1" value="0" onchange="updateScoreDB(1, this.value)">
-            </div>
-            
-            <div class="player-score-card">
-              <div class="player-score-name-wrapper">
-                <div class="player-score-name" contenteditable="true" id="config-name-2" oninput="compressConfigName(2)" onblur="updateNameDB(2, this.innerText)">P2</div>
-              </div>
-              <input class="player-score-input" type="number" id="config-score-2" value="0" onchange="updateScoreDB(2, this.value)">
-            </div>
-            
-            <div class="player-score-card">
-              <div class="player-score-name-wrapper">
-                <div class="player-score-name" contenteditable="true" id="config-name-3" oninput="compressConfigName(3)" onblur="updateNameDB(3, this.innerText)">P3</div>
-              </div>
-              <input class="player-score-input" type="number" id="config-score-3" value="0" onchange="updateScoreDB(3, this.value)">
-            </div>
-            
-            <div class="player-score-card">
-              <div class="player-score-name-wrapper">
-                <div class="player-score-name" contenteditable="true" id="config-name-4" oninput="compressConfigName(4)" onblur="updateNameDB(4, this.innerText)">P4</div>
-              </div>
-              <input class="player-score-input" type="number" id="config-score-4" value="0" onchange="updateScoreDB(4, this.value)">
-            </div>
-          </div>
+        <div class="music-panel-container">
+          <div class="music-grid" id="musicGrid"></div>
         </div>
       </div>
-
-      <button class="save-config-btn" onclick="saveRoundConfig()">LƯU CẤU HÌNH</button>
     </div>
-  </div>
 
-  <!-- SCRIPT CỐ ĐỊNH DÙNG CHUNG CHO MỌI VÒNG (ĐỒNG BỘ TAB SANG LIVESTREAM, SOUNDBOARD & KHÓA PIXEL) -->
-  <script type="module">
-    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    <div class="modal-overlay" id="configModal">
+      <div class="modal-content" id="configModalContent">
+        <div class="modal-header">
+          <h2>&#9881; CÀI ĐẶT VÒNG 1</h2>
+          <button class="close-btn" onclick="closeConfig()">✖</button>
+        </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
-      authDomain: "olympia-d2f44.firebaseapp.com",
-      databaseURL: "https://olympia-d2f44-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "olympia-d2f44",
-      storageBucket: "olympia-d2f44.firebasestorage.app",
-      messagingSenderId: "18063059793",
-      appId: "1:18063059793:web:5dad7ce59006e779988170",
-      measurementId: "G-XVER3NDTXY"
-    };
+        <div class="config-grid">
+          <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div>
+              <div class="config-group-title">Cấu hình chung</div>
+              <div class="config-grid" style="gap: 10px;">
+                <div class="config-item">
+                  <label>Số thí sinh</label>
+                  <input type="number" id="numPlayers" value="4" min="2" max="6">
+                </div>
+                <div class="config-item">
+                  <label>LƯỢT:</label>
+                  <select id="turnStatus" onchange="jumpToTurn(this.value)">
+                    <option value="rieng">Lượt riêng 1</option>
+                  </select>
+                </div>
+              </div>
+            </div>
 
-    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    const db = getDatabase(app);
+            <div>
+              <div class="config-group-title">Cấu hình lượt riêng</div>
+              <div class="config-grid" style="gap: 10px;">
+                <div class="config-item">
+                  <label>Số lượt:</label>
+                  <input type="number" id="lr_soluot" value="4" min="0" max="6">
+                </div>
+                <div class="config-item">
+                  <label>Số câu/lượt:</label>
+                  <input type="number" id="lr_socau" value="6">
+                </div>
+                <div class="config-item">
+                  <label>Thời gian(s)</label>
+                  <input type="number" id="lr_thoigian" value="-1" min="-1">
+                </div>
+                <div class="config-item">
+                  <label>Điểm đúng</label>
+                  <input type="number" id="lr_diemdung" value="10">
+                </div>
+                <div class="config-item">
+                  <label>Điểm sai</label>
+                  <input type="number" id="lr_diemsai" value="0">
+                </div>
+              </div>
+            </div>
 
-    window.selectTab = function(btn, tabCode) {
-      // 1. Đổi hiệu ứng sáng nút Tab
-      document.querySelectorAll('.header-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div class="config-group-title" style="margin-bottom: 0;">Cấu hình lượt chung</div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <label style="font-size: 13px; font-weight: bold; color: white;">Số lượt:</label>
+                  <input type="number" id="numLuotChung" value="1" min="0" max="4" style="width: 50px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 4px; padding: 4px; text-align: center;" onchange="renderLuotChungConfigs()">
+                </div>
+              </div>
+              <div id="luotChungList" class="custom-scroll" style="display: flex; flex-direction: column; gap: 15px; max-height: 180px; overflow-y: auto; padding-right: 5px;"></div>
+            </div>
+          </div>
 
-      // 2. Xác định hậu tố file dựa trên Tab được bấm
-      const tabText = btn.innerText.trim().toUpperCase();
-      let suffix = tabCode;
-      if (!suffix) {
-        if (tabText === 'MAIN') suffix = 'M';
-        else if (tabText === 'KHỞI ĐỘNG') suffix = 'R1';
-        else if (tabText === 'VƯỢT CHƯỚNG NGẠI VẬT') suffix = 'R2';
-        else if (tabText === 'TĂNG TỐC') suffix = 'R3';
-        else if (tabText === 'VỀ ĐÍCH') suffix = 'R4';
-        else if (tabText === 'CÂU HỎI PHỤ') suffix = 'SF';
-      }
+          <div>
+            <div class="config-group-title">Quản lý điểm số</div>
+            <div class="players-grid">
+              <div class="player-score-card">
+                <div class="player-score-name-wrapper">
+                  <div class="player-score-name" contenteditable="true" id="config-name-1" oninput="compressConfigName(1)" onblur="updateNameDB(1, this.innerText)">P1</div>
+                </div>
+                <input class="player-score-input" type="number" id="config-score-1" value="0" onchange="updateScoreDB(1, this.value)">
+              </div>
 
-      if (!suffix) return;
+              <div class="player-score-card">
+                <div class="player-score-name-wrapper">
+                  <div class="player-score-name" contenteditable="true" id="config-name-2" oninput="compressConfigName(2)" onblur="updateNameDB(2, this.innerText)">P2</div>
+                </div>
+                <input class="player-score-input" type="number" id="config-score-2" value="0" onchange="updateScoreDB(2, this.value)">
+              </div>
 
-      // 3. Thay đổi file CSS trên Controller (Controller_M.css, Controller_R1.css,...)
-      const cssLink = document.getElementById('round-css');
-      if (cssLink) {
-        cssLink.href = `../css/Controller_${suffix}.css`;
-      }
+              <div class="player-score-card">
+                <div class="player-score-name-wrapper">
+                  <div class="player-score-name" contenteditable="true" id="config-name-3" oninput="compressConfigName(3)" onblur="updateNameDB(3, this.innerText)">P3</div>
+                </div>
+                <input class="player-score-input" type="number" id="config-score-3" value="0" onchange="updateScoreDB(3, this.value)">
+              </div>
 
-      // 4. Thay đổi và thực thi lại file JS trên Controller (Controller_M.js, Controller_R1.js,...)
-      const oldScript = document.getElementById('round-js');
-      if (oldScript) {
-        oldScript.remove();
-      }
+              <div class="player-score-card">
+                <div class="player-score-name-wrapper">
+                  <div class="player-score-name" contenteditable="true" id="config-name-4" oninput="compressConfigName(4)" onblur="updateNameDB(4, this.innerText)">P4</div>
+                </div>
+                <input class="player-score-input" type="number" id="config-score-4" value="0" onchange="updateScoreDB(4, this.value)">
+              </div>
+            </div>
+          </div>
+        </div>
 
-      const newScript = document.createElement('script');
-      newScript.id = 'round-js';
-      newScript.type = 'module';
-      newScript.src = `../script/Controller_${suffix}.js?t=${Date.now()}`;
-      document.body.appendChild(newScript);
+        <button class="save-config-btn" onclick="saveRoundConfig()">LƯU</button>
+      </div>
+    </div>
+    <script type="module">
+      import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+      import { getDatabase, ref, set, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-      // 5. Đồng bộ sang màn hình Livestream qua Firebase để Livestream chạy Main.js & Main.css
-      set(ref(db, 'games/active_tab'), {
-        tab: suffix,
-        timestamp: Date.now()
-      });
-    };
+      const firebaseConfig = {
+        apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
+        authDomain: "olympia-d2f44.firebaseapp.com",
+        databaseURL: "https://olympia-d2f44-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "olympia-d2f44",
+        storageBucket: "olympia-d2f44.firebasestorage.app",
+        messagingSenderId: "18063059793",
+        appId: "1:18063059793:web:5dad7ce59006e779988170",
+        measurementId: "G-XVER3NDTXY"
+      };
 
-    // =========================================================================
-    // CẤU HÌNH DANH SÁCH FILE NHẠC SOUNDBOARD (THƯ MỤC sounds/)
-    // =========================================================================
-    const soundIdForFileName = fileName => fileName.replace(/[^A-Za-z0-9_-]/g, '_');
-    const soundFileNames = [
-      'Main_HostEntrance.mp3', 'Main_ContestantEntrance.mp3',
-      'Main_Introduction1.mp3', 'Main_Introduction2.mp3', 'Main_Introduction3.mp3',
-      'Main_Introduction4.mp3', 'Main_Introduction5.mp3', 'Main_PointSummary.mp3',
-      'Main_15s.mp3', 'Main_1st.mp3', 'Main_2nd.mp3', 'Main_3rd.mp3', 'Main_4th.mp3', 
-      'Main_Award.mp3', 'Main_Blanks.mp3',
-      'Main_DLDN2008.mp3', 'Main_DLDN2010.mp3',
-      'Main_DLDN2010_Instrument.mp3', 
-      'R1_Intro.mp3', 'R1_Start.mp3', 'R1_Bed1.mp3', 'R1_Bed2.mp3', 'R1_End.mp3', 
-      'R2_Intro.mp3', 'R2_Right.mp3', 'R2_RightObs.mp3', 'R2_Wrong.mp3', 
-      'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
-      'R4_Intro.mp3', 'R4_Begin.mp3', 'R4_15s.mp3', 'R4_20s.mp3', 'R4_20sPrac.mp3', 'R4_30s.mp3',
-      'R4_30sPrac.mp3', 'R4_40sPrac.mp3', 'R4_60sPrac.mp3',
-      'R4_End.mp3'
-    ];
-    const SOUND_FILES = soundFileNames.reduce((files, fileName) => {
-      files[soundIdForFileName(fileName)] = `../sounds/${fileName}`;
-      return files;
-    }, {});
+      const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+      const db = getDatabase(app);
 
-    const SOUND_LABELS = {
-      "Main_15s.mp3": "15s",
-      "Main_1st.mp3": "1st",
-      "Main_2nd.mp3": "2nd",
-      "Main_3rd.mp3": "3rd",
-      "Main_4th.mp3": "4th",
-      "Main_Award.mp3": "Award",
-      "Main_Blanks.mp3": "Blanks",
-      "Main_ContestantEntrance.mp3": "Contestant",
-      "Main_DLDN2008.mp3": "DLDN2008",
-      "Main_DLDN2010.mp3": "DLDN2010",
-      "Main_DLDN2010_Instrument.mp3": "DLDN2010_Inst",
-      "Main_HostEntrance.mp3": "Host Entrance",
-      "Main_Introduction1.mp3": "Intro1",
-      "Main_Introduction2.mp3": "Intro2",
-      "Main_Introduction3.mp3": "Intro3",
-      "Main_Introduction4.mp3": "Intro4",
-      "Main_Introduction5.mp3": "Intro5",
-      "Main_PointSummary.mp3": "PointSum",
-      "R1_Bed1.mp3": "Bed1",
-      "R1_Bed2.mp3": "Bed2",
-      "R1_End.mp3": "End Turn R1",
-      "R1_Intro.mp3": "Intro Round 1",
-      "R1_Start.mp3": "Start Turn R1",
-      "R2_Intro.mp3": "Intro Round 2",
-      "R2_Right.mp3": "Right",
-      "R2_RightObs.mp3": "RightObs",
-      "R2_Wrong.mp3": "Wrong",
-      "R3_Intro.mp3": "Intro Round 3",
-      "R3_Right.mp3": "Right",
-      "R3_Wrong.mp3": "Wrong",
-      "R4_15s.mp3": "15s",
-      "R4_20s.mp3": "20s",
-      "R4_20sPrac.mp3": "20sPrac",
-      "R4_30s.mp3": "30s",
-      "R4_30sPrac.mp3": "30sPrac",
-      "R4_40sPrac.mp3": "40sPrac",
-      "R4_60sPrac.mp3": "60sPrac",
-      "R4_Begin.mp3": "Begin Turn R4",
-      "R4_End.mp3": "End Turn R4",
-      "R4_Intro.mp3": "Intro Round 4"
-    };
-
-    const musicGrid = document.getElementById('musicGrid');
-    soundFileNames.forEach((fileName, index) => {
-      const soundId = soundIdForFileName(fileName);
-      const button = document.createElement('button');
-      button.className = 'music-trigger-btn';
-      button.dataset.sound = soundId;
-      button.title = fileName;
-      // Lấy tên tự chọn, nếu không có thì gán số thứ tự (index + 1)
-      button.textContent = SOUND_LABELS[fileName] || (index + 1).toString();
-      button.addEventListener('click', () => triggerAudio(button, soundId));
-      musicGrid.appendChild(button);
-    });
-
-    // Lưu trạng thái bài nào đang phát
-    const playingState = {};
-
-    window.triggerAudio = function(btn, soundId) {
-      if (btn) {
+      // TAB SELECTION
+      window.selectTab = function(btn, tabCode) {
+        document.querySelectorAll('.header-tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        setTimeout(() => btn.classList.remove('active'), 100);
-      }
-
-      // Đổi trạng thái trên Firebase để mọi controller cùng gửi chung lệnh play/stop.
-      const statusRef = ref(db, `games/soundboard_status/${soundId}`);
-      runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
-        const isPlaying = result.snapshot.val() === true;
-        return set(ref(db, 'games/soundboard'), {
-          soundId: soundId,
-          file: SOUND_FILES[soundId] || '',
-          action: isPlaying ? 'play' : 'stop',
+        const tabText = btn.innerText.trim().toUpperCase();
+        let suffix = tabCode;
+        if(!suffix) {
+          if (tabText === 'MAIN') suffix = 'M';
+          else if (tabText === 'KHỞI ĐỘNG') suffix = 'R1';
+          else if (tabText === 'VƯỢT CHƯỚNG NGẠI VẬT') suffix = 'R2';
+          else if (tabText === 'TĂNG TỐC') suffix = 'R3';
+          else if (tabText === 'VỀ ĐÍCH') suffix = 'R4';
+          else if (tabText === 'CÂU HỎI PHỤ') suffix = 'R5';
+        }
+        if(!suffix) return;
+        const cssLink = document.getElementById('round-css');
+        if (cssLink) {
+          cssLink.href = `../css/Controller_${suffix}.css`;
+        }
+        const oldScript = document.getElementById('round-js');
+        if (oldScript) {
+          oldScript.remove();
+        }
+        const newScript = document.createElement('script');
+        newScript.id = 'round-js';
+        newScript.type = 'module';
+        newScript.src = `../script/Controller_${suffix}.js?t=${Date.now()}`;
+        document.body.appendChild(newScript);
+        set(ref(db, 'games/active_tab'), {
+          tab: suffix,
           timestamp: Date.now()
         });
+      };
+
+      // SOUNDBOARD
+      const soundIdForFileName = fileName => fileName.replace(/[^A-Za-z0-9_-]/g, '_');
+      const soundFileNames = [
+        'Main_HostEntrance.mp3', 'Main_ContestantEntrance.mp3',
+        'Main_Introduction1.mp3', 'Main_Introduction2.mp3', 'Main_Introduction3.mp3',
+        'Main_Introduction4.mp3', 'Main_Introduction5.mp3', 'Main_PointSummary.mp3',
+        'Main_15s.mp3', 'Main_1st.mp3', 'Main_2nd.mp3', 'Main_3rd.mp3', 'Main_4th.mp3', 
+        'Main_Award.mp3', 'Main_Blanks.mp3',
+        'Main_DLDN2008.mp3', 'Main_DLDN2010.mp3',
+        'Main_DLDN2010_Instrument.mp3', 
+        'R1_Intro.mp3', 'R1_Start.mp3', 'R1_Bed1.mp3', 'R1_Bed2.mp3', 'R1_End.mp3', 
+        'R2_Intro.mp3', 'R2_Right.mp3', 'R2_RightObs.mp3', 'R2_Wrong.mp3', 
+        'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
+        'R4_Intro.mp3', 'R4_Begin.mp3', 'R4_15s.mp3', 'R4_20s.mp3', 'R4_20sPrac.mp3', 'R4_30s.mp3',
+        'R4_30sPrac.mp3', 'R4_40sPrac.mp3', 'R4_60sPrac.mp3',
+        'R4_End.mp3'
+      ];
+      const SOUND_FILES = soundFileNames.reduce((files, fileName) => {
+        files[soundIdForFileName(fileName)] = `../sounds/${fileName}`;
+        return files;
+      }, {});
+      const SOUND_LABELS = {
+        "Main_15s.mp3": "15s",
+        "Main_1st.mp3": "1st",
+        "Main_2nd.mp3": "2nd",
+        "Main_3rd.mp3": "3rd",
+        "Main_4th.mp3": "4th",
+        "Main_Award.mp3": "Award",
+        "Main_Blanks.mp3": "Blanks",
+        "Main_ContestantEntrance.mp3": "Contestant",
+        "Main_DLDN2008.mp3": "Theme 2008",
+        "Main_DLDN2010.mp3": "Theme 2010",
+        "Main_DLDN2010_Instrument.mp3": "Theme 2010 Inst",
+        "Main_HostEntrance.mp3": "Host Entrance",
+        "Main_Introduction1.mp3": "Introduction 1",
+        "Main_Introduction2.mp3": "Introduction 2",
+        "Main_Introduction3.mp3": "Introduction 3",
+        "Main_Introduction4.mp3": "Introduction 4",
+        "Main_Introduction5.mp3": "Introduction 5",
+        "Main_PointSummary.mp3": "Point Summary",
+        "R1_Bed1.mp3": "KD Bed 1",
+        "R1_Bed2.mp3": "KD Bed 2",
+        "R1_End.mp3": "End Turn R1",
+        "R1_Intro.mp3": "Intro Round 1",
+        "R1_Start.mp3": "Start Turn R1",
+        "R2_Intro.mp3": "Intro Round 2",
+        "R2_Right.mp3": "Right",
+        "R2_RightObs.mp3": "Right Obstacle",
+        "R2_Wrong.mp3": "Wrong",
+        "R3_Intro.mp3": "Intro Round 3",
+        "R3_Right.mp3": "Right",
+        "R3_Wrong.mp3": "Wrong",
+        "R4_15s.mp3": "15s",
+        "R4_20s.mp3": "20s",
+        "R4_20sPrac.mp3": "20s Prac",
+        "R4_30s.mp3": "30s",
+        "R4_30sPrac.mp3": "30s Prac",
+        "R4_40sPrac.mp3": "40s Prac",
+        "R4_60sPrac.mp3": "60s Prac",
+        "R4_Begin.mp3": "Begin Turn R4",
+        "R4_End.mp3": "End Turn R4",
+        "R4_Intro.mp3": "Intro Round 4"
+      };
+
+      const musicGrid = document.getElementById('musicGrid');
+      soundFileNames.forEach((fileName, index) => {
+        const soundId = soundIdForFileName(fileName);
+        const button = document.createElement('button');
+        button.className = 'music-trigger-btn';
+        button.dataset.sound = soundId;
+        button.textContent = SOUND_LABELS[fileName] || (index + 1).toString();
+        button.addEventListener('click', () => triggerAudio(button, soundId));
+        musicGrid.appendChild(button);
       });
-    };
 
-    // Lắng nghe trạng thái từ Livestream gửi về (khi nhạc tự phát hết bài thì nút tự về màu bình thường)
-    onValue(ref(db, 'games/soundboard_status'), (snapshot) => {
-      const statusMap = snapshot.val() || {};
-      document.querySelectorAll('.music-trigger-btn').forEach(btn => {
-        const sId = btn.getAttribute('data-sound');
-        if (!sId) return;
-
-        if (statusMap[sId]) {
-          playingState[sId] = true;
-          btn.classList.add('playing');
-        } else {
-          playingState[sId] = false;
-          btn.classList.remove('playing');
+      const playingState = {};
+      window.triggerAudio = function(btn, soundId) {
+        if (btn) {
+          btn.classList.add('active');
+          setTimeout(() => btn.classList.remove('active'), 100);
         }
+        const statusRef = ref(db, `games/soundboard_status/${soundId}`);
+        runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
+          const isPlaying = result.snapshot.val() === true;
+          return set(ref(db, 'games/soundboard'), {
+            soundId: soundId,
+            file: SOUND_FILES[soundId] || '',
+            action: isPlaying ? 'play' : 'stop',
+            timestamp: Date.now()
+          });
+        });
+      };
+
+      window.playMusic = function(fileName) {
+        const soundIdForFileName = name => name.replace(/[^A-Za-z0-9_-]/g, '_');
+        const soundId = soundIdForFileName(fileName);
+        const fileUrl = `../sounds/${fileName}`;
+        const statusRef = ref(db, `games/soundboard_status/${soundId}`);
+        runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
+          const isPlaying = result.snapshot.val() === true;
+          return update(ref(db, 'games/soundboard'), {
+            soundId: soundId,
+            file: fileUrl,
+            action: isPlaying ? 'play' : 'stop',
+            timestamp: Date.now()
+          });
+        });
+      };
+
+      window.updateScoreByIndex = function(index, plus) {
+        plus = Number(plus) || 0;
+        if (index === 0) {
+          for(let i = 1; i <= 4; i++) {
+            runTransaction(ref(db, `games/players/${i}/score`), (currentScore) => {
+              return (Number(currentScore) || 0) + plus;
+            });
+          } 
+        } else if (index >= 1 && index <= 6) {
+          runTransaction(ref(db, `games/players/${index}/score`), (currentScore) => {
+            return (Number(currentScore) || 0) + plus;
+          });
+        }
+      };
+
+      onValue(ref(db, 'games/soundboard_status'), (snapshot) => {
+        const statusMap = snapshot.val() || {};
+        document.querySelectorAll('.music-trigger-btn').forEach(btn => {
+          const sId = btn.getAttribute('data-sound');
+          if (!sId) return;
+          if (statusMap[sId]) {
+            playingState[sId] = true;
+            btn.classList.add('playing');
+          } else {
+            playingState[sId] = false;
+            btn.classList.remove('playing');
+          }
+        });
       });
-    });
 
-    // =========================================================================
-    // CƠ CHẾ KHÓA CỨNG PIXEL VẬT LÝ (CHỐNG CẢ SCALE WINDOWS LẪN CTRL +/-)
-    // =========================================================================
-    window.addEventListener('keydown', function(e) {
-      if ((e.ctrlKey || e.metaKey) && (
-          e.key === '+' || e.key === '-' || e.key === '=' || e.key === '_' || e.key === '0' ||
-          e.keyCode === 187 || e.keyCode === 189 || e.keyCode === 107 || e.keyCode === 109 || e.keyCode === 48 || e.keyCode === 96
-      )) {
-        e.preventDefault();
-      }
-    }, { passive: false });
+      window.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && (
+            e.key === '+' || e.key === '-' || e.key === '=' || e.key === '_' || e.key === '0' ||
+            e.keyCode === 187 || e.keyCode === 189 || e.keyCode === 107 || e.keyCode === 109 || e.keyCode === 48 || e.keyCode === 96
+        )) {
+          e.preventDefault();
+        }
+      }, { passive: false });
 
-    window.addEventListener('wheel', function(e) {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-      }
-    }, { passive: false });
+      window.addEventListener('wheel', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+        }
+      }, { passive: false });
 
-    function lockTruePhysicalSize() {
-      const dpr = window.devicePixelRatio || 1;
-      const inverseScale = 1 / dpr;
+      function lockTruePhysicalSize() {
+        const dpr = window.devicePixelRatio || 1;
+        const inverseScale = 1 / dpr;
 
-      const container = document.getElementById('mainContainer');
-      const modalContent = document.getElementById('configModalContent');
+        const container = document.getElementById('mainContainer');
+        const modalContent = document.getElementById('configModalContent');
 
-      if (container) {
-        container.style.transform = `scale(${inverseScale})`;
-        container.style.width = `${100 * dpr}vw`;
-        container.style.height = `${100 * dpr}vh`;
-      }
+        if (container) {
+          container.style.transform = `scale(${inverseScale})`;
+          container.style.width = `${100 * dpr}vw`;
+          container.style.height = `${100 * dpr}vh`;
+        }
 
-      if (modalContent) {
-        modalContent.style.transform = `scale(${inverseScale})`;
-      }
+        if (modalContent) {
+          modalContent.style.transform = `scale(${inverseScale})`;
+        }
 
-      if (typeof window.compressBadgeText === 'function') {
-        window.compressBadgeText('roundText');
-        window.compressBadgeText('quesText');
-        window.compressBadgeText('timeText');
-        for (let i = 1; i <= 4; i++) {
-          window.compressBadgeText(`playerBtnText-${i}`);
+        if (typeof window.compressBadgeText === 'function') {
+          window.compressBadgeText('roundText');
+          window.compressBadgeText('quesText');
+          window.compressBadgeText('timeText');
+          for (let i = 1; i <= 4; i++) {
+            window.compressBadgeText(`playerBtnText-${i}`);
+          }
         }
       }
-    }
 
-    function watchDPRChange() {
-      lockTruePhysicalSize();
-      const mqString = `(resolution: ${window.devicePixelRatio}dppx)`;
-      window.matchMedia(mqString).addEventListener('change', watchDPRChange, { once: true });
-    }
+      function watchDPRChange() {
+        lockTruePhysicalSize();
+        const mqString = `(resolution: ${window.devicePixelRatio}dppx)`;
+        window.matchMedia(mqString).addEventListener('change', watchDPRChange, { once: true });
+      }
 
-    window.addEventListener('resize', lockTruePhysicalSize);
-    window.addEventListener('load', watchDPRChange);
-    watchDPRChange();
-  </script>
-
-  <!-- NHÚNG SCRIPT RIÊNG CỦA VÒNG (MẶC ĐỊNH VÒNG 1) -->
-  <script id="round-js" type="module" src="../script/Controller_R1.js"></script>
-</body>
+      window.addEventListener('resize', lockTruePhysicalSize);
+      window.addEventListener('load', watchDPRChange);
+      watchDPRChange();
+    </script>
+    <script id="round-js" type="module" src="../script/Controller_R1.js"></script>
+  </body>
 </html>

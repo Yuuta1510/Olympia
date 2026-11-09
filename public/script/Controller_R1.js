@@ -16,11 +16,10 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 window.updateNameDB = function(index, nameStr) {
-  update(ref(db, `games/players/${index}`), { name: nameStr });
+    update(ref(db, `games/players/${index}`), {name: nameStr});
 };
-
 window.updateScoreDB = function(index, scoreVal) {
-  update(ref(db, `games/players/${index}`), { score: Number(scoreVal) });
+    update(ref(db, `games/players/${index}`), {score: Number(scoreVal)});
 };
 
 window.compressConfigName = function(index) {
@@ -55,35 +54,35 @@ window.addEventListener('load', () => {
 });
 
 const channel = {
-  postMessage: function(data) {
-    return update(ref(db, 'games/commands'), {
-      ...data,
-      timestamp: Date.now()
-    });
-  }
+    postMessage: function(data) {
+        return update(ref(db, 'games/commands'), {
+            ...data,
+            timestamp: Date.now()
+        });
+    }
 };
 
-// --- BIẾN LƯU TRỮ VÀ CẤU HÌNH VÒNG 1 ---
 let currentQuesIndex = 1;
 let round1Questions = [];
 let globalPlayers = {};
 let activePlayerIndex = null;
+let isGraphicShown = false;
 let isPlayersShown = false;
+let isQuestionShown = false;
 let ctrlTimerInterval = null;
 let isTimer5sRunning = false;
 let currentTurnTime = -1;
 let currentRemainingTime = -1;
 let isTurnTimePlaying = false;
 let turnTimerInterval = null;
-let lr_config = { so_luot: 4, so_cau: 6, thoi_gian: -1, diem_dung: 10, diem_sai: 0 };
-let lc_configs = [{ so_cau: 12, thoi_gian: -1, diem_dung: 10, diem_sai: -5 }];
+let lr_config = {so_luot: 4, so_cau: 6, thoi_gian: -1, diem_dung: 10, diem_sai: 0};
+let lc_configs = [{so_cau: 12, thoi_gian: -1, diem_dung: 10, diem_sai: -5}];
 
-// --- RENDER DYNAMIC LƯỢT CHUNG ---
 window.renderLuotChungConfigs = function() {
     let num = parseInt(document.getElementById('numLuotChung').value) || 0;
     let html = '';
-    for(let i = 0; i < num; i++) {
-        let conf = lc_configs[i] || { so_cau: 12, thoi_gian: -1, diem_dung: 10, diem_sai: -5 };
+    for(let i = 0; i < num; i++){
+        let conf = lc_configs[i] || {so_cau: 12, thoi_gian: -1, diem_dung: 10, diem_sai: -5};
         html += `
         <div style="border-left: 2px solid #38bdf8; padding-left: 10px;">
           <div class="config-group-title" style="font-size: 12px; margin-bottom: 4px; color: #38bdf8;"># Lượt Chung ${i+1}</div>
@@ -101,37 +100,29 @@ window.renderLuotChungConfigs = function() {
 
 window.updateTurnStatusOptions = function() {
     let numLC = parseInt(document.getElementById('numLuotChung').value) || 0;
-    // Lấy số lượt riêng (ưu tiên từ Input, nếu chưa có lấy từ cấu hình mặc định)
     let lrInput = document.getElementById('lr_soluot');
     let numLR = lrInput ? (parseInt(lrInput.value) || 4) : (lr_config.so_luot || 4);
-
     let select = document.getElementById('turnStatus');
     if (!select) return;
-    
     let currentVal = select.value;
     let opts = '';
-    
-    // Tự động sinh Option cho từng Lượt Riêng
-    for(let i = 1; i <= numLR; i++) {
-        opts += `<option value="rieng_${i}">Lượt Riêng ${i}</option>`;
+
+    for (let i = 1; i <= numLR; i++) {
+        opts += `<option value="rieng_${i}">Lượt riêng ${i}</option>`;
     }
-    
-    // Tự động sinh Option cho từng Lượt Chung
     for(let i = 0; i < numLC; i++) {
-        opts += `<option value="chung_${i}">Lượt Chung ${i+1}</option>`;
+        opts += `<option value="chung_${i}">Lượt chung ${i+1}</option>`;
     }
-    
     select.innerHTML = opts;
-    if(select.querySelector(`option[value="${currentVal}"]`)) {
+    if (select.querySelector(`option[value="${currentVal}"]`)) {
         select.value = currentVal;
     }
 };
 
-// --- HÀM JUMP NHANH ---
 window.jumpToTurn = function(val) {
-    let LR_Count = parseInt(lr_config.so_luot) || 4; 
+    let LR_Count = parseInt(lr_config.so_luot) || 4;
     let A = parseInt(lr_config.so_cau) || 0;
-    
+
     if (val.startsWith('rieng_')) {
         let pIdx = parseInt(val.split('_')[1]);
         if (A > 0) {
@@ -141,7 +132,7 @@ window.jumpToTurn = function(val) {
         }
     } else if (val.startsWith('chung_')) {
         let lcIdx = parseInt(val.split('_')[1]);
-        let startIndex = (LR_Count * A) + 1; 
+        let startIndex = (LR_Count * A) + 1;
         for(let i = 0; i < lcIdx; i++) {
             startIndex += parseInt(lc_configs[i]?.so_cau || 0);
         }
@@ -150,18 +141,16 @@ window.jumpToTurn = function(val) {
     updateQAPreview();
 };
 
-// --- HÀM CẬP NHẬT GIAO DIỆN & TÍNH TOÁN LOGIC CÂU HỎI ---
 function updateQAPreview() {
-    if(round1Questions && round1Questions[currentQuesIndex]) {
+    if (round1Questions && round1Questions[currentQuesIndex]) {
         document.getElementById('preview-question').innerText = round1Questions[currentQuesIndex].cau_hoi;
         document.getElementById('preview-answer').innerText = round1Questions[currentQuesIndex].dap_an;
     } else {
         document.getElementById('preview-question').innerText = "...";
         document.getElementById('preview-answer').innerText = "...";
     }
-    
-    let X = parseInt(document.getElementById('numPlayers').value) || 4;   
-    let LR_Count = parseInt(lr_config.so_luot); // Nếu undefined, mặc định hoặc lấy từ input
+
+    let LR_Count = parseInt(lr_config.so_luot);
     if (isNaN(LR_Count)) LR_Count = 4;
     let A = parseInt(lr_config.so_cau) || 0;
 
@@ -181,7 +170,6 @@ function updateQAPreview() {
         if(statusSelect && statusSelect.value !== `rieng_${playerIndex}`) {
             statusSelect.value = `rieng_${playerIndex}`;
         }
-
     } else if (lc_configs && lc_configs.length > 0) {
         let remainingIndex = currentQuesIndex - ((A > 0 && LR_Count > 0) ? (LR_Count * A) : 0);
         let foundLC = false;
@@ -202,11 +190,10 @@ function updateQAPreview() {
                 remainingIndex -= B; 
             }
         }
-        
-        if (!foundLC) { turnName = "KẾT THÚC"; relativeQues = 0; totalTurnQues = 0; }
+        if (!foundLC) { turnName = "LƯỢT RIÊNG 0"; relativeQues = 0; totalTurnQues = 0; }
     }
     else {
-        turnName = "KẾT THÚC"; relativeQues = 0; totalTurnQues = 0;
+        turnName = "LƯỢT ..."; relativeQues = 0; totalTurnQues = 0;
     }
 
     let timeStr = (turnTime === -1 || turnTime === undefined) ? "VÔ HẠN" : `${Number(turnTime).toFixed(1)}s`;
@@ -226,7 +213,7 @@ function updateQAPreview() {
         
         let displayTimeStr = "VÔ HẠN";
         if (currentRemainingTime !== -1 && currentRemainingTime !== undefined) {
-            displayTimeStr = (currentRemainingTime > 0) ? `${Number(currentRemainingTime).toFixed(1)}s` : "HẾT GIỜ";
+            displayTimeStr = (currentRemainingTime > 0) ? `${Number(currentRemainingTime).toFixed(1)}s` : "0.00s";
         }
         if (timeSpan) timeSpan.innerText = `THỜI GIAN: ${displayTimeStr}`;
     } else {
@@ -265,28 +252,21 @@ function isCommonQuestion(questionIndex) {
     return false;
 }
 
-// Thêm 2 biến này vào cụm khai báo biến toàn cục (cùng chỗ với isPlayersShown)
-let isGraphicShown = false;
-let isQuestionShown = false;
-
-// --- HÀM NÚT ĐIỀU KHIỂN ---
 window.triggerAction = function(btn, keyStr) {
   let resetBuzzersForNextQuestion = false;
-  
   const btnGraphic = document.getElementById('btn-graphic');
   const btnPlayers = document.getElementById('btn-players');
   const btnQuestion = document.getElementById('btn-question');
 
-  if(btn) {
+  if (btn) {
     btn.classList.add('active');
-    
     if (keyStr >= '1' && keyStr <= '6') {
         document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
         const targetBtn = document.getElementById(`playerBtn-${keyStr}`);
-        if(targetBtn) targetBtn.classList.add('is-turn');
+        if (targetBtn) targetBtn.classList.add('is-turn');
         activePlayerIndex = parseInt(keyStr);
         isPlayersShown = true;
-        if (btnPlayers) btnPlayers.classList.remove('dimmed'); // Sáng nút TÊN TS
+        if (btnPlayers) btnPlayers.classList.remove('dimmed');
     } else if (keyStr === '0') {
         document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
         activePlayerIndex = null;
@@ -297,11 +277,10 @@ window.triggerAction = function(btn, keyStr) {
         isPlayersShown = false;
         isGraphicShown = false;
         isQuestionShown = false;
-        // Tối cả 3 nút khi Reset
         if (btnGraphic) btnGraphic.classList.add('dimmed');
         if (btnPlayers) btnPlayers.classList.add('dimmed');
         if (btnQuestion) btnQuestion.classList.add('dimmed');
-    } else if (keyStr === 'r' || keyStr === 'rb') { // Thêm 'rb' vào khối tắt sáng thẻ
+    } else if (keyStr === 'r' || keyStr === 'rb') {
         document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
         activePlayerIndex = null;
         if (keyStr === 'r') {
@@ -321,17 +300,11 @@ window.triggerAction = function(btn, keyStr) {
     setTimeout(() => { btn.classList.remove('active'); }, 50);
   }
 
-  // --- Chạy tiếng Buzz nếu bấm gọi thí sinh trong Lượt Chung ---
   if (keyStr >= '1' && keyStr <= '6' && isCommonQuestion(currentQuesIndex)) {
-      update(ref(db, 'games/soundboard'), {
-          soundId: 'r1_buzzed',
-          file: '../sounds/R1_Buzzed.mp3',
-          action: 'play',
-          timestamp: Date.now()
-      });
+      if (typeof window.playMusic === 'function') {
+          window.playMusic('R1_Buzzed.mp3');
+      }
   }
-
-  // --- Xử lý nút Lùi/Tiến Câu Hỏi ---
   if (keyStr === 'p') {
       if(currentQuesIndex > 1) {
           currentQuesIndex--;
@@ -347,8 +320,6 @@ window.triggerAction = function(btn, keyStr) {
           document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
       }
   }
-
-  // --- Xử lý đồ họa Toggle (S) ---
   if (keyStr === 'r') {
       channel.postMessage({ action: 'stop_turn_time' });
       isTurnTimePlaying = false;
@@ -356,6 +327,7 @@ window.triggerAction = function(btn, keyStr) {
       if (btnPlayTime) btnPlayTime.innerText = '▶';
       currentRemainingTime = currentTurnTime;
   }
+
   if (keyStr === 's') {
       isGraphicShown = !isGraphicShown;
       if (isGraphicShown) {
@@ -366,7 +338,6 @@ window.triggerAction = function(btn, keyStr) {
           if (btnGraphic) btnGraphic.classList.add('dimmed');
       }
   }
-  
   else if (keyStr === '0') {
       if (isPlayersShown) {
           channel.postMessage({ action: 'show_players', players: globalPlayers });
@@ -379,8 +350,7 @@ window.triggerAction = function(btn, keyStr) {
   else if (keyStr >= '1' && keyStr <= '6') {
       channel.postMessage({ action: 'active_player', index: parseInt(keyStr), players: globalPlayers });
   } 
-  
-  // --- Xử lý Câu hỏi Toggle (Q) ---
+
   else if (keyStr === 'q') {
       isQuestionShown = !isQuestionShown;
       if (isQuestionShown) {
@@ -394,7 +364,6 @@ window.triggerAction = function(btn, keyStr) {
       }
   }
   else if (keyStr === 'n' || keyStr === 'p') {
-      // Khi lùi/chuyển, nếu câu hỏi đang hiển thị, tự động đồng bộ đẩy câu mới lên màn hình
       if (isQuestionShown && round1Questions && round1Questions[currentQuesIndex]) {
           const showQuestion = () => channel.postMessage({ action: 'show_question', text: round1Questions[currentQuesIndex].cau_hoi });
           if (keyStr === 'n' && resetBuzzersForNextQuestion) {
@@ -403,24 +372,15 @@ window.triggerAction = function(btn, keyStr) {
               showQuestion();
           }
       }
-  } 
-  
-  // --- Reset Đồ Họa ---
-  else if (keyStr === 'r') {
-      channel.postMessage({ action: 'reset_graphic' });
   }
   else if (keyStr === 'r') {
       channel.postMessage({ action: 'reset_graphic' });
   }
   else if (keyStr === 'rb') {
-      // Gửi lệnh reset chuông sang Livestream
       channel.postMessage({ action: 'reset_buzzers' });
   }
-  
-  // --- Đếm ngược 5s ---
   else if (keyStr === 't5') {
       const timerBtn = document.getElementById('timer5s-display');
-
       if (isTimer5sRunning) {
           channel.postMessage({ action: 'stop_5s' }); 
           if (ctrlTimerInterval) clearInterval(ctrlTimerInterval);
@@ -461,16 +421,12 @@ window.triggerAction = function(btn, keyStr) {
 };
 window.resetTurnTime = function() {
     if (currentTurnTime === -1 || currentTurnTime === undefined) return;
-    
-    // Dừng đếm ngược cục bộ nếu đang chạy (KHÔNG gửi lệnh ngắt nhạc sang Livestream)
     if (isTurnTimePlaying) {
         clearInterval(turnTimerInterval);
         isTurnTimePlaying = false;
         const btnPlayTime = document.getElementById('btnPlayPauseTime');
         if (btnPlayTime) btnPlayTime.innerText = '▶';
     }
-
-    // Trả giao diện về đúng số giây ban đầu
     currentRemainingTime = currentTurnTime;
     const timeSpan = document.getElementById('timeText');
     if (timeSpan) {
@@ -482,28 +438,20 @@ window.toggleTurnTime = function() {
     if (currentTurnTime === -1 || currentTurnTime === undefined) return;
     const btn = document.getElementById('btnPlayPauseTime');
     const timeSpan = document.getElementById('timeText');
-    
     let isRestarting = false;
-    // Thay đổi: Nhận diện khởi động lại khi hết giờ HOẶC khi đã bị reset về bằng gốc
     if (currentRemainingTime <= 0 || currentRemainingTime === currentTurnTime) {
         currentRemainingTime = currentTurnTime;
         isRestarting = true;
     }
-
     isTurnTimePlaying = !isTurnTimePlaying;
-    
     if (isTurnTimePlaying) {
-        // ĐANG CHẠY:
         btn.innerText = '⏸';
         channel.postMessage({ action: 'play_turn_time', duration: currentTurnTime, restart: isRestarting });
 
-        // Sử dụng mốc thời gian thực (Timestamp) để chống sai số/trễ nhịp hoàn toàn so với video
         const startTime = Date.now();
         const startRemaining = currentRemainingTime;
 
         if (turnTimerInterval) clearInterval(turnTimerInterval);
-        
-        // Lặp mỗi 50ms để số thập phân chạy siêu mượt
         turnTimerInterval = setInterval(() => {
             const elapsed = (Date.now() - startTime) / 1000;
             currentRemainingTime = startRemaining - elapsed;
@@ -516,20 +464,17 @@ window.toggleTurnTime = function() {
                 clearInterval(turnTimerInterval);
                 isTurnTimePlaying = false;
                 btn.innerText = '▶';
-                
-                // Gửi lệnh time_out: Dừng nhưng KHÔNG ẨN video 60s
                 channel.postMessage({ action: 'time_out' });
             }
             window.compressBadgeText('timeText');
         }, 50);
-        
     } else {
-        // ĐANG TẠM DỪNG:
         btn.innerText = '▶';
         channel.postMessage({ action: 'pause_turn_time' });
         if (turnTimerInterval) clearInterval(turnTimerInterval);
     }
 };
+
 window.triggerScore = function(btn, type) {
     if(btn) {
         btn.classList.add('active');
@@ -537,7 +482,6 @@ window.triggerScore = function(btn, type) {
     }
 
     if (!activePlayerIndex) {
-        alert("⚠️ Vui lòng chọn (nhấn nút P1-P4) để xác định thí sinh nhận điểm!");
         return;
     }
 
@@ -554,15 +498,16 @@ window.triggerScore = function(btn, type) {
     }
     
     let delta = (type === 'add') ? dDung : dSai;
-    let currentScore = globalPlayers[activePlayerIndex]?.score || 0;
-    
-    window.updateScoreDB(activePlayerIndex, currentScore + delta);
-    update(ref(db, 'games/soundboard'), {
-        soundId: type === 'add' ? 'r1_correct' : 'r1_wrong',
-        file: type === 'add' ? '../sounds/R1_Right.mp3' : '../sounds/R1_Wrong.mp3',
-        action: 'play',
-        timestamp: Date.now()
-    });
+    if (typeof window.updateScoreByIndex === 'function') {
+        window.updateScoreByIndex(activePlayerIndex, delta);
+    } else {
+        let currentScore = globalPlayers[activePlayerIndex]?.score || 0;
+        window.updateScoreDB(activePlayerIndex, currentScore + delta);
+    }
+
+    if (typeof window.playMusic === 'function') {
+        window.playMusic(type === 'add' ? 'R1_Right.mp3' : 'R1_Wrong.mp3');
+    }
     console.log(`Đã ${type === 'add' ? 'cộng' : 'trừ'} ${Math.abs(delta)} điểm cho P${activePlayerIndex}`);
 };
 
@@ -577,10 +522,6 @@ window.closeConfig = function() {
   document.getElementById('configModal').style.display = 'none';
 };
 
-// ==========================================
-// LẮNG NGHE DỮ LIỆU REALTIME TỪ FIREBASE
-// ==========================================
-
 onValue(ref(db, 'games/players'), (snapshot) => {
     if (snapshot.exists()) {
         globalPlayers = snapshot.val(); 
@@ -588,14 +529,12 @@ onValue(ref(db, 'games/players'), (snapshot) => {
         
         for (let i = 1; i <= 4; i++) {
             if (players[i]) {
-                // Ánh xạ sang UI Bảng dọc mới
                 const nameEl = document.getElementById(`playerBtnName-${i}`);
                 const scoreEl = document.getElementById(`playerBtnScore-${i}`);
                 
                 if (nameEl) nameEl.innerText = players[i].name;
                 if (scoreEl) scoreEl.innerText = players[i].score;
                 
-                // Đồng bộ modal config
                 const scoreInput = document.getElementById(`config-score-${i}`);
                 const nameLabel = document.getElementById(`config-name-${i}`);
                 
