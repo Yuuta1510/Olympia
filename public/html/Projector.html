@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Projector</title>
+        <link id="projector-css" rel="stylesheet" href="../css/Projector_R1.css" />
+        <style>
+            html, body {
+                width: 100vw;
+                height: 100vh;
+                overflow: hidden;
+                background-color: black;
+            }
+            #roundIntroVideo {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                object-fit: cover;
+                z-index: 9999;
+                display: none;
+                background-color: transparent;
+                pointer-events: none;
+            }
+
+            #enableSoundBtn {
+                position: fixed;
+                z-index: 10001;
+                left: 50%;
+                bottom: 24px;
+                transform: translateX(-50%);
+                padding: 14px 22px;
+                border: 2px solid #fff;
+                border-radius: 8px;
+                background: #b91c1c;
+                color: #fff;
+                font: 700 18px Arial, sans-serif;
+                cursor: pointer;
+                box-shadow: 0 4px 16px #0009;
+            }
+
+            #enableSoundBtn[hidden] {
+                display: none !important;
+            }
+
+            #projector-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-image: url('../graphic/bg.png');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                z-index: -1;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="projector-bg"></div>
+        <!-- Video Intro Phần Thi cho 4 vòng (intro_r1.mp4 -> intro_r4.mp4) -->
+        <video id="roundIntroVideo" playsinline preload="auto"></video>
+        <button id="enableSoundBtn" type="button" hidden>Bật âm thanh Livestream</button>
+
+        <!-- Video Đồ họa nền Vòng 1 (KhoiDong.webm) -->
+        <video id="graphic_r1" class="video-overlay" style="display: none;">
+            <source src="../graphic/KhoiDong_Proj.webm" type="video/webm">
+        </video>
+        <video id="graphic_time" class="video-overlay" style="display: none; z-index: 1;">
+            <source src="../graphic/60s.webm" type="video/webm">
+        </video>
+        <div id="playerContainer"></div>
+        <div id="questionText" class="question"></div>
+        <div id="timer5sBox" class="countdown-5s-box">5</div>
+        <div id="projTurnName" class="proj-turn-name"></div>
+        <div id="projQuestionCount" class="proj-question-count">
+            <div class="count-title">CÂU</div>
+            <div id="countNumber" class="count-number"></div>
+        </div>
+
+        <script type="module">
+            import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+            import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+            import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
+                authDomain: "olympia-d2f44.firebaseapp.com",
+                databaseURL: "https://olympia-d2f44-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "olympia-d2f44",
+                storageBucket: "olympia-d2f44.firebasestorage.app",
+                messagingSenderId: "18063059793",
+                appId: "1:18063059793:web:5dad7ce59006e779988170",
+                measurementId: "G-XVER3NDTXY"
+            };
+
+            const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+            const analytics = getAnalytics(app);
+            const db = getDatabase(app);
+            window.firebaseDB = db;
+
+            // =====================================================================
+            // 1. ĐỒNG BỘ CHUYỂN TAB (MAIN, R1, R2, R3, R4, SF)
+            // =====================================================================
+            const tabFileMap = {
+                'M': 'Main',
+                'R1': 'Round1',
+                'R2': 'Round2',
+                'R3': 'Round3',
+                'R4': 'Round4',
+                'SF': 'SubFinal'
+            };
+
+            let currentLoadedTab = 'R1';
+
+            function switchLivestreamFiles(tabCode) {
+                const filePrefix = tabFileMap[tabCode];
+                if (!filePrefix || currentLoadedTab === tabCode) return;
+                currentLoadedTab = tabCode;
+
+                const cssLink = document.getElementById('projector-css');
+                if (cssLink) {
+                    cssLink.href = `../css/${filePrefix}.css`;
+                }
+
+                const oldScript = document.getElementById('projector-js');
+                if (oldScript) {
+                    oldScript.remove();
+                }
+
+                const newScript = document.createElement('script');
+                newScript.id = 'projector-js';
+                newScript.type = 'module';
+                newScript.src = `../script/${filePrefix}.js?t=${Date.now()}`;
+                document.body.appendChild(newScript);
+            }
+
+            onValue(ref(db, 'games/active_tab'), (snapshot) => {
+                if (!snapshot.exists()) return;
+                const data = snapshot.val();
+                if (data && data.tab) {
+                    switchLivestreamFiles(data.tab);
+                }
+            });
+
+            // =====================================================================
+            // 2. XỬ LÝ 4 VIDEO INTRO PHẦN THI (intro_r1.mp4 -> intro_r4.mp4)
+            // =====================================================================
+            const roundIntroVideo = document.getElementById('roundIntroVideo');
+
+            if (roundIntroVideo) {
+                // Khi chạy hết video thì dừng ở frame cuối cho đến khi bấm lần 2 để ẩn
+                roundIntroVideo.addEventListener('ended', () => {
+                    roundIntroVideo.pause();
+                });
+            }
+
+            function playRoundIntroWithFallback(roundKey, customFile) {
+                if (!roundIntroVideo) return;
+                const rLower = (roundKey || 'r1').toLowerCase();
+                const rUpper = rLower.toUpperCase();
+                const baseFile = customFile || `intro_${rLower}.mp4`;
+
+                const candidates = [
+                    `../graphic/${baseFile}`,
+                    `../graphic/${baseFile.toLowerCase()}`,
+                    `../graphic/intro_${rLower}.mp4`,
+                    `../graphic/Intro_${rLower}.mp4`,
+                    `../graphic/intro_${rUpper}.mp4`,
+                    `../graphic/Intro_${rUpper}.mp4`,
+                    `/graphic/${baseFile}`,
+                    `Graphic/${baseFile}`,
+                    baseFile,
+                    `Graphic/intro_${rLower}.mp4`,
+                    `intro_${rLower}.mp4`,
+                    `Graphic/Intro_${rLower}.mp4`,
+                    `Intro_${rLower}.mp4`,
+                    `Graphic/Intro_${rUpper}.mp4`,
+                    `Intro_${rUpper}.mp4`
+                ];
+
+                let idx = 0;
+                roundIntroVideo.style.display = 'block';
+
+                const tryNextSource = () => {
+                    if (idx >= candidates.length) {
+                        console.warn(`Không tìm thấy file video Intro cho vòng ${roundKey}`);
+                        roundIntroVideo.style.display = 'none';
+                        set(ref(db, 'games/round_intro_status'), null);
+                        return;
+                    }
+                    roundIntroVideo.src = candidates[idx++];
+                    roundIntroVideo.currentTime = 0;
+                    roundIntroVideo.play().then(() => {
+                        set(ref(db, 'games/round_intro_status'), rLower);
+                    }).catch(() => {
+                        tryNextSource();
+                    });
+                };
+
+                roundIntroVideo.onerror = () => {
+                    tryNextSource();
+                };
+
+                tryNextSource();
+            }
+
+            function hideRoundIntroVideo() {
+                if (!roundIntroVideo) return;
+                roundIntroVideo.onerror = null;
+                roundIntroVideo.style.display = 'none';
+                roundIntroVideo.pause();
+                roundIntroVideo.currentTime = 0;
+                set(ref(db, 'games/round_intro_status'), null);
+            }
+
+            set(ref(db, 'games/round_intro_status'), null);
+            let isInitialIntroLoad = true;
+
+            onValue(ref(db, 'games/round_intro'), (snapshot) => {
+                if (isInitialIntroLoad) {
+                    isInitialIntroLoad = false;
+                    return;
+                }
+                if (!snapshot.exists() || !roundIntroVideo) return;
+
+                const data = snapshot.val();
+                if (!data) return;
+
+                if (data.action === 'play') {
+                    playRoundIntroWithFallback(data.round || 'r1', data.file);
+                } else if (data.action === 'hide') {
+                    hideRoundIntroVideo();
+                }
+            });
+
+            // Nếu bấm RESET ĐỒ HỌA, tự động ẩn luôn video intro vòng thi nếu đang hiện
+            let isInitialCmdLoad = true;
+            onValue(ref(db, 'games/commands'), (snapshot) => {
+                if (isInitialCmdLoad) {
+                    isInitialCmdLoad = false;
+                    return;
+                }
+                if (!snapshot.exists()) return;
+                const data = snapshot.val();
+                if (data && (data.action === 'reset_graphic' || data.action === 'reset_main_graphic')) {
+                    hideRoundIntroVideo();
+                }
+            });
+
+            // =====================================================================
+            // 3. BỘ PHÁT NHẠC SOUNDBOARD TRỰC TIẾP TRÊN MÀN LIVESTREAM
+            // =====================================================================
+            const soundIdForFileName = fileName => fileName.replace(/[^A-Za-z0-9_-]/g, '_');
+            const soundFileNames = [
+                'Main_15s.mp3', 'Main_1st.mp3', 'Main_2nd.mp3', 'Main_3rd.mp3',
+                'Main_4th.mp3', 'Main_Award.mp3', 'Main_Blanks.mp3',
+                'Main_ContestantEntrance.mp3', 'Main_DLDN2008.mp3', 'Main_DLDN2010.mp3',
+                'Main_DLDN2010_Instrument.mp3', 'Main_HostEntrance.mp3',
+                'Main_Introduction1.mp3', 'Main_Introduction2.mp3', 'Main_Introduction3.mp3',
+                'Main_Introduction4.mp3', 'Main_Introduction5.mp3', 'Main_PointSummary.mp3',
+                'R1_Bed1.mp3', 'R1_Bed2.mp3', 'R1_End.mp3', 'R1_Intro.mp3', 'R1_60s.mp3',
+                'R1_Start.mp3', 'R2_Intro.mp3', 'R2_Right.mp3', 'R2_RightObs.mp3',
+                'R2_Wrong.mp3', 'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
+                'R4_15s.mp3', 'R4_20s.mp3', 'R4_20sPrac.mp3', 'R4_30s.mp3',
+                'R4_30sPrac.mp3', 'R4_40sPrac.mp3', 'R4_60sPrac.mp3', 'R4_Begin.mp3',
+                'R4_End.mp3', 'R4_Intro.mp3'
+            ];
+            const SOUND_FILES = soundFileNames.reduce((files, fileName) => {
+                files[soundIdForFileName(fileName)] = `../sounds/${fileName}`;
+                return files;
+            }, {});
+
+            const audioCache = {};
+            const activeSounds = {};
+            const soundCommandVersions = {};
+            const activePlaybackVersions = {};
+            const enableSoundBtn = document.getElementById('enableSoundBtn');
+            let pendingAudioPlayback = null;
+
+            function createAudioInstance(soundId, fileUrl) {
+                const audio = new Audio(fileUrl);
+                audio.preload = 'auto';
+                audio.onended = () => {
+                    if (!activeSounds[soundId] || activePlaybackVersions[soundId] !== soundCommandVersions[soundId]) return;
+                    activeSounds[soundId] = false;
+                    set(ref(db, `games/soundboard_status/${soundId}`), false);
+                };
+                return audio;
+            }
+
+            Object.keys(SOUND_FILES).forEach(id => {
+                audioCache[id] = createAudioInstance(id, SOUND_FILES[id]);
+            });
+
+            enableSoundBtn.addEventListener('click', () => {
+                const pending = pendingAudioPlayback;
+                if (!pending || soundCommandVersions[pending.soundId] !== pending.commandVersion) {
+                    enableSoundBtn.hidden = true;
+                    pendingAudioPlayback = null;
+                    return;
+                }
+
+                // Gọi play trực tiếp trong thao tác click để trình duyệt cấp quyền phát tiếng.
+                pending.audio.currentTime = 0;
+                pending.audio.play().then(() => {
+                    if (soundCommandVersions[pending.soundId] !== pending.commandVersion) return;
+                    activeSounds[pending.soundId] = true;
+                    activePlaybackVersions[pending.soundId] = pending.commandVersion;
+                    pendingAudioPlayback = null;
+                    enableSoundBtn.hidden = true;
+                    set(ref(db, `games/soundboard_status/${pending.soundId}`), true);
+                }).catch(error => {
+                    console.warn(`Không thể bật âm thanh [${pending.fileUrl}] trên Livestream:`, error);
+                    enableSoundBtn.textContent = 'Không bật được âm thanh — nhấn để thử lại';
+                });
+            });
+
+            let isInitialSoundLoad = true;
+
+            onValue(ref(db, 'games/soundboard'), (snapshot) => {
+                if (isInitialSoundLoad) {
+                    isInitialSoundLoad = false;
+                    return;
+                }
+                if (!snapshot.exists()) return;
+
+                const data = snapshot.val();
+                if (!data || !data.soundId) return;
+
+                const soundId = data.soundId;
+                const fileUrl = data.file || SOUND_FILES[soundId];
+                const resolvedFileUrl = fileUrl ? new URL(fileUrl, document.baseURI).href : '';
+
+                if (resolvedFileUrl && (!audioCache[soundId] || audioCache[soundId].src !== resolvedFileUrl)) {
+                    audioCache[soundId] = createAudioInstance(soundId, fileUrl);
+                }
+
+                const audio = audioCache[soundId];
+                if (!audio) return;
+
+                const shouldStop = data.action === 'stop';
+                const commandVersion = (soundCommandVersions[soundId] || 0) + 1;
+                soundCommandVersions[soundId] = commandVersion;
+                if (pendingAudioPlayback && pendingAudioPlayback.soundId === soundId) {
+                    pendingAudioPlayback = null;
+                    enableSoundBtn.hidden = true;
+                }
+
+                if (shouldStop) {
+                    activeSounds[soundId] = false;
+                    audio.pause();
+                    audio.currentTime = 0;
+                    set(ref(db, `games/soundboard_status/${soundId}`), false);
+                } else {
+                    activeSounds[soundId] = true;
+                    activePlaybackVersions[soundId] = commandVersion;
+                    audio.currentTime = 0;
+                    audio.play().then(() => {
+                        if (activeSounds[soundId] && soundCommandVersions[soundId] === commandVersion) {
+                            set(ref(db, `games/soundboard_status/${soundId}`), true);
+                        }
+                    }).catch(err => {
+                        console.warn(`Không thể phát nhạc [${fileUrl}] trên Livestream:`, err);
+                        if (soundCommandVersions[soundId] === commandVersion) {
+                            activeSounds[soundId] = false;
+                            set(ref(db, `games/soundboard_status/${soundId}`), false);
+                            if (err.name === 'NotAllowedError') {
+                                pendingAudioPlayback = { soundId, audio, commandVersion, fileUrl };
+                                enableSoundBtn.textContent = `Bật âm thanh để phát ${soundId}`;
+                                enableSoundBtn.hidden = false;
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
+
+        <!-- NHÚNG SCRIPT ĐỘNG CHO LIVESTREAM (MẶC ĐỊNH Round1.js) -->
+        <script id="projector-js" type="module" src="../script/Round1.js"></script>
+    </body>
+</html>

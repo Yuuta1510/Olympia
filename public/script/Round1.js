@@ -15,6 +15,93 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getDatabase(app);
 
+let globalPlayers = {};
+let lr_config = { so_luot: 4, so_cau: 6 };
+let lc_configs = [{ so_cau: 12 }];
+
+onValue(ref(db, 'games/players'), (snapshot) => {
+    if (snapshot.exists()) globalPlayers = snapshot.val();
+});
+
+onValue(ref(db, 'games/round_1'), (snapshot) => {
+    if (snapshot.exists()) {
+        const data = snapshot.val();
+        if (data.luot_rieng) lr_config = data.luot_rieng;
+        if (data.luot_chung) {
+            lc_configs = Array.isArray(data.luot_chung) ? data.luot_chung : [data.luot_chung];
+        }
+    }
+});
+
+function updateProjectorInfo(quesIndex) {
+    const turnNameEl = document.getElementById('projTurnName');
+    const countBoxEl = document.getElementById('projQuestionCount');
+    const countNumEl = document.getElementById('countNumber');
+
+    if (!turnNameEl || !countBoxEl || !countNumEl) return;
+
+    if (!quesIndex) {
+        turnNameEl.style.display = 'none';
+        countBoxEl.style.display = 'none';
+        return;
+    }
+
+    let LR_Count = parseInt(lr_config.so_luot) || 4;
+    let A = parseInt(lr_config.so_cau) || 0;
+
+    let turnName = "";
+    let relativeQues = 0;
+    let totalTurnQues = 0;
+
+    if (A > 0 && LR_Count > 0 && quesIndex <= (LR_Count * A)) {
+        let playerIndex = Math.ceil(quesIndex / A);
+        relativeQues = quesIndex - ((playerIndex - 1) * A);
+        totalTurnQues = A;
+        
+        let pName = (globalPlayers && globalPlayers[playerIndex] && globalPlayers[playerIndex].name) 
+                    ? globalPlayers[playerIndex].name 
+                    : `THÍ SINH ${playerIndex}`;
+        turnName = `KHỞI ĐỘNG RIÊNG - ${pName.toUpperCase()}`;
+    } else if (lc_configs && lc_configs.length > 0) {
+        let remainingIndex = quesIndex - ((A > 0 && LR_Count > 0) ? (LR_Count * A) : 0);
+        let foundLC = false;
+        for (let i = 0; i < lc_configs.length; i++) {
+            let B = parseInt(lc_configs[i].so_cau) || 0;
+            if (B > 0 && remainingIndex <= B) {
+                turnName = `KHỞI ĐỘNG CHUNG`;
+                relativeQues = remainingIndex;
+                totalTurnQues = B;
+                foundLC = true;
+                break;
+            } else {
+                remainingIndex -= B;
+            }
+        }
+        if (!foundLC) {
+            turnName = `KHỞI ĐỘNG CHUNG`;
+            relativeQues = 0;
+            totalTurnQues = 0;
+        }
+    } else {
+        turnName = `KHỞI ĐỘNG CHUNG`;
+        relativeQues = 0;
+        totalTurnQues = 0;
+    }
+
+    turnNameEl.textContent = turnName;
+    countNumEl.textContent = `${relativeQues}/${totalTurnQues}`;
+
+    turnNameEl.style.display = 'block';
+    countBoxEl.style.display = 'flex';
+}
+
+function hideProjectorInfo() {
+    const turnNameEl = document.getElementById('projTurnName');
+    const countBoxEl = document.getElementById('projQuestionCount');
+    if (turnNameEl) turnNameEl.style.display = 'none';
+    if (countBoxEl) countBoxEl.style.display = 'none';
+}
+
 function compressText(elementId, maxWidth, align) {
     const el = document.getElementById(elementId);
     if (!el) return;
@@ -38,7 +125,7 @@ function compressText(elementId, maxWidth, align) {
 
 async function drawAllPlayers(playersData) {
     const container = document.getElementById('playerContainer');
-    container.style.display = 'flex';
+    container.style.display = 'block'; // Đổi từ 'flex' sang 'block'
     
     if (playersData) {
         const existingPlayers = container.querySelectorAll('.player');
@@ -49,7 +136,7 @@ async function drawAllPlayers(playersData) {
                 const scoreEl = document.getElementById(`player-score-${stt}`);
                 if (nameEl) nameEl.textContent = `${stt}. ${player.name || ""}`;
                 if (scoreEl) scoreEl.textContent = player.score || 0;
-                compressText(`player-name-${stt}`, 200, 'left');
+                compressText(`player-name-${stt}`, 190, 'left');
             }
             return; 
         }
@@ -58,7 +145,8 @@ async function drawAllPlayers(playersData) {
         for (const [stt, player] of Object.entries(playersData)) {
             if (!player) continue;
             const row = document.createElement('div');
-            row.className = 'player';
+            // Gán thêm class định vị riêng cho từng thí sinh (player-pos-1, player-pos-2, ...)
+            row.className = `player player-pos-${stt}`;
 
             const nameEl = document.createElement('div');
             nameEl.className = 'player-name';
@@ -73,7 +161,7 @@ async function drawAllPlayers(playersData) {
             row.appendChild(nameEl);
             row.appendChild(scoreEl);
             container.appendChild(row);
-            compressText(`player-name-${stt}`, 200, 'left');
+            compressText(`player-name-${stt}`, 190, 'left');
         }
     } else {
         container.innerHTML = "";
@@ -82,17 +170,12 @@ async function drawAllPlayers(playersData) {
 
 function activePlayer(index) {
     const bg = document.getElementById('active-bg');
-    const players = document.querySelectorAll('.player'); 
-    const target = players[index - 1];
-    if (bg && target) {
-        bg.style.opacity = 1;
-        bg.style.left = (target.offsetLeft - 9) + 'px';
-        const totalPlayer = players.length;
-        if(index === totalPlayer) {
-            bg.classList.add('is-trapezoid');
-        } else {
-            bg.classList.remove('is-trapezoid'); 
-        }
+    if (!bg) return;
+    bg.style.opacity = '';
+    if (index >= 1 && index <= 4) {
+        bg.className = `pos-${index}`;
+    } else {
+        bg.className = '';
     }
 }
 
@@ -132,8 +215,14 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
     if (data.action === 'show_graphic') {
         const videoEl = document.getElementById('graphic_r1');
         if (videoEl) {
-            // Logic chọn video dựa trên việc có giới hạn thời gian hay không
-            videoEl.src = data.isTimeLimited ? '../graphic/KhoiDongTime.webm' : '../graphic/KhoiDong.webm';
+            // Tự động nhận diện nếu trang hiện tại là Projector
+            const isProjector = window.location.pathname.toLowerCase().includes('projector') || 
+                                document.title.toLowerCase().includes('projector');
+            
+            const fileNormal = isProjector ? '../graphic/KhoiDong_Proj.webm' : '../graphic/KhoiDong.webm';
+            const fileTime   = isProjector ? '../graphic/KhoiDongTime_Proj.webm' : '../graphic/KhoiDongTime.webm';
+
+            videoEl.src = data.isTimeLimited ? fileTime : fileNormal;
             videoEl.style.display = 'block';
             videoEl.currentTime = 0; 
             videoEl.play().catch(err => console.error("Lỗi phát video nền:", err));
@@ -225,8 +314,7 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
         }
     } else if (data.action === 'show_players') {
         await drawAllPlayers(data.players);
-        const bg = document.getElementById('active-bg');
-        if (bg) bg.style.opacity = 0; 
+        activePlayer(0);
     } else if (data.action === 'hide_players') {
         const container = document.getElementById('playerContainer');
         if (container) container.style.display = 'none';
@@ -235,12 +323,15 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
         activePlayer(data.index); 
     } else if (data.action === 'show_question') {
         drawQuestion(data.text);
+        if (data.quesIndex) {
+            updateProjectorInfo(data.quesIndex);
+        }
     } else if (data.action === 'hide_question') {
         const textQues = document.getElementById('questionText');
         if (textQues) textQues.style.display = 'none';
+        hideProjectorInfo();
     } else if (data.action === 'reset_buzzers') {
-        const activeBackground = document.getElementById('active-bg');
-        if (activeBackground) activeBackground.style.opacity = 0;
+        activePlayer(0);
     } else if (data.action === 'start_5s') {
         const timerBox = document.getElementById('timer5sBox');
         if (!timerBox) return;
@@ -265,6 +356,7 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
         if (timerBox) timerBox.style.display = 'none';
         if (timer5sInterval) clearInterval(timer5sInterval);
     } else if (data.action === 'reset_graphic') {
+        hideProjectorInfo();
         const videoEl = document.getElementById('graphic_r1');
         const timeEl = document.getElementById('graphic_time');
         if (videoEl) {
