@@ -355,7 +355,11 @@ window.triggerAction = function(btn, keyStr) {
       isQuestionShown = !isQuestionShown;
       if (isQuestionShown) {
           if (round1Questions && round1Questions[currentQuesIndex]) {
-              channel.postMessage({ action: 'show_question', text: round1Questions[currentQuesIndex].cau_hoi });
+              channel.postMessage({ 
+                  action: 'show_question', 
+                  text: round1Questions[currentQuesIndex].cau_hoi,
+                  quesIndex: currentQuesIndex
+              });
           }
           if (btnQuestion) btnQuestion.classList.remove('dimmed');
       } else {
@@ -365,7 +369,11 @@ window.triggerAction = function(btn, keyStr) {
   }
   else if (keyStr === 'n' || keyStr === 'p') {
       if (isQuestionShown && round1Questions && round1Questions[currentQuesIndex]) {
-          const showQuestion = () => channel.postMessage({ action: 'show_question', text: round1Questions[currentQuesIndex].cau_hoi });
+          const showQuestion = () => channel.postMessage({ 
+              action: 'show_question', 
+              text: round1Questions[currentQuesIndex].cau_hoi,
+              quesIndex: currentQuesIndex
+          });
           if (keyStr === 'n' && resetBuzzersForNextQuestion) {
               channel.postMessage({ action: 'reset_buzzers' }).then(showQuestion);
           } else {
