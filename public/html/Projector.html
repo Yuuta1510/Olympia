@@ -4,13 +4,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Projector</title>
-        <link id="projector-css" rel="stylesheet" href="../css/Projector_R1.css" />
+        <link id="projector-css" rel="stylesheet" href="../css/Projector_Round1.css" />
         <style>
             html, body {
                 width: 100vw;
                 height: 100vh;
                 overflow: hidden;
-                background-color: black;
+                background-color: transparent;
             }
             #roundIntroVideo {
                 position: fixed;
@@ -51,10 +51,11 @@
                 left: 0;
                 width: 100vw;
                 height: 100vh;
-                background-image: url('../graphic/bg.png');
+                /* background-image: url('../graphic/bg.png');
                 background-size: cover;
                 background-position: center;
-                background-repeat: no-repeat;
+                background-repeat: no-repeat; */
+                background: transparent;
                 z-index: -1;
                 pointer-events: none;
             }
@@ -67,19 +68,21 @@
         <button id="enableSoundBtn" type="button" hidden>Bật âm thanh Livestream</button>
 
         <!-- Video Đồ họa nền Vòng 1 (KhoiDong.webm) -->
-        <video id="graphic_r1" class="video-overlay" style="display: none;">
-            <source src="../graphic/KhoiDong_Proj.webm" type="video/webm">
-        </video>
-        <video id="graphic_time" class="video-overlay" style="display: none; z-index: 1;">
-            <source src="../graphic/60s.webm" type="video/webm">
-        </video>
-        <div id="playerContainer"></div>
-        <div id="questionText" class="question"></div>
-        <div id="timer5sBox" class="countdown-5s-box">5</div>
-        <div id="projTurnName" class="proj-turn-name"></div>
-        <div id="projQuestionCount" class="proj-question-count">
-            <div class="count-title">CÂU</div>
-            <div id="countNumber" class="count-number"></div>
+        <div id="round1-ui" class="round-ui">
+            <video id="graphic_r1" class="video-overlay" style="display: none;">
+                <source src="../graphic/KhoiDong_Proj.webm" type="video/webm">
+            </video>
+            <video id="graphic_time" class="video-overlay" style="display: none; z-index: 1;">
+                <source src="../graphic/60s.webm" type="video/webm">
+            </video>
+            <div id="playerContainer"></div>
+            <div id="questionText" class="question"></div>
+            <div id="timer5sBox" class="countdown-5s-box">5</div>
+            <div id="projTurnName" class="proj-turn-name"></div>
+            <div id="projQuestionCount" class="proj-question-count">
+                <div class="count-title">CÂU</div>
+                <div id="countNumber" class="count-number"></div>
+            </div>
         </div>
 
         <script type="module">
@@ -124,7 +127,7 @@
 
                 const cssLink = document.getElementById('projector-css');
                 if (cssLink) {
-                    cssLink.href = `../css/${filePrefix}.css`;
+                    cssLink.href = `../css/Projector_${filePrefix}.css`;
                 }
 
                 const oldScript = document.getElementById('projector-js');
@@ -137,6 +140,14 @@
                 newScript.type = 'module';
                 newScript.src = `../script/${filePrefix}.js?t=${Date.now()}`;
                 document.body.appendChild(newScript);
+
+                if (typeof window.cleanupCurrentRound === 'function') {
+                    window.cleanupCurrentRound();
+                    window.cleanupCurrentRound = null;
+                }
+                
+                const r1Ui = document.getElementById('round1-ui');
+                if (r1Ui) r1Ui.style.display = (tabCode === 'R1') ? 'grid' : 'none';
             }
 
             onValue(ref(db, 'games/active_tab'), (snapshot) => {

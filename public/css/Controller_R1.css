@@ -6,6 +6,7 @@
    ========================================================================== */
 .main-content-grid {
   width: 100%;
+  position: relative;
   background-color: var(--black);
   padding: 10px;
   display: grid;

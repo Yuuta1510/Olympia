@@ -146,6 +146,14 @@
       }
 
       .main-content-grid {
+        width: 100%;
+        position: relative;
+        background-color: var(--black);
+        padding: 10px;
+        display: grid;
+        grid-template-columns: 1fr 220px; 
+        gap: 12px;
+        flex: 1;
         min-height: 0;
       }
 
@@ -213,62 +221,64 @@
         </div>
 
         <div class="main-content-grid">
-          <div class="qa-column">
-            <div class="question-box">
-              <div class="question-header">
-                <span id="roundText">LƯỢT RIÊNG 1</span>
-                <span class="divider">-</span>
-                <span id="quesText">CÂU HỎI 1/...</span>
-                <span class="divider">-</span>
-                <span id="timeText">THỜI GIAN: 60s</span>
-                <button id="btnResetTime" onclick="resetTurnTime()" style="margin-left:auto; width: 40px; height: 32px; background: #dc2626; color: white; border: 1.5px solid white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">🔄</button>
-                <button id="btnPlayPauseTime" onclick="toggleTurnTime()" style="margin-left: auto; margin-right: 15px; width: 40px; height: 32px; background: #2563eb; color: white; border: 1.5px solid white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">▶</button>
-              </div>
-
-              <div class="question-content" id="preview-question">Loading></div>
-
-              <div class="question-actions">
-                <div class="left-actions">
-                  <button class="action-btn dimmed" id="btn-graphic" onclick="triggerAction(this, 's')">ĐỒ HỌA</button>
-                  <button class="action-btn dimmed" id="btn-players" onclick="triggerAction(this, '0')">THÍ SINH</button>
-                  <button class="action-btn dimmed" id="btn-question" onclick="triggerAction(this, 'q')">CÂU HỎI</button>
-                  <button class="action-btn" onclick="triggerAction(this, 'p')">◀ Q</button>
-                  <button class="action-btn" onclick="triggerAction(this, 'n')">Q ▶</button>
-                  <button class="action-btn" onclick="triggerAction(this, 'rb')">RESET CHUÔNG</button>
-                  <button class="action-btn" onclick="triggerAudio(this, 'Main_Blanks_mp3')">BLANK</button>
-                  <button class="action-btn" style="background-color: #cc0000;" onclick="triggerAction(this, 'r')">RESET ĐỒ HỌA</button>
+          <div id="round1-ui" style="display: grid; grid-template-columns: 1fr 220px; width: 100%; height: 100%; gap: 12px;">
+            <div class="qa-column">
+              <div class="question-box">
+                <div class="question-header">
+                  <span id="roundText">LƯỢT RIÊNG 1</span>
+                  <span class="divider">-</span>
+                  <span id="quesText">CÂU HỎI 1/...</span>
+                  <span class="divider">-</span>
+                  <span id="timeText">THỜI GIAN: 60s</span>
+                  <button id="btnResetTime" onclick="resetTurnTime()" style="margin-left:auto; width: 40px; height: 32px; background: #dc2626; color: white; border: 1.5px solid white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">🔄</button>
+                  <button id="btnPlayPauseTime" onclick="toggleTurnTime()" style="margin-left: auto; margin-right: 15px; width: 40px; height: 32px; background: #2563eb; color: white; border: 1.5px solid white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">▶</button>
                 </div>
 
-                <div class="right-actions">
-                  <div class="timer-5s-box" id="timer5s-display" onclick="triggerAction(this, 't5')">5</div>
+                <div class="question-content" id="preview-question">Loading></div>
+
+                <div class="question-actions">
+                  <div class="left-actions">
+                    <button class="action-btn dimmed" id="btn-graphic" onclick="triggerAction(this, 's')">ĐỒ HỌA</button>
+                    <button class="action-btn dimmed" id="btn-players" onclick="triggerAction(this, '0')">THÍ SINH</button>
+                    <button class="action-btn dimmed" id="btn-question" onclick="triggerAction(this, 'q')">CÂU HỎI</button>
+                    <button class="action-btn" onclick="triggerAction(this, 'p')">◀ Q</button>
+                    <button class="action-btn" onclick="triggerAction(this, 'n')">Q ▶</button>
+                    <button class="action-btn" onclick="triggerAction(this, 'rb')">RESET CHUÔNG</button>
+                    <button class="action-btn" onclick="triggerAudio(this, 'Main_Blanks_mp3')">BLANK</button>
+                    <button class="action-btn" style="background-color: #cc0000;" onclick="triggerAction(this, 'r')">RESET ĐỒ HỌA</button>
+                  </div>
+
+                  <div class="right-actions">
+                    <div class="timer-5s-box" id="timer5s-display" onclick="triggerAction(this, 't5')">5</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="answer-box">
+                <div class="answer-content" id="preview-answer">...</div>
+                <div class="answer-actions">
+                  <button class="action-btn score-btn add-btn" onclick="triggerScore(this, 'add')">ĐÚNG</button>
+                  <button class="action-btn score-btn sub-btn" onclick="triggerScore(this, 'sub')">SAI</button>
                 </div>
               </div>
             </div>
-
-            <div class="answer-box">
-              <div class="answer-content" id="preview-answer">...</div>
-              <div class="answer-actions">
-                <button class="action-btn score-btn add-btn" onclick="triggerScore(this, 'add')">ĐÚNG</button>
-                <button class="action-btn score-btn sub-btn" onclick="triggerScore(this, 'sub')">SAI</button>
+            <div class="players-column">
+              <div class="player-vertical-card" onclick="triggerAction(this, '1')" id="playerBtn-1">
+                <div class="player-v-name" id="playerBtnName-1">P1</div>
+                <div class="player-v-score" id="playerBtnScore-1">0</div>
               </div>
-            </div>
-          </div>
-          <div class="players-column">
-            <div class="player-vertical-card" onclick="triggerAction(this, '1')" id="playerBtn-1">
-              <div class="player-v-name" id="playerBtnName-1">P1</div>
-              <div class="player-v-score" id="playerBtnScore-1">0</div>
-            </div>
-            <div class="player-vertical-card" onclick="triggerAction(this, '2')" id="playerBtn-2">
-              <div class="player-v-name" id="playerBtnName-2">P2</div>
-              <div class="player-v-score" id="playerBtnScore-2">0</div>
-            </div>
-            <div class="player-vertical-card" onclick="triggerAction(this, '3')" id="playerBtn-3">
-              <div class="player-v-name" id="playerBtnName-3">P3</div>
-              <div class="player-v-score" id="playerBtnScore-3">0</div>
-            </div>
-            <div class="player-vertical-card" onclick="triggerAction(this, '4')" id="playerBtn-4">
-              <div class="player-v-name" id="playerBtnName-4">P4</div>
-              <div class="player-v-score" id="playerBtnScore-4">0</div>
+              <div class="player-vertical-card" onclick="triggerAction(this, '2')" id="playerBtn-2">
+                <div class="player-v-name" id="playerBtnName-2">P2</div>
+                <div class="player-v-score" id="playerBtnScore-2">0</div>
+              </div>
+              <div class="player-vertical-card" onclick="triggerAction(this, '3')" id="playerBtn-3">
+                <div class="player-v-name" id="playerBtnName-3">P3</div>
+                <div class="player-v-score" id="playerBtnScore-3">0</div>
+              </div>
+              <div class="player-vertical-card" onclick="triggerAction(this, '4')" id="playerBtn-4">
+                <div class="player-v-name" id="playerBtnName-4">P4</div>
+                <div class="player-v-score" id="playerBtnScore-4">0</div>
+              </div>
             </div>
           </div>
         </div>
@@ -428,6 +438,13 @@
           tab: suffix,
           timestamp: Date.now()
         });
+        if (typeof window.cleanupCurrentRound === 'function') {
+            window.cleanupCurrentRound();
+            window.cleanupCurrentRound = null;
+        }
+        
+        const r1Ui = document.getElementById('round1-ui');
+        if (r1Ui) r1Ui.style.display = (suffix === 'R1') ? 'grid' : 'none';
       };
 
       // SOUNDBOARD
