@@ -62,11 +62,11 @@
     height: 52.7%;
     display: flex;
     flex-direction: column; 
-    align-items: stretch; /* Đổi từ flex-start sang stretch để thanh thông tin kéo giãn ngang */
+    align-items: stretch; 
     gap: 20px;
-    border: 2px solid #fff; /* Thêm viền trắng cho khung list */
+    border: 2px solid #fff; 
     border-radius: 8px;
-    background: #0b1120; /* Phủ thêm nền tối nhẹ để khối danh sách có chiều sâu */
+    background: #0b1120; 
 }
 
 .r2-ctrl-cnv-title {
@@ -82,13 +82,12 @@
     text-transform: uppercase;
 }
 
-/* Khung bọc dàn ngang cho Từng Hàng Chữ Cái và Số STT */
 .r2-ctrl-row-wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 95%;
-    transform: translate(20px, 35px);
+    transform: translate(20px, 5px);
 }
 
 .r2-ctrl-row {
@@ -114,6 +113,8 @@
 .r2-ctrl-char.selected { background: #0ea5e9; color: transparent; border-color: #38bdf8; }
 .r2-ctrl-char.cancelled { background: #475569; color: transparent; border-color: #94a3b8; }
 .r2-ctrl-char.unselected { background: transparent; color: transparent; }
+/* Hàng gợi ý (không có chữ cái) */
+.r2-ctrl-char.empty-hint { display: none; }
 
 .r2-ctrl-row-number {
     width: 50px;
@@ -143,6 +144,8 @@
     padding: 15px 20px;
     border-radius: 8px;
     border: 2px solid #00b7ff; 
+    display: flex;
+    flex-direction: column;
 }
 .r2-ctrl-score-grid {
     position: absolute;
@@ -156,8 +159,8 @@
 }
 .r2-c-score-card {
     display: flex;
-    flex-direction:
-    column; border: 2px solid #4f5050;
+    flex-direction: column; 
+    border: 2px solid #4f5050;
     border-radius: 6px;
     background: #0b004b;
 }
@@ -182,13 +185,15 @@
     color: #fff;
 }
 
+/* ĐÃ DI CHUYỂN: Cụm 4 nút dạt về góc dưới bên phải trong Box Câu hỏi */
 .r2-ctrl-page-btns {
-    position: absolute;
-    top: 48%;
-    right: 5%;
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 8px;
     z-index: 30;
+    justify-content: flex-end;
+    margin-top: auto;
 }
 
 .r2-ctrl-btn {
@@ -214,4 +219,11 @@
 .r2-ctrl-btn.active {
     border-color: #FFFF00;
     color: #FFFF00;
+}
+
+.r2-c-score-card.buzzed {
+    border-color: #facc15;
+    box-shadow: 0 0 15px #facc15;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
 }

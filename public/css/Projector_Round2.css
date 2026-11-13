@@ -40,54 +40,23 @@
 }
 .r2-main-img {
     position: absolute;
-    width: 39%;       /* Chỉnh độ to nhỏ của ảnh mục tiêu */
-    height: 42.4%;      
-    top: 14.2%;          /* Đẩy ảnh lên/xuống */
-    left: 8%;   /* Đẩy ảnh qua trái/phải */
+    width: 39%;       
+    height: 43.2%;      
+    top: 13.5%;          
+    left: 8%;   
 }
 
-/* Thiết lập chung cho các miếng ghép (1.png -> 5.png) */
 .r2-piece {
     position: absolute;
     height: auto;
 }
 .r2-piece.hidden { opacity: 0; }
 
-/* Miếng ghép 1 */
-#r2-p1 {
-    width: 19.7%;
-    top: 13.3%;
-    left: 8%;
-}
-
-/* Miếng ghép 2 */
-#r2-p2 {
-    width: 19.7%;
-    top: 13.3%;
-    left: 27.5%; 
-}
-
-/* Miếng ghép 3 */
-#r2-p3 {
-    width: 19.7%;
-    top: 35.1%;
-    left: 27.5%; 
-}
-
-/* Miếng ghép 4 */
-#r2-p4 {
-    width: 19.7%;
-    top: 35.1%;
-    left: 8%; 
-}
-
-/* Miếng ghép 5 */
-#r2-p5 {
-    width: 17.4%;
-    height: 19.2%;
-    top: 25.5%;
-    left: 18.9%; 
-}
+#r2-p1 { width: 19.7%; top: 13.3%; left: 8%; }
+#r2-p2 { width: 19.7%; top: 13.3%; left: 27.5%; }
+#r2-p3 { width: 19.7%; top: 35.1%; left: 27.5%; }
+#r2-p4 { width: 19.7%; top: 35.1%; left: 8%; }
+#r2-p5 { width: 17.4%; height: 19.2%; top: 25.5%; left: 18.9%; }
 
 .r2-rows-area {
     position: absolute;
@@ -112,6 +81,12 @@
     font-weight: bold;
     white-space: nowrap;
 }
+
+/* CẤU TRÚC ẨN HÀNG 5 VÀ 6 TRÊN PROJECTOR */
+.r2-rows-area > .r2-row-container:nth-child(6){
+    display: none !important;
+}
+
 .r2-row {
     display: flex;
     gap: 3px;
@@ -181,10 +156,7 @@
     opacity: 0;
     transition: opacity 0.3s ease;
 }
-
-.r2-p2-text.fade-in {
-    opacity: 1;
-}
+.r2-p2-text.fade-in { opacity: 1; }
 
 .r2-p2-name {
     left: 23.5%;
@@ -195,7 +167,6 @@
     text-align: center;
     color: white;
 }
-
 .r2-p2-ans {
     left: 51%;
     width: 25.5%;
@@ -211,3 +182,48 @@
 .r2-p2-pos-2 { top: 40.5%; }
 .r2-p2-pos-3 { top: 54%; }
 .r2-p2-pos-4 { top: 67.5%; }
+
+/* Khung bọc danh sách những người nhấn chuông */
+.r2-buzzer-container {
+    position: absolute;
+    bottom: -7%;
+    right: 46.2%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    z-index: 10;
+    width: 70%;
+    height: 35%;
+}
+
+.r2-buzzer-item {
+    width: 15%;
+    height: 15%;
+    flex-shrink: 0;
+    background: url('../graphic/R2_Buzzed.png') center / contain no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.r2-buzzer-name-wrapper {
+    width: 85%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.r2-buzzer-name {
+    display: inline-block;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 6px 0px 0px 0px;
+    font-family: "Myriad Pro", sans-serif;
+    font-size: 26px;
+    font-weight: bold;
+    color: #fff;
+}
