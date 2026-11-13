@@ -241,10 +241,10 @@
                     <button class="action-btn dimmed" id="btn-graphic" onclick="triggerAction(this, 's')">ĐỒ HỌA</button>
                     <button class="action-btn dimmed" id="btn-players" onclick="triggerAction(this, '0')">THÍ SINH</button>
                     <button class="action-btn dimmed" id="btn-question" onclick="triggerAction(this, 'q')">CÂU HỎI</button>
-                    <button class="action-btn" onclick="triggerAction(this, 'p')">◀ Q</button>
-                    <button class="action-btn" onclick="triggerAction(this, 'n')">Q ▶</button>
+                    <button class="action-btn" onclick="triggerAction(this, 'p')">◀ PREV</button>
+                    <button class="action-btn" onclick="triggerAction(this, 'n')">NEXT ▶</button>
                     <button class="action-btn" onclick="triggerAction(this, 'rb')">RESET CHUÔNG</button>
-                    <button class="action-btn" onclick="triggerAudio(this, 'Main_Blanks_mp3')">BLANK</button>
+                    <button class="action-btn" onclick="playMusic('Main_Blanks.mp3', false, false)">BLANK</button>
                     <button class="action-btn" style="background-color: #cc0000;" onclick="triggerAction(this, 'r')">RESET ĐỒ HỌA</button>
                   </div>
 
@@ -518,42 +518,55 @@
         button.className = 'music-trigger-btn';
         button.dataset.sound = soundId;
         button.textContent = SOUND_LABELS[fileName] || (index + 1).toString();
-        button.addEventListener('click', () => triggerAudio(button, soundId));
+        
+        // SỬ DỤNG HÀM playMusic THỐNG NHẤT
+        button.addEventListener('click', () => {
+          // 1. Hiệu ứng nháy nút active
+          button.classList.add('active');
+          setTimeout(() => button.classList.remove('active'), 100);
+          
+          // 2. Gọi nhạc (autoStop = true để có thể tắt/bật như công tắc, playOver = false)
+          window.playMusic(fileName, true, false);
+        });
+        
         musicGrid.appendChild(button);
       });
 
       const playingState = {};
-      window.triggerAudio = function(btn, soundId) {
-        if (btn) {
-          btn.classList.add('active');
-          setTimeout(() => btn.classList.remove('active'), 100);
-        }
-        const statusRef = ref(db, `games/soundboard_status/${soundId}`);
-        runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
-          const isPlaying = result.snapshot.val() === true;
-          return set(ref(db, 'games/soundboard'), {
-            soundId: soundId,
-            file: SOUND_FILES[soundId] || '',
-            action: isPlaying ? 'play' : 'stop',
-            timestamp: Date.now()
-          });
-        });
-      };
 
-      window.playMusic = function(fileName) {
+      // CẬP NHẬT HÀM PHÁT NHẠC (HỖ TRỢ AUTO-STOP VÀ PLAY-OVER)
+      window.playMusic = function(fileName, autoStop = false, playOver = false) {
         const soundIdForFileName = name => name.replace(/[^A-Za-z0-9_-]/g, '_');
-        const soundId = soundIdForFileName(fileName);
+        const baseSoundId = soundIdForFileName(fileName);
         const fileUrl = `../sounds/${fileName}`;
-        const statusRef = ref(db, `games/soundboard_status/${soundId}`);
-        runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
-          const isPlaying = result.snapshot.val() === true;
+        const statusRef = ref(db, `games/soundboard_status/${baseSoundId}`);
+
+        if (autoStop) {
+          // autoStop = true: Đóng vai trò như công tắc Toggle (Play/Stop)
+          runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
+            const isPlaying = result.snapshot.val() === true;
+            return update(ref(db, 'games/soundboard'), {
+              soundId: baseSoundId,
+              file: fileUrl,
+              action: isPlaying ? 'play' : 'stop',
+              timestamp: Date.now()
+            });
+          });
+        } else {
+          // autoStop = false: Luôn phát (Phát lại từ đầu hoặc phát đè)
+          set(statusRef, true);
+          
+          // playOver = true: Tạo ra 1 ID duy nhất (kèm timestamp) để Projector tạo luồng Audio mới chạy song song
+          const targetSoundId = playOver ? `${baseSoundId}_${Date.now()}` : baseSoundId;
+          
           return update(ref(db, 'games/soundboard'), {
-            soundId: soundId,
+            soundId: targetSoundId,
             file: fileUrl,
-            action: isPlaying ? 'play' : 'stop',
+            action: 'play',
+            playOver: playOver, 
             timestamp: Date.now()
           });
-        });
+        }
       };
 
       window.updateScoreByIndex = function(index, plus) {
