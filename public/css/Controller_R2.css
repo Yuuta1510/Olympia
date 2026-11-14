@@ -17,7 +17,7 @@
     top: 5%;
     left: 5%;
     width: 40%;
-    aspect-ratio: 16/9;
+    height: 52.5%;
     border: 3px solid #fff;
     background: #fff;
     overflow: hidden;
@@ -110,7 +110,7 @@
 }
 
 .r2-ctrl-char.opened { background: #facc15; color: #000; border-color: #facc15; }
-.r2-ctrl-char.selected { background: #0ea5e9; color: transparent; border-color: #38bdf8; }
+.r2-ctrl-char.selected { background: #0ea5e9; color: #000; border-color: #38bdf8; }
 .r2-ctrl-char.cancelled { background: #475569; color: transparent; border-color: #94a3b8; }
 .r2-ctrl-char.unselected { background: transparent; color: transparent; }
 /* Hàng gợi ý (không có chữ cái) */
@@ -151,7 +151,7 @@
     position: absolute;
     bottom: 5%;
     right: 5%;
-    width: 25%;
+    width: 15%;
     height: 35%;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -224,6 +224,4 @@
 .r2-c-score-card.buzzed {
     border-color: #facc15;
     box-shadow: 0 0 15px #facc15;
-    transform: scale(1.02);
-    transition: all 0.2s ease;
 }
