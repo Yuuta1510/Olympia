@@ -2,8 +2,9 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quản Lý Kho Câu Hỏi - Game Olympia</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+  <title>Quản Lý & Nhập Đề Câu Hỏi - Olympia</title>
+  
   <style>
     :root {
       --navy-header: #000080;
@@ -15,272 +16,454 @@
       --font-main: "UTM Avo", Arial, sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
       background-color: #0f172a;
       color: #f8fafc;
       font-family: var(--font-main);
-      padding: 10px;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
     }
 
     .container {
-      max-width: 100%;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       display: flex;
       flex-direction: column;
+      transform-origin: top left;
     }
 
-    .panel {
+    .panel-container {
       display: flex;
       flex-direction: column;
       width: 100%;
       height: 100%;
-      background: var(--black);
-      border: 1.5px solid var(--white);
-      border-radius: 8px;
-      overflow: hidden;
+      min-height: 0;
     }
 
-    .header-bar {
+    .top-navbar {
+      width: 100%;
+      height: 48px;
       background-color: var(--navy-header);
-      padding: 12px 20px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid var(--white);
+      align-items: flex-end;
+      padding: 6px 12px 0px 12px;
+      gap: 4px;
+      flex-shrink: 0;
     }
 
-    .header-bar h1 {
-      font-size: 18px;
+    .header-tab-btn {
+      height: 32px;
+      width: 180px;
+      background-color: white;
+      color: var(--navy-header);
+      font-family: var(--font-main);
+      font-size: 13px;
+      font-weight: 800;
       text-transform: uppercase;
-      color: var(--white);
+      padding: 6px 10px;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      border: 1px solid #CCCCCC;
+      border-bottom: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
     }
 
-    .content-grid {
+    .header-tab-btn.active {
+      background-color: rgb(255, 213, 0);
+      border-color: var(--white);
+    }
+
+    .header-tab-btn:hover {
+      background-color: #b3b3b3;
+    }
+
+    .main-content {
+      flex: 1;
       display: grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 400px 1fr;
       gap: 15px;
       padding: 15px;
-      flex: 1;
-      overflow: hidden;
       min-height: 0;
+      background-color: #0b0f19;
     }
 
-    .form-column, .list-column {
+    .sidebar-box, .content-box {
+      background-color: #1e293b;
+      border: 1.5px solid #334155;
+      border-radius: 6px;
       display: flex;
       flex-direction: column;
+      padding: 15px;
       gap: 12px;
-      height: 100%;
-      min-height: 0;
+      overflow: hidden;
+    }
+    
+    .sidebar-box { overflow-y: auto; }
+
+    .box-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: #38bdf8;
+      text-transform: uppercase;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
     }
 
     .form-group label {
-      font-size: 13px;
+      font-size: 12px;
+      color: #cbd5e1;
       font-weight: bold;
-      color: #38bdf8;
     }
 
-    .form-group input, .form-group select, .form-group textarea {
-      background: #1e293b;
-      color: var(--white);
-      border: 1px solid #334155;
-      padding: 10px;
+    .form-group select, .form-group input, .form-group textarea {
+      background: #0f172a;
+      color: white;
+      border: 1px solid #475569;
+      padding: 8px 10px;
       border-radius: 4px;
       font-family: var(--font-main);
-      font-size: 14px;
+      font-size: 13px;
       outline: none;
     }
 
     .form-group textarea {
       resize: vertical;
-      height: 90px;
+      min-height: 60px;
     }
 
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
       border-color: #38bdf8;
     }
 
-    .btn-save {
-      background-color: #0ea5e9;
-      color: var(--white);
-      border: none;
-      padding: 12px;
+    .upload-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-upload-file {
+      background-color: #2563eb;
+      color: #ffffff;
+      border: 1px solid #60a5fa;
+      padding: 8px 12px;
       border-radius: 4px;
       font-family: var(--font-main);
+      font-size: 12px;
       font-weight: bold;
-      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .btn-upload-file:hover {
+      background-color: #1d4ed8;
+    }
+
+    .btn-clear-img {
+      background-color: #475569;
+      color: #ffffff;
+      border: none;
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-family: var(--font-main);
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-clear-img:hover {
+      background-color: #dc2626;
+    }
+
+    .upload-progress-wrap {
+      width: 100%;
+      height: 6px;
+      background: #0f172a;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid #334155;
+      display: none;
+    }
+
+    .upload-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #22c55e;
+      transition: width 0.2s ease;
+    }
+
+    .upload-status-text {
+      font-size: 11px;
+      color: #94a3b8;
+      display: none;
+    }
+
+    .r2-img-preview-box {
+      display: none;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #0f172a;
+      border: 1.5px solid #475569;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .r2-img-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .btn-action {
+      background-color: #0ea5e9;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-family: var(--font-main);
       cursor: pointer;
       text-transform: uppercase;
       transition: background 0.2s;
-      margin-top: 5px;
     }
 
-    .btn-save:hover {
-      background-color: #0284c7;
-    }
+    .btn-action:hover { background-color: #0284c7; }
+    .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-danger { background-color: #dc2626; }
+    .btn-danger:hover { background-color: #b91c1c; }
 
-    .table-wrapper {
+    .question-list-container {
       flex: 1;
-      background: #1e293b;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .question-card {
+      background-color: #0f172a;
       border: 1px solid #334155;
       border-radius: 4px;
-      overflow-y: auto;
-      min-height: 0;
-    }
-
-    /* Tùy chỉnh thanh cuộn cho danh sách câu hỏi */
-    .table-wrapper::-webkit-scrollbar {
-      width: 8px;
-    }
-    .table-wrapper::-webkit-scrollbar-track {
-      background: #0f172a;
-      border-radius: 4px;
-    }
-    .table-wrapper::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
-    }
-    .table-wrapper::-webkit-scrollbar-thumb:hover {
-      background: #475569;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 13px;
-    }
-
-    th, td {
       padding: 10px 12px;
-      border-bottom: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
     }
 
-    th {
-      background-color: #0f172a;
-      color: #38bdf8;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    .question-card:hover { border-color: #38bdf8; }
+
+    .q-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow: hidden;
+      flex: 1;
     }
 
-    tr:hover {
-      background-color: rgba(56, 189, 248, 0.05);
-    }
-
-    .action-links button {
-      background: none;
-      border: none;
-      cursor: pointer;
+    .q-title {
+      font-size: 13px;
       font-weight: bold;
+      color: #f8fafc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .q-ans { font-size: 12px; color: #34d399; }
+
+    .q-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .q-btn {
+      background: #334155;
+      color: white;
+      border: none;
       padding: 4px 8px;
       border-radius: 3px;
-      font-family: var(--font-main);
+      font-size: 11px;
+      cursor: pointer;
     }
+    .q-btn:hover { background: #475569; }
+    .q-btn.del:hover { background: #dc2626; }
 
-    .btn-edit { color: #38bdf8; }
-    .btn-edit:hover { background: rgba(56, 189, 248, 0.1); }
-    
-    .btn-delete { color: #ef4444; }
-    .btn-delete:hover { background: rgba(239, 68, 68, 0.1); }
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #0f172a; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="panel">
+  <div class="container" id="mainContainer">
+    <div class="panel-container">
       
-      <!-- HEADER -->
-      <div class="header-bar">
-        <h1>Quản lý & Nhập đề câu hỏi</h1>
+      <div class="top-navbar">
+        <button class="header-tab-btn" onclick="location.href='Controller.html'">BẢNG ĐIỀU KHIỂN</button>
+        <button class="header-tab-btn active" onclick="location.href='Question.html'">QUẢN LÝ CÂU HỎI</button>
+        <button class="header-tab-btn" onclick="location.href='Livestream.html'" style="margin-left: auto;">MÀN HÌNH LIVESTREAM</button>
       </div>
 
-      <!-- NỘI DUNG CHÍNH -->
-      <div class="content-grid">
+      <div class="main-content">
         
-        <!-- Cột trái: Form Nhập / Sửa câu hỏi theo đúng cấu trúc phân chia -->
-        <div class="form-column">
+        <div class="sidebar-box custom-scroll">
+          <div class="box-title">Thêm / Sửa Câu Hỏi</div>
+          
+          <input type="hidden" id="editIndex" value="">
+
           <div class="form-group">
-            <label>Chọn Vòng Thi</label>
-            <select id="roundSelect" onchange="updateSubTurnOptions(); loadQuestionsForSelectedRound();">
-              <option value="round_1">Vòng 1: Khởi động</option>
-              <option value="round_2">Vòng 2: Vượt chướng ngại vật</option>
-              <option value="round_3">Vòng 3: Tăng tốc</option>
-              <option value="round_4">Vòng 4: Về đích</option>
+            <label>Chọn Phần Thi:</label>
+            <select id="roundSelect" onchange="toggleFormMode()">
+              <optgroup label="Vòng 1: Khởi Động">
+                <option value="round_1_rieng_1">Lượt riêng 1 (Hàng 3-32)</option>
+                <option value="round_1_rieng_2">Lượt riêng 2 (Hàng 34-63)</option>
+                <option value="round_1_rieng_3">Lượt riêng 3 (Hàng 65-94)</option>
+                <option value="round_1_rieng_4">Lượt riêng 4 (Hàng 96-125)</option>
+                <option value="round_1_rieng_5">Lượt riêng 5 (Hàng 127-156)</option>
+                <option value="round_1_rieng_6">Lượt riêng 6 (Hàng 158-187)</option>
+                <option value="round_1_chung_1">Lượt chung 1 (Hàng 189-238)</option>
+                <option value="round_1_chung_2">Lượt chung 2 (Hàng 240-289)</option>
+                <option value="round_1_chung_3">Lượt chung 3 (Hàng 290-339)</option>
+                <option value="round_1_chung_4">Lượt chung 4 (Hàng 340-389)</option>
+              </optgroup>
+              <optgroup label="Các Vòng Thi Khác">
+                <option value="round_2">Vòng 2: Vượt Chướng Ngại Vật</option>
+                <option value="round_3">Vòng 3: Tăng Tốc</option>
+                <option value="round_4">Vòng 4: Về Đích</option>
+                <option value="sub_final">Câu Hỏi Phụ</option>
+              </optgroup>
             </select>
           </div>
 
-          <div class="form-group">
-            <label>Phân loại lượt (Dành riêng cho Khởi động)</label>
-            <select id="subTurnSelect" onchange="filterQuestionsBySubTurn()">
-              <option value="all">Toàn bộ câu hỏi vòng này</option>
-            </select>
+          <!-- FORM MẶC ĐỊNH (R1, R3, R4) -->
+          <div id="defaultForm">
+              <div class="form-group">
+                <label>Số Thứ Tự Câu:</label>
+                <input type="number" id="quesNumber" value="1" min="1" max="100">
+              </div>
+
+              <div class="form-group">
+                <label>Nội dung Câu Hỏi (Cột B):</label>
+                <textarea id="quesContent" placeholder="Nhập câu hỏi..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Đáp Án (Cột C):</label>
+                <input type="text" id="quesAnswer" placeholder="Nhập đáp án...">
+              </div>
           </div>
 
-          <div class="form-group">
-            <label>ID Câu hỏi (Mã số câu)</label>
-            <input type="number" id="quesId" placeholder="Ví dụ: 1, 2, 1001..." />
+          <!-- FORM VÒNG 2 (R2) -->
+          <div id="r2Form" style="display: none;">
+              <div style="color: #facc15; font-size: 12px; font-weight: bold; margin-bottom: 8px;">* Nhập dữ liệu Vượt Chướng Ngại Vật (5 Hàng + 1 Chướng ngại vật)</div>
+              
+              <div class="form-group" style="margin-bottom: 10px;">
+                <label>Hình Ảnh Chướng Ngại Vật (Chọn từ máy):</label>
+                <input type="file" id="r2_image_file" accept="image/*" style="display: none;" onchange="handleR2ImageUpload(event)">
+                
+                <div class="upload-row">
+                  <button type="button" class="btn-upload-file" onclick="document.getElementById('r2_image_file').click()">📁 CHỌN ẢNH TỪ MÁY</button>
+                  <button type="button" class="btn-clear-img" onclick="clearR2Image()">XÓA ẢNH</button>
+                </div>
+
+                <div class="upload-progress-wrap" id="r2_upload_progress_wrap">
+                  <div class="upload-progress-bar" id="r2_upload_progress_bar"></div>
+                </div>
+                <div class="upload-status-text" id="r2_upload_status"></div>
+
+                <input type="text" id="r2_image" placeholder="Link Firebase Storage sẽ tự động điền ở đây..." oninput="updateR2ImagePreview(this.value)">
+
+                <div class="r2-img-preview-box" id="r2_image_preview_wrap">
+                  <img id="r2_image_preview" src="" alt="Xem trước ảnh chướng ngại vật" onerror="document.getElementById('r2_image_preview_wrap').style.display='none'">
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <!-- 5 Hàng Ngang -->
+                  <div style="background: #0f172a; padding: 10px; border-radius: 4px; border: 1px solid #475569;">
+                      <label style="color: #38bdf8; font-size: 12px; font-weight: bold;">Hàng ngang 1:</label>
+                      <textarea id="r2_q1" placeholder="Câu hỏi hàng 1..." style="width: 100%; margin-top: 5px; height: 40px;"></textarea>
+                      <input type="text" id="r2_a1" placeholder="Đáp án hàng 1..." style="width: 100%; margin-top: 5px;">
+                  </div>
+                  <div style="background: #0f172a; padding: 10px; border-radius: 4px; border: 1px solid #475569;">
+                      <label style="color: #38bdf8; font-size: 12px; font-weight: bold;">Hàng ngang 2:</label>
+                      <textarea id="r2_q2" placeholder="Câu hỏi hàng 2..." style="width: 100%; margin-top: 5px; height: 40px;"></textarea>
+                      <input type="text" id="r2_a2" placeholder="Đáp án hàng 2..." style="width: 100%; margin-top: 5px;">
+                  </div>
+                  <div style="background: #0f172a; padding: 10px; border-radius: 4px; border: 1px solid #475569;">
+                      <label style="color: #38bdf8; font-size: 12px; font-weight: bold;">Hàng ngang 3:</label>
+                      <textarea id="r2_q3" placeholder="Câu hỏi hàng 3..." style="width: 100%; margin-top: 5px; height: 40px;"></textarea>
+                      <input type="text" id="r2_a3" placeholder="Đáp án hàng 3..." style="width: 100%; margin-top: 5px;">
+                  </div>
+                  <div style="background: #0f172a; padding: 10px; border-radius: 4px; border: 1px solid #475569;">
+                      <label style="color: #38bdf8; font-size: 12px; font-weight: bold;">Hàng ngang 4:</label>
+                      <textarea id="r2_q4" placeholder="Câu hỏi hàng 4..." style="width: 100%; margin-top: 5px; height: 40px;"></textarea>
+                      <input type="text" id="r2_a4" placeholder="Đáp án hàng 4..." style="width: 100%; margin-top: 5px;">
+                  </div>
+                  <div style="background: #0f172a; padding: 10px; border-radius: 4px; border: 1px solid #475569;">
+                      <label style="color: #38bdf8; font-size: 12px; font-weight: bold;">Hàng ngang 5 (Gợi ý thêm):</label>
+                      <textarea id="r2_q5" placeholder="Câu hỏi hàng 5..." style="width: 100%; margin-top: 5px; height: 40px;"></textarea>
+                      <input type="text" id="r2_a5" placeholder="Đáp án hàng 5..." style="width: 100%; margin-top: 5px;">
+                  </div>
+                  
+                  <!-- Chướng Ngại Vật -->
+                  <div style="background: #3f1818; padding: 10px; border-radius: 4px; border: 1px solid #f87171;">
+                      <label style="color: #fca5a5; font-size: 12px; font-weight: bold;">CHƯỚNG NGẠI VẬT (Từ khóa trung tâm):</label>
+                      <textarea id="r2_q_cnv" placeholder="Gợi ý chướng ngại vật..." style="width: 100%; margin-top: 5px; height: 40px;"></textarea>
+                      <input type="text" id="r2_a_cnv" placeholder="ĐÁP ÁN CHƯỚNG NGẠI VẬT..." style="width: 100%; margin-top: 5px; font-weight: bold;">
+                  </div>
+              </div>
           </div>
 
-          <div class="form-group">
-            <label>Nội dung câu hỏi</label>
-            <textarea id="quesContent" placeholder="Nhập nội dung câu hỏi..."></textarea>
+          <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px;">
+              <button class="btn-action" id="btnSaveQuestion" onclick="saveQuestionToDB()">LƯU CÂU HỎI VÀO DATABASE</button>
+              <button class="btn-action btn-danger" onclick="resetForm()">LÀM MỚI FORM</button>
           </div>
-
-          <div class="form-group">
-            <label>Đáp án</label>
-            <input type="text" id="quesAnswer" placeholder="Nhập đáp án chính xác..." />
-          </div>
-
-          <button class="btn-save" onclick="saveQuestionToFirebase()">Lưu câu hỏi vào Database</button>
         </div>
 
-        <!-- Cột phải: Danh sách câu hỏi đã lưu -->
-        <div class="list-column">
-          <div style="font-weight: bold; font-size: 14px; color: #38bdf8;" id="tableTitle">Danh sách câu hỏi hiện tại trong Database</div>
-          <div class="table-wrapper">
-            <table id="questionTable">
-              <thead>
-                <tr>
-                  <th style="width: 80px;">ID</th>
-                  <th>Nội dung câu hỏi</th>
-                  <th style="width: 150px;">Đáp án</th>
-                  <th style="width: 100px; text-align: center;">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody id="questionTableBody">
-                <!-- Dữ liệu được render tự động qua Firebase -->
-              </tbody>
-            </table>
+        <div class="content-box">
+          <div class="box-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Danh Sách Câu Hỏi Hiện Tại</span>
+            <span id="totalQuesCount" style="font-size: 12px; color: #94a3b8;">Tổng số: 0 câu</span>
+          </div>
+
+          <div class="question-list-container custom-scroll" id="questionListContainer">
+            <div style="text-align: center; color: #64748b; margin-top: 40px;">Đang tải danh sách câu hỏi từ Firebase...</div>
           </div>
         </div>
 
       </div>
-
     </div>
   </div>
 
-  <!-- FIREBASE SCRIPT -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
@@ -293,181 +476,320 @@
       measurementId: "G-XVER3NDTXY"
     };
 
-    const app = initializeApp(firebaseConfig);
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     const db = getDatabase(app);
+    const storage = getStorage(app);
 
-    let currentQuestionsData = {};
-    let round1ConfigData = { so_luot_rieng: 4, luot_rieng: { so_cau: 6 }, luot_chung: [{ so_cau: 12 }] };
+    let allQuestionsData = {};
+    let activeR2UploadPromise = null;
 
-    // Lắng nghe cấu hình Khởi động từ Firebase để tính toán phân chia lượt riêng / chung chính xác
-    onValue(ref(db, 'games/round_1'), (snapshot) => {
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            round1ConfigData.so_luot_rieng = data.so_luot_rieng || 4;
-            if (data.luot_rieng) round1ConfigData.luot_rieng = data.luot_rieng;
-            if (data.luot_chung) round1ConfigData.luot_chung = Array.isArray(data.luot_chung) ? data.luot_chung : [data.luot_chung];
-            window.updateSubTurnOptions();
-        }
-    });
+    window.updateR2ImagePreview = function(url) {
+      const cleanUrl = String(url || '').trim();
+      const wrap = document.getElementById('r2_image_preview_wrap');
+      const img = document.getElementById('r2_image_preview');
+      if (!wrap || !img) return;
 
-    window.updateSubTurnOptions = function() {
-        const roundKey = document.getElementById('roundSelect').value;
-        const subSelect = document.getElementById('subTurnSelect');
-        
-        if (roundKey !== 'round_1') {
-            subSelect.innerHTML = `<option value="all">Toàn bộ câu hỏi vòng này</option>`;
-            subSelect.disabled = true;
-            return;
-        }
-
-        subSelect.disabled = false;
-        let html = `<option value="all">Toàn bộ câu hỏi Khởi Động</option>`;
-        
-        // Thêm các lượt riêng
-        let x = round1ConfigData.so_luot_rieng || 4;
-        for (let i = 1; i <= x; i++) {
-            html += `<option value="lr_${i}">Lượt riêng ${i}</option>`;
-        }
-        
-        // Thêm các lượt chung
-        let lcArr = round1ConfigData.luot_chung || [];
-        for (let j = 0; j < lcArr.length; j++) {
-            html += `<option value="lc_${j}">Lượt chung ${j + 1}</option>`;
-        }
-        subSelect.innerHTML = html;
+      if (cleanUrl) {
+        img.src = cleanUrl;
+        wrap.style.display = 'block';
+      } else {
+        img.src = '';
+        wrap.style.display = 'none';
+      }
     };
 
-    // Lắng nghe dữ liệu câu hỏi theo vòng đang chọn
-    window.loadQuestionsForSelectedRound = function() {
-      const roundKey = document.getElementById('roundSelect').value;
-      const dbRef = ref(db, `questions/${roundKey}`);
+    window.clearR2Image = function() {
+      const fileInput = document.getElementById('r2_image_file');
+      const urlInput = document.getElementById('r2_image');
+      const progressWrap = document.getElementById('r2_upload_progress_wrap');
+      const progressBar = document.getElementById('r2_upload_progress_bar');
+      const statusEl = document.getElementById('r2_upload_status');
 
-      onValue(dbRef, (snapshot) => {
-        if (snapshot.exists()) {
-          currentQuestionsData = snapshot.val();
-        } else {
-          currentQuestionsData = {};
-        }
-        window.filterQuestionsBySubTurn();
-      }, { onlyOnce: true });
+      if (fileInput) fileInput.value = '';
+      if (urlInput) urlInput.value = '';
+      if (progressWrap) progressWrap.style.display = 'none';
+      if (progressBar) progressBar.style.width = '0%';
+      if (statusEl) {
+        statusEl.style.display = 'none';
+        statusEl.innerText = '';
+      }
+      activeR2UploadPromise = null;
+      window.updateR2ImagePreview('');
     };
 
-    window.filterQuestionsBySubTurn = function() {
-        const roundKey = document.getElementById('roundSelect').value;
-        const subVal = document.getElementById('subTurnSelect').value;
-        const tbody = document.getElementById('questionTableBody');
-        tbody.innerHTML = '';
+    window.handleR2ImageUpload = function(event) {
+      const file = event.target?.files?.[0];
+      if (!file) return;
 
-        let filteredEntries = [];
-        
-        if (roundKey === 'round_1' && subVal !== 'all') {
-            let A = parseInt(round1ConfigData.luot_rieng.so_cau) || 6;
-            let X = parseInt(round1ConfigData.so_luot_rieng) || 4;
-            let startIdx = 1;
-            let endIdx = 9999;
-
-            if (subVal.startsWith('lr_')) {
-                let pIdx = parseInt(subVal.split('_')[1]);
-                startIdx = (pIdx - 1) * A + 1;
-                endIdx = pIdx * A;
-            } else if (subVal.startsWith('lc_')) {
-                let lcIdx = parseInt(subVal.split('_')[1]);
-                startIdx = X * A + 1;
-                for(let i = 0; i < lcIdx; i++) {
-                    startIdx += parseInt(round1ConfigData.luot_chung[i]?.so_cau || 12);
-                }
-                let currentB = parseInt(round1ConfigData.luot_chung[lcIdx]?.so_cau || 12);
-                endIdx = startIdx + currentB - 1;
-            }
-
-            for (const [id, qObj] of Object.entries(currentQuestionsData)) {
-                let numId = parseInt(id);
-                if (!isNaN(numId) && numId >= startIdx && numId <= endIdx) {
-                    filteredEntries.push([id, qObj]);
-                }
-            }
-        } else {
-            for (const [id, qObj] of Object.entries(currentQuestionsData)) {
-                if (!qObj || typeof qObj !== 'object') continue;
-                filteredEntries.push([id, qObj]);
-            }
-        }
-
-        if (filteredEntries.length > 0) {
-          // Sắp xếp tăng dần theo ID câu hỏi
-          filteredEntries.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
-
-          for (const [id, qObj] of filteredEntries) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td><b>${id}</b></td>
-              <td>${qObj.cau_hoi || ''}</td>
-              <td>${qObj.dap_an || ''}</td>
-              <td style="text-align: center;" class="action-links">
-                <button class="btn-edit" onclick="editQuestion('${id}')">Sửa</button>
-                <button class="btn-delete" onclick="deleteQuestion('${id}')">Xóa</button>
-              </td>
-            `;
-            tbody.appendChild(tr);
-          }
-        } else {
-          tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8;">Không có câu hỏi nào trong danh mục này.</td></tr>`;
-        }
-    };
-
-    // Lưu hoặc cập nhật câu hỏi lên Firebase
-    window.saveQuestionToFirebase = function() {
-      const roundKey = document.getElementById('roundSelect').value;
-      const qId = document.getElementById('quesId').value.trim();
-      const content = document.getElementById('quesContent').value.trim();
-      const answer = document.getElementById('quesAnswer').value.trim();
-
-      if (!qId || !content || !answer) {
-        alert("Vui lòng điền đầy đủ ID, Nội dung câu hỏi và Đáp án!");
+      if (!file.type.startsWith('image/')) {
+        alert("⚠️ Vui lòng chọn đúng định dạng tệp hình ảnh (JPG, PNG, WEBP, GIF...)!");
+        event.target.value = '';
         return;
       }
 
-      const qRef = ref(db, `questions/${roundKey}/${qId}`);
-      set(qRef, {
-        cau_hoi: content,
-        dap_an: answer
-      }).then(() => {
-        alert(`Đã lưu thành công câu hỏi ID: ${qId}!`);
-        document.getElementById('quesId').value = '';
-        document.getElementById('quesContent').value = '';
-        document.getElementById('quesAnswer').value = '';
-        window.loadQuestionsForSelectedRound();
-      }).catch((error) => {
-        console.error("Lỗi khi lưu:", error);
-        alert("Có lỗi xảy ra khi lưu câu hỏi.");
+      const progressWrap = document.getElementById('r2_upload_progress_wrap');
+      const progressBar = document.getElementById('r2_upload_progress_bar');
+      const statusEl = document.getElementById('r2_upload_status');
+      const saveBtn = document.getElementById('btnSaveQuestion');
+
+      // Hiển thị xem trước ngay từ máy trong lúc đang upload
+      const localPreviewUrl = URL.createObjectURL(file);
+      window.updateR2ImagePreview(localPreviewUrl);
+
+      progressWrap.style.display = 'block';
+      progressBar.style.width = '0%';
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#38bdf8';
+      statusEl.innerText = `Đang tải "${file.name}" lên Firebase Storage (0%)...`;
+      if (saveBtn) saveBtn.disabled = true;
+
+      const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const fileRef = storageRef(storage, `round_2/cnv_${Date.now()}_${safeFileName}`);
+      const uploadTask = uploadBytesResumable(fileRef, file, {
+        contentType: file.type
+      });
+
+      activeR2UploadPromise = new Promise((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            progressBar.style.width = `${pct}%`;
+            statusEl.innerText = `Đang tải "${file.name}" lên Firebase Storage (${pct}%)...`;
+          },
+          (error) => {
+            statusEl.style.color = '#f87171';
+            statusEl.innerText = `❌ Lỗi tải ảnh lên Storage: ${error.message}`;
+            if (saveBtn) saveBtn.disabled = false;
+            activeR2UploadPromise = null;
+            reject(error);
+          },
+          async () => {
+            try {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              document.getElementById('r2_image').value = downloadURL;
+              window.updateR2ImagePreview(downloadURL);
+              URL.revokeObjectURL(localPreviewUrl);
+
+              statusEl.style.color = '#34d399';
+              statusEl.innerText = '✅ Đã tải ảnh lên Firebase Storage thành công!';
+              if (saveBtn) saveBtn.disabled = false;
+              activeR2UploadPromise = null;
+              resolve(downloadURL);
+            } catch (err) {
+              statusEl.style.color = '#f87171';
+              statusEl.innerText = `❌ Lỗi lấy đường dẫn ảnh: ${err.message}`;
+              if (saveBtn) saveBtn.disabled = false;
+              activeR2UploadPromise = null;
+              reject(err);
+            }
+          }
+        );
       });
     };
 
-    // Đưa dữ liệu lên form để sửa
-    window.editQuestion = function(id) {
-      const qObj = currentQuestionsData[id];
-      if (qObj) {
-        document.getElementById('quesId').value = id;
-        document.getElementById('quesContent').value = qObj.cau_hoi || '';
-        document.getElementById('quesAnswer').value = qObj.dap_an || '';
-        document.getElementById('quesId').focus();
+    window.toggleFormMode = function() {
+        const roundKey = document.getElementById('roundSelect').value;
+        const defaultForm = document.getElementById('defaultForm');
+        const r2Form = document.getElementById('r2Form');
+
+        if (roundKey === 'round_2') {
+            defaultForm.style.display = 'none';
+            r2Form.style.display = 'block';
+        } else {
+            defaultForm.style.display = 'block';
+            r2Form.style.display = 'none';
+        }
+        renderQuestionList();
+    };
+
+    onValue(ref(db, 'questions'), (snapshot) => {
+      if (snapshot.exists()) {
+        allQuestionsData = snapshot.val();
+      } else {
+        allQuestionsData = {};
+      }
+      renderQuestionList();
+    });
+
+    window.saveQuestionToDB = async function() {
+      const roundKey = document.getElementById('roundSelect').value;
+      
+      if (roundKey === 'round_2') {
+          if (activeR2UploadPromise) {
+              try {
+                  await activeR2UploadPromise;
+              } catch (e) {
+                  alert("❌ Không thể lưu vì tải ảnh lên Firebase Storage thất bại!");
+                  return;
+              }
+          }
+
+          const imageLink = document.getElementById('r2_image').value.trim();
+          let hasEmpty = false;
+          let r2Data = {};
+          
+          for(let i=1; i<=5; i++) {
+              const q = document.getElementById(`r2_q${i}`).value.trim();
+              const a = document.getElementById(`r2_a${i}`).value.trim();
+              if(!q || !a) hasEmpty = true;
+              r2Data[i] = { cau_hoi: q, dap_an: a, image: imageLink };
+          }
+          
+          const qCnv = document.getElementById('r2_q_cnv').value.trim();
+          const aCnv = document.getElementById('r2_a_cnv').value.trim();
+          if(!qCnv || !aCnv) hasEmpty = true;
+          
+          r2Data['cnv'] = { cau_hoi: qCnv, dap_an: aCnv, image: imageLink };
+          
+          if (hasEmpty) {
+              alert("⚠️ Vui lòng điền đủ 5 hàng ngang và Từ khóa chướng ngại vật!");
+              return;
+          }
+
+          set(ref(db, `questions/round_2`), r2Data).then(() => {
+              alert("✅ Đã lưu bộ đề Vòng 2 thành công!");
+          }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
+          
+      } else {
+          const qNum = parseInt(document.getElementById('quesNumber').value);
+          const qContent = document.getElementById('quesContent').value.trim();
+          const qAnswer = document.getElementById('quesAnswer').value.trim();
+          if (!qContent || !qAnswer) {
+            alert("⚠️ Vui lòng nhập đầy đủ nội dung câu hỏi và đáp án!");
+            return;
+          }
+          
+          let targetRound = 'round_1'; 
+          if(roundKey === 'round_3' || roundKey === 'round_4' || roundKey === 'sub_final') {
+              targetRound = roundKey;
+          }
+
+          const quesRef = ref(db, `questions/${targetRound}/${qNum}`);
+          set(quesRef, {
+            cau_hoi: qContent,
+            dap_an: qAnswer,
+            phan_thi: roundKey
+          }).then(() => {
+            alert("✅ Đã lưu câu hỏi thành công!");
+            resetForm();
+          }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
       }
     };
 
-    // Xóa câu hỏi khỏi Database
-    window.deleteQuestion = function(id) {
-      if (confirm(`Bạn có chắc chắn muốn xóa câu hỏi ID: ${id} không?`)) {
-        const roundKey = document.getElementById('roundSelect').value;
-        const qRef = ref(db, `questions/${roundKey}/${id}`);
-        remove(qRef).then(() => {
-          window.loadQuestionsForSelectedRound();
+    window.resetForm = function() {
+      document.getElementById('quesNumber').value = '1';
+      document.getElementById('quesContent').value = '';
+      document.getElementById('quesAnswer').value = '';
+      document.getElementById('editIndex').value = '';
+      
+      window.clearR2Image();
+      for(let i=1; i<=5; i++){
+          document.getElementById(`r2_q${i}`).value = '';
+          document.getElementById(`r2_a${i}`).value = '';
+      }
+      document.getElementById('r2_q_cnv').value = '';
+      document.getElementById('r2_a_cnv').value = '';
+    };
+
+    window.editQuestion = function(index, content, answer) {
+      document.getElementById('quesNumber').value = index;
+      document.getElementById('quesContent').value = content;
+      document.getElementById('quesAnswer').value = answer;
+      document.getElementById('quesContent').focus();
+    };
+
+    window.editR2Question = function(data) {
+        const imgUrl = data['cnv']?.image || data[1]?.image || '';
+        document.getElementById('r2_image').value = imgUrl;
+        window.updateR2ImagePreview(imgUrl);
+        for(let i=1; i<=5; i++) {
+            document.getElementById(`r2_q${i}`).value = data[i]?.cau_hoi || '';
+            document.getElementById(`r2_a${i}`).value = data[i]?.dap_an || '';
+        }
+        document.getElementById('r2_q_cnv').value = data['cnv']?.cau_hoi || '';
+        document.getElementById('r2_a_cnv').value = data['cnv']?.dap_an || '';
+        document.getElementById('r2_q1').focus();
+    };
+
+    window.deleteQuestion = function(round, index) {
+      if (confirm(`Bạn có chắc chắn muốn xóa câu hỏi ${index} của ${round} không?`)) {
+        remove(ref(db, `questions/${round}/${index}`)).then(() => {
+          alert("🗑️ Đã xóa câu hỏi thành công!");
         });
       }
     };
 
-    // Khởi chạy load dữ liệu lần đầu khi mở trang
+    window.deleteR2 = function() {
+        if (confirm(`Bạn có chắc chắn muốn xóa toàn bộ bộ đề Vòng 2 không?`)) {
+            remove(ref(db, `questions/round_2`)).then(() => {
+                alert("🗑️ Đã xóa Vòng 2 thành công!");
+            });
+        }
+    };
+
+    function renderQuestionList() {
+      const container = document.getElementById('questionListContainer');
+      const roundKey = document.getElementById('roundSelect').value;
+      
+      let html = '';
+      let count = 0;
+
+      if (roundKey === 'round_2') {
+          const r2 = allQuestionsData.round_2;
+          if (r2 && Object.keys(r2).length > 0) {
+              count = 6;
+              const cnvImage = r2['cnv']?.image || r2[1]?.image || '';
+              html += `<div class="question-card" style="flex-direction: column; align-items: stretch; background: #1e1b4b; border-color: #6366f1;">`;
+              html += `<div style="display: flex; justify-content: space-between; border-bottom: 1px solid #4338ca; padding-bottom: 8px; margin-bottom: 8px;">`;
+              html += `<div style="color: #a5b4fc; font-weight: bold; font-size: 14px;">BỘ ĐỀ VƯỢT CHƯỚNG NGẠI VẬT</div>`;
+              html += `<div>
+                          <button class="q-btn" onclick='editR2Question(${JSON.stringify(r2).replace(/'/g, "&#39;")})'>Sửa Bộ Đề</button>
+                          <button class="q-btn del" onclick="deleteR2()">Xóa Toàn Bộ</button>
+                       </div>`;
+              html += `</div>`;
+
+              if (cnvImage) {
+                  html += `<div style="margin-bottom: 8px;"><img src="${cnvImage.replace(/"/g, '&quot;')}" alt="Ảnh CNV" style="max-width: 240px; width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; border: 1px solid #4f46e5;"></div>`;
+              }
+              
+              for(let i=1; i<=5; i++) {
+                  if(r2[i]) html += `<div style="font-size: 12px; color: #cbd5e1; margin-bottom: 4px;"><b>Hàng ${i}:</b> ${r2[i].cau_hoi} <span style="color:#34d399">(Đ/A: ${r2[i].dap_an})</span></div>`;
+              }
+              if(r2['cnv']) html += `<div style="font-size: 13px; color: #fca5a5; margin-top: 6px; border-top: 1px solid #4338ca; padding-top: 6px;"><b>CNV:</b> ${r2['cnv'].cau_hoi} <span style="color:#facc15">(Đ/A: ${r2['cnv'].dap_an})</span></div>`;
+              
+              html += `</div>`;
+          }
+      } else {
+          let targetRound = 'round_1';
+          if(roundKey === 'round_3' || roundKey === 'round_4' || roundKey === 'sub_final') targetRound = roundKey;
+          
+          const qList = allQuestionsData[targetRound] || [];
+          qList.forEach((q, idx) => {
+            if (q !== null && q !== undefined) {
+              count++;
+              html += `
+                <div class="question-card">
+                  <div class="q-info">
+                    <div class="q-title"><b>Câu ${idx}:</b> ${q.cau_hoi}</div>
+                    <div class="q-ans">Đáp án: ${q.dap_an}</div>
+                  </div>
+                  <div class="q-actions">
+                    <button class="q-btn" onclick="editQuestion(${idx}, \`${q.cau_hoi.replace(/"/g, '&quot;')}\`, \`${q.dap_an.replace(/"/g, '&quot;')}\`)">Sửa</button>
+                    <button class="q-btn del" onclick="deleteQuestion('${targetRound}', ${idx})">Xóa</button>
+                  </div>
+                </div>
+              `;
+            }
+          });
+      }
+
+      container.innerHTML = html || '<div style="text-align: center; color: #64748b; margin-top: 40px;">Chưa có câu hỏi nào.</div>';
+      document.getElementById('totalQuesCount').innerText = `Tổng số: ${count} câu`;
+    }
+
     window.addEventListener('load', () => {
-      window.loadQuestionsForSelectedRound();
+        toggleFormMode();
     });
   </script>
 </body>
