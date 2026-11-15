@@ -55,7 +55,7 @@
         min-height: 0;
       }
 
-      /* Thanh tab dieu khien */
+      /* Thanh tab điều khiển */
       .top-navbar {
         width: 100%;
         height: 48px;
@@ -70,7 +70,7 @@
         flex-shrink: 0;
       }
 
-      /* Tab dieu khien */
+      /* Tab điều khiển */
       .header-tab-btn {
         height: 32px;
         width: 200px;
@@ -103,7 +103,7 @@
         background-color: #b3b3b3;
       }
 
-      /* Nut settings */
+      /* Nút settings */
       .settings-icon-btn {
         display: flex;
         background: transparent;
@@ -127,7 +127,7 @@
         transform: rotate(90deg);
       }
 
-      /* soundboard */
+      /* Soundboard */
       .music-panel-container {
         width: 100%;
         max-height: 38vh;
@@ -151,7 +151,7 @@
         background-color: var(--black);
         padding: 10px;
         display: grid;
-        grid-template-columns: 1fr 220px; 
+        grid-template-columns: 1fr 220px;
         gap: 12px;
         flex: 1;
         min-height: 0;
@@ -199,6 +199,12 @@
         color: var(--yellow-border);
         border-color: white;
       }
+
+      /* Ẩn mặc định giao diện Vòng 2 khi đang ở Vòng 1 */
+      #r2-controller-ui,
+      #r2ConfigModal {
+        display: none;
+      }
     </style>
     <link id="round-css" rel="stylesheet" href="../css/Controller_R1.css" />
   </head>
@@ -206,13 +212,13 @@
     <div class="container" id="mainContainer">
       <div class="game-control-panel">
         <div class="top-navbar">
-          <button class="header-tab-btn" onclick="selectTab(this, 'M')">MAIN</button>
-          <button class="header-tab-btn active" onclick="selectTab(this, 'R1')">KHỞI ĐỘNG</button>
-          <button class="header-tab-btn" onclick="selectTab(this, 'R2')">VƯỢT CHƯỚNG NGẠI VẬT</button>
-          <button class="header-tab-btn" onclick="selectTab(this, 'R3')">TĂNG TỐC</button>
-          <button class="header-tab-btn" onclick="selectTab(this, 'R4')">VỀ ĐÍCH</button>
-          <button class="header-tab-btn" onclick="selectTab(this, 'R5')">CÂU HỎI PHỤ</button>
-          <button id="open-option-btn" class="settings-icon-btn" title="Settings" onclick="openConfig()">
+          <button type="button" class="header-tab-btn" data-tab="M">MAIN</button>
+          <button type="button" class="header-tab-btn active" data-tab="R1">KHỞI ĐỘNG</button>
+          <button type="button" class="header-tab-btn" data-tab="R2">VƯỢT CHƯỚNG NGẠI VẬT</button>
+          <button type="button" class="header-tab-btn" data-tab="R3">TĂNG TỐC</button>
+          <button type="button" class="header-tab-btn" data-tab="R4">VỀ ĐÍCH</button>
+          <button type="button" class="header-tab-btn" data-tab="R5">CÂU HỎI PHỤ</button>
+          <button type="button" id="open-option-btn" class="settings-icon-btn" title="Settings">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -221,7 +227,8 @@
         </div>
 
         <div class="main-content-grid">
-          <div id="round1-ui" style="display: grid; grid-template-columns: 1fr 220px; width: 100%; height: 100%; gap: 12px;">
+          <!-- GIAO DIỆN VÒNG 1: KHỞI ĐỘNG -->
+          <div id="round1-ui">
             <div class="qa-column">
               <div class="question-box">
                 <div class="question-header">
@@ -230,26 +237,26 @@
                   <span id="quesText">CÂU HỎI 1/...</span>
                   <span class="divider">-</span>
                   <span id="timeText">THỜI GIAN: 60s</span>
-                  <button id="btnResetTime" onclick="resetTurnTime()" style="margin-left:auto; width: 40px; height: 32px; background: #dc2626; color: white; border: 1.5px solid white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">🔄</button>
-                  <button id="btnPlayPauseTime" onclick="toggleTurnTime()" style="margin-left: auto; margin-right: 15px; width: 40px; height: 32px; background: #2563eb; color: white; border: 1.5px solid white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; display: none;">▶</button>
+                  <button type="button" id="btnResetTime">🔄</button>
+                  <button type="button" id="btnPlayPauseTime">▶</button>
                 </div>
 
-                <div class="question-content" id="preview-question">Loading></div>
+                <div class="question-content" id="preview-question">Loading...</div>
 
                 <div class="question-actions">
                   <div class="left-actions">
-                    <button class="action-btn dimmed" id="btn-graphic" onclick="triggerAction(this, 's')">ĐỒ HỌA</button>
-                    <button class="action-btn dimmed" id="btn-players" onclick="triggerAction(this, '0')">THÍ SINH</button>
-                    <button class="action-btn dimmed" id="btn-question" onclick="triggerAction(this, 'q')">CÂU HỎI</button>
-                    <button class="action-btn" onclick="triggerAction(this, 'p')">◀ PREV</button>
-                    <button class="action-btn" onclick="triggerAction(this, 'n')">NEXT ▶</button>
-                    <button class="action-btn" onclick="triggerAction(this, 'rb')">RESET CHUÔNG</button>
-                    <button class="action-btn" onclick="playMusic('Main_Blanks.mp3', false, false)">BLANK</button>
-                    <button class="action-btn" style="background-color: #cc0000;" onclick="triggerAction(this, 'r')">RESET ĐỒ HỌA</button>
+                    <button type="button" class="action-btn dimmed" id="btn-graphic" data-action="s">ĐỒ HỌA</button>
+                    <button type="button" class="action-btn dimmed" id="btn-players" data-action="0">THÍ SINH</button>
+                    <button type="button" class="action-btn dimmed" id="btn-question" data-action="q">CÂU HỎI</button>
+                    <button type="button" class="action-btn" data-action="p">◀ PREV</button>
+                    <button type="button" class="action-btn" data-action="n">NEXT ▶</button>
+                    <button type="button" class="action-btn" data-action="rb">RESET CHUÔNG</button>
+                    <button type="button" class="action-btn" id="btn-blank-music">BLANK</button>
+                    <button type="button" class="action-btn reset-graphic-btn" data-action="r">RESET ĐỒ HỌA</button>
                   </div>
 
                   <div class="right-actions">
-                    <div class="timer-5s-box" id="timer5s-display" onclick="triggerAction(this, 't5')">5</div>
+                    <div class="timer-5s-box" id="timer5s-display" data-action="t5">5</div>
                   </div>
                 </div>
               </div>
@@ -257,28 +264,187 @@
               <div class="answer-box">
                 <div class="answer-content" id="preview-answer">...</div>
                 <div class="answer-actions">
-                  <button class="action-btn score-btn add-btn" onclick="triggerScore(this, 'add')">ĐÚNG</button>
-                  <button class="action-btn score-btn sub-btn" onclick="triggerScore(this, 'sub')">SAI</button>
+                  <button type="button" class="action-btn score-btn add-btn" data-score-type="add">ĐÚNG</button>
+                  <button type="button" class="action-btn score-btn sub-btn" data-score-type="sub">SAI</button>
                 </div>
               </div>
             </div>
+
             <div class="players-column">
-              <div class="player-vertical-card" onclick="triggerAction(this, '1')" id="playerBtn-1">
+              <div class="player-vertical-card" data-player-turn="1" id="playerBtn-1">
                 <div class="player-v-name" id="playerBtnName-1">P1</div>
                 <div class="player-v-score" id="playerBtnScore-1">0</div>
               </div>
-              <div class="player-vertical-card" onclick="triggerAction(this, '2')" id="playerBtn-2">
+              <div class="player-vertical-card" data-player-turn="2" id="playerBtn-2">
                 <div class="player-v-name" id="playerBtnName-2">P2</div>
                 <div class="player-v-score" id="playerBtnScore-2">0</div>
               </div>
-              <div class="player-vertical-card" onclick="triggerAction(this, '3')" id="playerBtn-3">
+              <div class="player-vertical-card" data-player-turn="3" id="playerBtn-3">
                 <div class="player-v-name" id="playerBtnName-3">P3</div>
                 <div class="player-v-score" id="playerBtnScore-3">0</div>
               </div>
-              <div class="player-vertical-card" onclick="triggerAction(this, '4')" id="playerBtn-4">
+              <div class="player-vertical-card" data-player-turn="4" id="playerBtn-4">
                 <div class="player-v-name" id="playerBtnName-4">P4</div>
                 <div class="player-v-score" id="playerBtnScore-4">0</div>
               </div>
+            </div>
+          </div>
+
+          <!-- GIAO DIỆN VÒNG 2: VƯỢT CHƯỚNG NGẠI VẬT -->
+          <div id="r2-controller-ui">
+            <div class="r2-ctrl-image-area">
+              <img class="r2-ctrl-target-img" src="../graphic/r2_target.png" alt="Chướng ngại vật" />
+              <div class="r2-ctrl-piece" id="r2-cp-1" data-piece-index="0"></div>
+              <div class="r2-ctrl-lbl" id="r2-lbl-1">1</div>
+              <div class="r2-ctrl-piece" id="r2-cp-2" data-piece-index="1"></div>
+              <div class="r2-ctrl-lbl" id="r2-lbl-2">2</div>
+              <div class="r2-ctrl-piece" id="r2-cp-3" data-piece-index="2"></div>
+              <div class="r2-ctrl-lbl" id="r2-lbl-3">3</div>
+              <div class="r2-ctrl-piece" id="r2-cp-4" data-piece-index="3"></div>
+              <div class="r2-ctrl-lbl" id="r2-lbl-4">4</div>
+              <div class="r2-ctrl-piece" id="r2-cp-5" data-piece-index="4"></div>
+              <div class="r2-ctrl-lbl" id="r2-lbl-5">5</div>
+            </div>
+
+            <div class="r2-ctrl-rows-area">
+              <div class="r2-ctrl-cnv-title">CHƯỚNG NGẠI VẬT CÓ 0 CHỮ CÁI</div>
+
+              <div class="r2-ctrl-row-wrapper" data-row-index="0">
+                <div class="r2-ctrl-row"></div>
+                <div class="r2-ctrl-row-controls">
+                  <div class="r2-ctrl-row-number" data-row-index="0" title="Chọn hàng ngang 1">1</div>
+                  <div class="r2-ctrl-row-state-btns">
+                    <button type="button" class="r2-ctrl-state-btn correct" data-row-index="0" data-state="opened">Đ</button>
+                    <button type="button" class="r2-ctrl-state-btn wrong" data-row-index="0" data-state="cancelled">S</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="r2-ctrl-row-wrapper" data-row-index="1">
+                <div class="r2-ctrl-row"></div>
+                <div class="r2-ctrl-row-controls">
+                  <div class="r2-ctrl-row-number" data-row-index="1" title="Chọn hàng ngang 2">2</div>
+                  <div class="r2-ctrl-row-state-btns">
+                    <button type="button" class="r2-ctrl-state-btn correct" data-row-index="1" data-state="opened">Đ</button>
+                    <button type="button" class="r2-ctrl-state-btn wrong" data-row-index="1" data-state="cancelled">S</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="r2-ctrl-row-wrapper" data-row-index="2">
+                <div class="r2-ctrl-row"></div>
+                <div class="r2-ctrl-row-controls">
+                  <div class="r2-ctrl-row-number" data-row-index="2" title="Chọn hàng ngang 3">3</div>
+                  <div class="r2-ctrl-row-state-btns">
+                    <button type="button" class="r2-ctrl-state-btn correct" data-row-index="2" data-state="opened">Đ</button>
+                    <button type="button" class="r2-ctrl-state-btn wrong" data-row-index="2" data-state="cancelled">S</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="r2-ctrl-row-wrapper" data-row-index="3">
+                <div class="r2-ctrl-row"></div>
+                <div class="r2-ctrl-row-controls">
+                  <div class="r2-ctrl-row-number" data-row-index="3" title="Chọn hàng ngang 4">4</div>
+                  <div class="r2-ctrl-row-state-btns">
+                    <button type="button" class="r2-ctrl-state-btn correct" data-row-index="3" data-state="opened">Đ</button>
+                    <button type="button" class="r2-ctrl-state-btn wrong" data-row-index="3" data-state="cancelled">S</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="r2-ctrl-row-wrapper" data-row-index="4">
+                <div class="r2-ctrl-row"></div>
+                <div class="r2-ctrl-row-controls">
+                  <div class="r2-ctrl-row-number center-row" data-row-index="4" title="Chọn hàng ngang TT">TT</div>
+                  <div class="r2-ctrl-row-state-btns">
+                    <button type="button" class="r2-ctrl-state-btn correct" data-row-index="4" data-state="opened">Đ</button>
+                    <button type="button" class="r2-ctrl-state-btn wrong" data-row-index="4" data-state="cancelled">S</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="r2-ctrl-question">
+              <div id="r2-ctrl-q-text"></div>
+              <div class="r2-ctrl-page-btns">
+                <button type="button" id="r2-btn-wait-bg" class="r2-ctrl-btn">ẨN NỀN CHỜ</button>
+                <button type="button" id="r2-btn-toggle-ques" class="r2-ctrl-btn">HIỆN CÂU HỎI</button>
+                <button type="button" id="r2-btn-toggle-15s" class="r2-ctrl-btn">15s</button>
+                <button type="button" id="r2-btn-page" class="r2-ctrl-btn">CHUYỂN TRANG 2</button>
+                <button type="button" id="r2-btn-show-ans" class="r2-ctrl-btn">HIỆN ĐÁP ÁN</button>
+                <button type="button" id="r2-btn-reset-ans" class="r2-ctrl-btn">RESET</button>
+                <button type="button" id="r2-btn-reveal-all" class="r2-ctrl-btn">MỞ ALL</button>
+              </div>
+            </div>
+
+            <div class="r2-ctrl-score-grid">
+              <div class="r2-c-score-card" id="r2-ctrl-score-0" data-player-index="0" title="Bấm chuông chướng ngại vật">
+                <div class="r2-c-score-name">P1</div>
+                <div class="r2-c-score-val">0</div>
+              </div>
+              <div class="r2-c-score-card" id="r2-ctrl-score-1" data-player-index="1" title="Bấm chuông chướng ngại vật">
+                <div class="r2-c-score-name">P2</div>
+                <div class="r2-c-score-val">0</div>
+              </div>
+              <div class="r2-c-score-card" id="r2-ctrl-score-2" data-player-index="2" title="Bấm chuông chướng ngại vật">
+                <div class="r2-c-score-name">P3</div>
+                <div class="r2-c-score-val">0</div>
+              </div>
+              <div class="r2-c-score-card" id="r2-ctrl-score-3" data-player-index="3" title="Bấm chuông chướng ngại vật">
+                <div class="r2-c-score-name">P4</div>
+                <div class="r2-c-score-val">0</div>
+              </div>
+            </div>
+
+            <div class="r2-ctrl-answers-panel">
+              <div class="r2-ctrl-ans-header">ĐÁP ÁN THÍ SINH</div>
+              <div class="r2-ctrl-ans-list">
+                <div class="r2-ctrl-ans-card" id="r2-ctrl-ans-card-0">
+                  <div class="r2-ctrl-ans-card-top">
+                    <div class="r2-ctrl-ans-player" id="r2-ctrl-ans-name-0">1. P1</div>
+                    <span class="r2-ctrl-ans-status" id="r2-ctrl-ans-status-0">TRỐNG</span>
+                  </div>
+                  <div class="r2-ctrl-ans-input-row">
+                    <input type="text" class="r2-ctrl-ans-input" id="r2-ctrl-ans-input-0" data-player-index="0" placeholder="Nhập hoặc chờ đáp án..." />
+                    <button type="button" class="r2-ctrl-ans-wrong-btn" id="r2-ctrl-ans-wrong-0" data-player-index="0" title="Đánh dấu / hủy đánh dấu đáp án sai">SAI</button>
+                  </div>
+                </div>
+
+                <div class="r2-ctrl-ans-card" id="r2-ctrl-ans-card-1">
+                  <div class="r2-ctrl-ans-card-top">
+                    <div class="r2-ctrl-ans-player" id="r2-ctrl-ans-name-1">2. P2</div>
+                    <span class="r2-ctrl-ans-status" id="r2-ctrl-ans-status-1">TRỐNG</span>
+                  </div>
+                  <div class="r2-ctrl-ans-input-row">
+                    <input type="text" class="r2-ctrl-ans-input" id="r2-ctrl-ans-input-1" data-player-index="1" placeholder="Nhập hoặc chờ đáp án..." />
+                    <button type="button" class="r2-ctrl-ans-wrong-btn" id="r2-ctrl-ans-wrong-1" data-player-index="1" title="Đánh dấu / hủy đánh dấu đáp án sai">SAI</button>
+                  </div>
+                </div>
+
+                <div class="r2-ctrl-ans-card" id="r2-ctrl-ans-card-2">
+                  <div class="r2-ctrl-ans-card-top">
+                    <div class="r2-ctrl-ans-player" id="r2-ctrl-ans-name-2">3. P3</div>
+                    <span class="r2-ctrl-ans-status" id="r2-ctrl-ans-status-2">TRỐNG</span>
+                  </div>
+                  <div class="r2-ctrl-ans-input-row">
+                    <input type="text" class="r2-ctrl-ans-input" id="r2-ctrl-ans-input-2" data-player-index="2" placeholder="Nhập hoặc chờ đáp án..." />
+                    <button type="button" class="r2-ctrl-ans-wrong-btn" id="r2-ctrl-ans-wrong-2" data-player-index="2" title="Đánh dấu / hủy đánh dấu đáp án sai">SAI</button>
+                  </div>
+                </div>
+
+                <div class="r2-ctrl-ans-card" id="r2-ctrl-ans-card-3">
+                  <div class="r2-ctrl-ans-card-top">
+                    <div class="r2-ctrl-ans-player" id="r2-ctrl-ans-name-3">4. P4</div>
+                    <span class="r2-ctrl-ans-status" id="r2-ctrl-ans-status-3">TRỐNG</span>
+                  </div>
+                  <div class="r2-ctrl-ans-input-row">
+                    <input type="text" class="r2-ctrl-ans-input" id="r2-ctrl-ans-input-3" data-player-index="3" placeholder="Nhập hoặc chờ đáp án..." />
+                    <button type="button" class="r2-ctrl-ans-wrong-btn" id="r2-ctrl-ans-wrong-3" data-player-index="3" title="Đánh dấu / hủy đánh dấu đáp án sai">SAI</button>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="r2-ctrl-ans-reset-btn" id="r2-btn-reset-player-ans">RESET ĐÁP ÁN TS</button>
             </div>
           </div>
         </div>
@@ -289,25 +455,26 @@
       </div>
     </div>
 
+    <!-- MODAL CÀI ĐẶT VÒNG 1 -->
     <div class="modal-overlay" id="configModal">
       <div class="modal-content" id="configModalContent">
         <div class="modal-header">
           <h2>&#9881; CÀI ĐẶT VÒNG 1</h2>
-          <button class="close-btn" onclick="closeConfig()">✖</button>
+          <button type="button" class="close-btn" id="closeR1ConfigBtn">✖</button>
         </div>
 
         <div class="config-grid">
-          <div style="display: flex; flex-direction: column; gap: 15px;">
+          <div class="config-left-col">
             <div>
               <div class="config-group-title">Cấu hình chung</div>
-              <div class="config-grid" style="gap: 10px;">
+              <div class="config-grid config-grid-compact">
                 <div class="config-item">
-                  <label>Số thí sinh</label>
-                  <input type="number" id="numPlayers" value="4" min="2" max="6">
+                  <label for="numPlayers">Số thí sinh</label>
+                  <input type="number" id="numPlayers" value="4" min="2" max="6" />
                 </div>
                 <div class="config-item">
-                  <label>LƯỢT:</label>
-                  <select id="turnStatus" onchange="jumpToTurn(this.value)">
+                  <label for="turnStatus">LƯỢT:</label>
+                  <select id="turnStatus">
                     <option value="rieng">Lượt riêng 1</option>
                   </select>
                 </div>
@@ -316,39 +483,39 @@
 
             <div>
               <div class="config-group-title">Cấu hình lượt riêng</div>
-              <div class="config-grid" style="gap: 10px;">
+              <div class="config-grid config-grid-compact">
                 <div class="config-item">
-                  <label>Số lượt:</label>
-                  <input type="number" id="lr_soluot" value="4" min="0" max="6">
+                  <label for="lr_soluot">Số lượt:</label>
+                  <input type="number" id="lr_soluot" value="4" min="0" max="6" />
                 </div>
                 <div class="config-item">
-                  <label>Số câu/lượt:</label>
-                  <input type="number" id="lr_socau" value="6">
+                  <label for="lr_socau">Số câu/lượt:</label>
+                  <input type="number" id="lr_socau" value="6" />
                 </div>
                 <div class="config-item">
-                  <label>Thời gian(s)</label>
-                  <input type="number" id="lr_thoigian" value="-1" min="-1">
+                  <label for="lr_thoigian">Thời gian(s)</label>
+                  <input type="number" id="lr_thoigian" value="-1" min="-1" />
                 </div>
                 <div class="config-item">
-                  <label>Điểm đúng</label>
-                  <input type="number" id="lr_diemdung" value="10">
+                  <label for="lr_diemdung">Điểm đúng</label>
+                  <input type="number" id="lr_diemdung" value="10" />
                 </div>
                 <div class="config-item">
-                  <label>Điểm sai</label>
-                  <input type="number" id="lr_diemsai" value="0">
+                  <label for="lr_diemsai">Điểm sai</label>
+                  <input type="number" id="lr_diemsai" value="0" />
                 </div>
               </div>
             </div>
 
             <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div class="config-group-title" style="margin-bottom: 0;">Cấu hình lượt chung</div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <label style="font-size: 13px; font-weight: bold; color: white;">Số lượt:</label>
-                  <input type="number" id="numLuotChung" value="1" min="0" max="4" style="width: 50px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 4px; padding: 4px; text-align: center;" onchange="renderLuotChungConfigs()">
+              <div class="config-lc-header">
+                <div class="config-group-title">Cấu hình lượt chung</div>
+                <div class="config-lc-count-wrap">
+                  <label for="numLuotChung">Số lượt:</label>
+                  <input type="number" id="numLuotChung" value="1" min="0" max="4" />
                 </div>
               </div>
-              <div id="luotChungList" class="custom-scroll" style="display: flex; flex-direction: column; gap: 15px; max-height: 180px; overflow-y: auto; padding-right: 5px;"></div>
+              <div id="luotChungList" class="custom-scroll"></div>
             </div>
           </div>
 
@@ -357,41 +524,151 @@
             <div class="players-grid">
               <div class="player-score-card">
                 <div class="player-score-name-wrapper">
-                  <div class="player-score-name" contenteditable="true" id="config-name-1" oninput="compressConfigName(1)" onblur="updateNameDB(1, this.innerText)">P1</div>
+                  <div class="player-score-name" contenteditable="true" id="config-name-1" data-player-index="1">P1</div>
                 </div>
-                <input class="player-score-input" type="number" id="config-score-1" value="0" onchange="updateScoreDB(1, this.value)">
+                <input class="player-score-input" type="number" id="config-score-1" data-player-index="1" value="0" />
               </div>
 
               <div class="player-score-card">
                 <div class="player-score-name-wrapper">
-                  <div class="player-score-name" contenteditable="true" id="config-name-2" oninput="compressConfigName(2)" onblur="updateNameDB(2, this.innerText)">P2</div>
+                  <div class="player-score-name" contenteditable="true" id="config-name-2" data-player-index="2">P2</div>
                 </div>
-                <input class="player-score-input" type="number" id="config-score-2" value="0" onchange="updateScoreDB(2, this.value)">
+                <input class="player-score-input" type="number" id="config-score-2" data-player-index="2" value="0" />
               </div>
 
               <div class="player-score-card">
                 <div class="player-score-name-wrapper">
-                  <div class="player-score-name" contenteditable="true" id="config-name-3" oninput="compressConfigName(3)" onblur="updateNameDB(3, this.innerText)">P3</div>
+                  <div class="player-score-name" contenteditable="true" id="config-name-3" data-player-index="3">P3</div>
                 </div>
-                <input class="player-score-input" type="number" id="config-score-3" value="0" onchange="updateScoreDB(3, this.value)">
+                <input class="player-score-input" type="number" id="config-score-3" data-player-index="3" value="0" />
               </div>
 
               <div class="player-score-card">
                 <div class="player-score-name-wrapper">
-                  <div class="player-score-name" contenteditable="true" id="config-name-4" oninput="compressConfigName(4)" onblur="updateNameDB(4, this.innerText)">P4</div>
+                  <div class="player-score-name" contenteditable="true" id="config-name-4" data-player-index="4">P4</div>
                 </div>
-                <input class="player-score-input" type="number" id="config-score-4" value="0" onchange="updateScoreDB(4, this.value)">
+                <input class="player-score-input" type="number" id="config-score-4" data-player-index="4" value="0" />
               </div>
             </div>
           </div>
         </div>
 
-        <button class="save-config-btn" onclick="saveRoundConfig()">LƯU</button>
+        <button type="button" class="save-config-btn" id="saveR1ConfigBtn">LƯU</button>
       </div>
     </div>
+
+    <!-- MODAL CÀI ĐẶT VÒNG 2 -->
+    <div class="r2-cfg-modal-overlay" id="r2ConfigModal">
+      <div class="r2-cfg-modal-content" id="r2ConfigModalContent">
+        <div class="r2-cfg-modal-header">
+          <h2>&#9881; CÀI ĐẶT VÒNG 2 - VƯỢT CHƯỚNG NGẠI VẬT</h2>
+          <button type="button" class="r2-cfg-close-btn" id="r2-cfg-close-btn">✖</button>
+        </div>
+
+        <div class="r2-cfg-group-title">Quản lý tên, điểm số &amp; cộng điểm thí sinh</div>
+
+        <div class="r2-cfg-players-row">
+          <div class="r2-cfg-player-card">
+            <div class="r2-cfg-name-wrapper">
+              <div class="r2-cfg-name" contenteditable="true" id="r2-config-name-1" data-player-num="1">P1</div>
+            </div>
+            <div class="r2-cfg-score-section">
+              <span class="r2-cfg-sub-label">Tổng điểm hiện tại</span>
+              <input class="r2-cfg-score-input" type="number" id="r2-config-score-1" data-player-num="1" value="0" />
+            </div>
+            <div class="r2-cfg-bonus-section">
+              <span class="r2-cfg-sub-label center">Điểm cộng thêm</span>
+              <div class="r2-cfg-preset-row">
+                <button type="button" class="r2-cfg-preset-btn primary" data-player-num="1" data-delta="10" title="Cộng thêm 10 điểm">+10</button>
+                <button type="button" class="r2-cfg-preset-btn" data-player-num="1" data-delta="-10" title="Giảm 10 điểm">-10</button>
+                <button type="button" class="r2-cfg-preset-btn reset" data-player-num="1" data-set="0" title="Đặt điểm cộng về 0">0</button>
+              </div>
+              <div class="r2-cfg-bonus-input-wrap" title="Nhập số điểm cộng tùy ý">
+                <span class="r2-cfg-bonus-prefix">+</span>
+                <input class="r2-cfg-bonus-input" type="number" id="r2-config-add-1" data-player-num="1" value="0" placeholder="Điểm khác" />
+              </div>
+              <div class="r2-cfg-preview-total" id="r2-config-preview-1">Sau lưu: <strong>0</strong></div>
+            </div>
+          </div>
+
+          <div class="r2-cfg-player-card">
+            <div class="r2-cfg-name-wrapper">
+              <div class="r2-cfg-name" contenteditable="true" id="r2-config-name-2" data-player-num="2">P2</div>
+            </div>
+            <div class="r2-cfg-score-section">
+              <span class="r2-cfg-sub-label">Tổng điểm hiện tại</span>
+              <input class="r2-cfg-score-input" type="number" id="r2-config-score-2" data-player-num="2" value="0" />
+            </div>
+            <div class="r2-cfg-bonus-section">
+              <span class="r2-cfg-sub-label center">Điểm cộng thêm</span>
+              <div class="r2-cfg-preset-row">
+                <button type="button" class="r2-cfg-preset-btn primary" data-player-num="2" data-delta="10" title="Cộng thêm 10 điểm">+10</button>
+                <button type="button" class="r2-cfg-preset-btn" data-player-num="2" data-delta="-10" title="Giảm 10 điểm">-10</button>
+                <button type="button" class="r2-cfg-preset-btn reset" data-player-num="2" data-set="0" title="Đặt điểm cộng về 0">0</button>
+              </div>
+              <div class="r2-cfg-bonus-input-wrap" title="Nhập số điểm cộng tùy ý">
+                <span class="r2-cfg-bonus-prefix">+</span>
+                <input class="r2-cfg-bonus-input" type="number" id="r2-config-add-2" data-player-num="2" value="0" placeholder="Điểm khác" />
+              </div>
+              <div class="r2-cfg-preview-total" id="r2-config-preview-2">Sau lưu: <strong>0</strong></div>
+            </div>
+          </div>
+
+          <div class="r2-cfg-player-card">
+            <div class="r2-cfg-name-wrapper">
+              <div class="r2-cfg-name" contenteditable="true" id="r2-config-name-3" data-player-num="3">P3</div>
+            </div>
+            <div class="r2-cfg-score-section">
+              <span class="r2-cfg-sub-label">Tổng điểm hiện tại</span>
+              <input class="r2-cfg-score-input" type="number" id="r2-config-score-3" data-player-num="3" value="0" />
+            </div>
+            <div class="r2-cfg-bonus-section">
+              <span class="r2-cfg-sub-label center">Điểm cộng thêm</span>
+              <div class="r2-cfg-preset-row">
+                <button type="button" class="r2-cfg-preset-btn primary" data-player-num="3" data-delta="10" title="Cộng thêm 10 điểm">+10</button>
+                <button type="button" class="r2-cfg-preset-btn" data-player-num="3" data-delta="-10" title="Giảm 10 điểm">-10</button>
+                <button type="button" class="r2-cfg-preset-btn reset" data-player-num="3" data-set="0" title="Đặt điểm cộng về 0">0</button>
+              </div>
+              <div class="r2-cfg-bonus-input-wrap" title="Nhập số điểm cộng tùy ý">
+                <span class="r2-cfg-bonus-prefix">+</span>
+                <input class="r2-cfg-bonus-input" type="number" id="r2-config-add-3" data-player-num="3" value="0" placeholder="Điểm khác" />
+              </div>
+              <div class="r2-cfg-preview-total" id="r2-config-preview-3">Sau lưu: <strong>0</strong></div>
+            </div>
+          </div>
+
+          <div class="r2-cfg-player-card">
+            <div class="r2-cfg-name-wrapper">
+              <div class="r2-cfg-name" contenteditable="true" id="r2-config-name-4" data-player-num="4">P4</div>
+            </div>
+            <div class="r2-cfg-score-section">
+              <span class="r2-cfg-sub-label">Tổng điểm hiện tại</span>
+              <input class="r2-cfg-score-input" type="number" id="r2-config-score-4" data-player-num="4" value="0" />
+            </div>
+            <div class="r2-cfg-bonus-section">
+              <span class="r2-cfg-sub-label center">Điểm cộng thêm</span>
+              <div class="r2-cfg-preset-row">
+                <button type="button" class="r2-cfg-preset-btn primary" data-player-num="4" data-delta="10" title="Cộng thêm 10 điểm">+10</button>
+                <button type="button" class="r2-cfg-preset-btn" data-player-num="4" data-delta="-10" title="Giảm 10 điểm">-10</button>
+                <button type="button" class="r2-cfg-preset-btn reset" data-player-num="4" data-set="0" title="Đặt điểm cộng về 0">0</button>
+              </div>
+              <div class="r2-cfg-bonus-input-wrap" title="Nhập số điểm cộng tùy ý">
+                <span class="r2-cfg-bonus-prefix">+</span>
+                <input class="r2-cfg-bonus-input" type="number" id="r2-config-add-4" data-player-num="4" value="0" placeholder="Điểm khác" />
+              </div>
+              <div class="r2-cfg-preview-total" id="r2-config-preview-4">Sau lưu: <strong>0</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="r2-cfg-save-btn" id="r2-cfg-save-btn">LƯU</button>
+      </div>
+    </div>
+
     <script type="module">
       import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getDatabase, ref, set, onValue, runTransaction, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
       const firebaseConfig = {
         apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
         authDomain: "olympia-d2f44.firebaseapp.com",
@@ -412,7 +689,7 @@
         btn.classList.add('active');
         const tabText = btn.innerText.trim().toUpperCase();
         let suffix = tabCode;
-        if(!suffix) {
+        if (!suffix) {
           if (tabText === 'MAIN') suffix = 'M';
           else if (tabText === 'KHỞI ĐỘNG') suffix = 'R1';
           else if (tabText === 'VƯỢT CHƯỚNG NGẠI VẬT') suffix = 'R2';
@@ -420,7 +697,19 @@
           else if (tabText === 'VỀ ĐÍCH') suffix = 'R4';
           else if (tabText === 'CÂU HỎI PHỤ') suffix = 'R5';
         }
-        if(!suffix) return;
+        if (!suffix) return;
+
+        if (typeof window.cleanupCurrentRound === 'function') {
+          window.cleanupCurrentRound();
+          window.cleanupCurrentRound = null;
+        }
+
+        const r1Ui = document.getElementById('round1-ui');
+        if (r1Ui) r1Ui.style.display = (suffix === 'R1') ? 'grid' : 'none';
+
+        const r2Ui = document.getElementById('r2-controller-ui');
+        if (r2Ui) r2Ui.style.display = (suffix === 'R2') ? 'block' : 'none';
+
         const cssLink = document.getElementById('round-css');
         if (cssLink) {
           cssLink.href = `../css/Controller_${suffix}.css`;
@@ -438,14 +727,22 @@
           tab: suffix,
           timestamp: Date.now()
         });
-        if (typeof window.cleanupCurrentRound === 'function') {
-            window.cleanupCurrentRound();
-            window.cleanupCurrentRound = null;
-        }
-        
-        const r1Ui = document.getElementById('round1-ui');
-        if (r1Ui) r1Ui.style.display = (suffix === 'R1') ? 'grid' : 'none';
       };
+
+      document.querySelectorAll('.header-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          window.selectTab(btn, btn.dataset.tab);
+        });
+      });
+
+      const openOptionBtn = document.getElementById('open-option-btn');
+      if (openOptionBtn) {
+        openOptionBtn.addEventListener('click', () => {
+          if (typeof window.openConfig === 'function') {
+            window.openConfig();
+          }
+        });
+      }
 
       // SOUNDBOARD
       const soundIdForFileName = fileName => fileName.replace(/[^A-Za-z0-9_-]/g, '_');
@@ -453,21 +750,17 @@
         'Main_HostEntrance.mp3', 'Main_ContestantEntrance.mp3',
         'Main_Introduction1.mp3', 'Main_Introduction2.mp3', 'Main_Introduction3.mp3',
         'Main_Introduction4.mp3', 'Main_Introduction5.mp3', 'Main_PointSummary.mp3',
-        'Main_15s.mp3', 'Main_1st.mp3', 'Main_2nd.mp3', 'Main_3rd.mp3', 'Main_4th.mp3', 
+        'Main_15s.mp3', 'Main_1st.mp3', 'Main_2nd.mp3', 'Main_3rd.mp3', 'Main_4th.mp3',
         'Main_Award.mp3', 'Main_Blanks.mp3',
         'Main_DLDN2008.mp3', 'Main_DLDN2010.mp3',
-        'Main_DLDN2010_Instrument.mp3', 
-        'R1_Intro.mp3', 'R1_Start.mp3', 'R1_Bed1.mp3', 'R1_Bed2.mp3', 'R1_End.mp3', 
-        'R2_Intro.mp3', 'R2_Right.mp3', 'R2_RightObs.mp3', 'R2_Wrong.mp3', 
+        'Main_DLDN2010_Instrument.mp3',
+        'R1_Intro.mp3', 'R1_Start.mp3', 'R1_Bed1.mp3', 'R1_Bed2.mp3', 'R1_End.mp3',
+        'R2_Intro.mp3', 'R2_Right.mp3', 'R2_RightObs.mp3', 'R2_Wrong.mp3',
         'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
         'R4_Intro.mp3', 'R4_Begin.mp3', 'R4_15s.mp3', 'R4_20s.mp3', 'R4_20sPrac.mp3', 'R4_30s.mp3',
         'R4_30sPrac.mp3', 'R4_40sPrac.mp3', 'R4_60sPrac.mp3',
         'R4_End.mp3'
       ];
-      const SOUND_FILES = soundFileNames.reduce((files, fileName) => {
-        files[soundIdForFileName(fileName)] = `../sounds/${fileName}`;
-        return files;
-      }, {});
       const SOUND_LABELS = {
         "Main_15s.mp3": "15s",
         "Main_1st.mp3": "1st",
@@ -515,34 +808,28 @@
       soundFileNames.forEach((fileName, index) => {
         const soundId = soundIdForFileName(fileName);
         const button = document.createElement('button');
+        button.type = 'button';
         button.className = 'music-trigger-btn';
         button.dataset.sound = soundId;
         button.textContent = SOUND_LABELS[fileName] || (index + 1).toString();
-        
-        // SỬ DỤNG HÀM playMusic THỐNG NHẤT
+
         button.addEventListener('click', () => {
-          // 1. Hiệu ứng nháy nút active
           button.classList.add('active');
           setTimeout(() => button.classList.remove('active'), 100);
-          
-          // 2. Gọi nhạc (autoStop = true để có thể tắt/bật như công tắc, playOver = false)
           window.playMusic(fileName, true, false);
         });
-        
+
         musicGrid.appendChild(button);
       });
 
       const playingState = {};
 
-      // CẬP NHẬT HÀM PHÁT NHẠC (HỖ TRỢ AUTO-STOP VÀ PLAY-OVER)
       window.playMusic = function(fileName, autoStop = false, playOver = false) {
-        const soundIdForFileName = name => name.replace(/[^A-Za-z0-9_-]/g, '_');
         const baseSoundId = soundIdForFileName(fileName);
         const fileUrl = `../sounds/${fileName}`;
         const statusRef = ref(db, `games/soundboard_status/${baseSoundId}`);
 
         if (autoStop) {
-          // autoStop = true: Đóng vai trò như công tắc Toggle (Play/Stop)
           runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
             const isPlaying = result.snapshot.val() === true;
             return update(ref(db, 'games/soundboard'), {
@@ -553,17 +840,14 @@
             });
           });
         } else {
-          // autoStop = false: Luôn phát (Phát lại từ đầu hoặc phát đè)
           set(statusRef, true);
-          
-          // playOver = true: Tạo ra 1 ID duy nhất (kèm timestamp) để Projector tạo luồng Audio mới chạy song song
           const targetSoundId = playOver ? `${baseSoundId}_${Date.now()}` : baseSoundId;
-          
+
           return update(ref(db, 'games/soundboard'), {
             soundId: targetSoundId,
             file: fileUrl,
             action: 'play',
-            playOver: playOver, 
+            playOver: playOver,
             timestamp: Date.now()
           });
         }
@@ -572,11 +856,11 @@
       window.updateScoreByIndex = function(index, plus) {
         plus = Number(plus) || 0;
         if (index === 0) {
-          for(let i = 1; i <= 4; i++) {
+          for (let i = 1; i <= 4; i++) {
             runTransaction(ref(db, `games/players/${i}/score`), (currentScore) => {
               return (Number(currentScore) || 0) + plus;
             });
-          } 
+          }
         } else if (index >= 1 && index <= 6) {
           runTransaction(ref(db, `games/players/${index}/score`), (currentScore) => {
             return (Number(currentScore) || 0) + plus;
@@ -601,8 +885,8 @@
 
       window.addEventListener('keydown', function(e) {
         if ((e.ctrlKey || e.metaKey) && (
-            e.key === '+' || e.key === '-' || e.key === '=' || e.key === '_' || e.key === '0' ||
-            e.keyCode === 187 || e.keyCode === 189 || e.keyCode === 107 || e.keyCode === 109 || e.keyCode === 48 || e.keyCode === 96
+          e.key === '+' || e.key === '-' || e.key === '=' || e.key === '_' || e.key === '0' ||
+          e.keyCode === 187 || e.keyCode === 189 || e.keyCode === 107 || e.keyCode === 109 || e.keyCode === 48 || e.keyCode === 96
         )) {
           e.preventDefault();
         }
@@ -635,9 +919,6 @@
           window.compressBadgeText('roundText');
           window.compressBadgeText('quesText');
           window.compressBadgeText('timeText');
-          for (let i = 1; i <= 4; i++) {
-            window.compressBadgeText(`playerBtnText-${i}`);
-          }
         }
       }
 

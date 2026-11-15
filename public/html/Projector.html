@@ -51,10 +51,6 @@
                 left: 0;
                 width: 100vw;
                 height: 100vh;
-                /* background-image: url('../graphic/bg.png');
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat; */
                 background: transparent;
                 z-index: -1;
                 pointer-events: none;
@@ -67,14 +63,12 @@
         <video id="roundIntroVideo" playsinline preload="auto"></video>
         <button id="enableSoundBtn" type="button" hidden>Bật âm thanh Livestream</button>
 
-        <!-- Video Đồ họa nền Vòng 1 (KhoiDong.webm) -->
+        <!-- GIAO DIỆN VÒNG 1: KHỞI ĐỘNG -->
         <div id="round1-ui" class="round-ui">
-            <video id="graphic_r1" class="video-overlay" style="display: none;">
-                <source src="../graphic/KhoiDong_Proj.webm" type="video/webm">
-            </video>
-            <video id="graphic_time" class="video-overlay" style="display: none; z-index: 1;">
-                <source src="../graphic/60s.webm" type="video/webm">
-            </video>
+            <video id="graphic_r1" class="video-overlay" src="../graphic/KhoiDong_Proj.webm" playsinline preload="auto"></video>
+            <video id="graphic_time" class="video-overlay" src="../graphic/60s.webm" playsinline preload="auto"></video>
+            <audio id="audio_r1_clock" preload="auto"></audio>
+
             <div id="playerContainer"></div>
             <div id="questionText" class="question"></div>
             <div id="timer5sBox" class="countdown-5s-box">5</div>
@@ -82,6 +76,69 @@
             <div id="projQuestionCount" class="proj-question-count">
                 <div class="count-title">CÂU</div>
                 <div id="countNumber" class="count-number"></div>
+            </div>
+        </div>
+
+        <!-- GIAO DIỆN VÒNG 2: VƯỢT CHƯỚNG NGẠI VẬT -->
+        <div id="r2-projector-ui" style="display: none;">
+            <div id="r2-wait-bg"></div>
+
+            <div id="r2-page-1">
+                <div class="r2-bg-layer"></div>
+                <video class="r2-video-layer" id="r2-15s-video" src="../graphic/R2_15s.webm" playsinline preload="auto"></video>
+
+                <div class="r2-image-area">
+                    <img class="r2-main-img" src="../graphic/r2_target.png" alt="Chướng ngại vật" />
+                    <img class="r2-piece" id="r2-p1" src="../graphic/1.png" alt="" />
+                    <img class="r2-piece" id="r2-p2" src="../graphic/2.png" alt="" />
+                    <img class="r2-piece" id="r2-p3" src="../graphic/3.png" alt="" />
+                    <img class="r2-piece" id="r2-p4" src="../graphic/4.png" alt="" />
+                    <img class="r2-piece" id="r2-p5" src="../graphic/5.png" alt="" />
+                </div>
+
+                <div class="r2-rows-area">
+                    <div class="r2-cnv-title">CHƯỚNG NGẠI VẬT CÓ 0 CHỮ CÁI</div>
+                    <div class="r2-row-container">
+                        <div class="r2-row"></div>
+                    </div>
+                    <div class="r2-row-container">
+                        <div class="r2-row"></div>
+                    </div>
+                    <div class="r2-row-container">
+                        <div class="r2-row"></div>
+                    </div>
+                    <div class="r2-row-container">
+                        <div class="r2-row"></div>
+                    </div>
+                    <div class="r2-row-container">
+                        <div class="r2-row"></div>
+                    </div>
+                </div>
+
+                <div class="r2-buzzer-container" id="r2-buzzer-container"></div>
+
+                <div class="r2-question-box"></div>
+            </div>
+
+            <div id="r2-page-2">
+                <div class="r2-p2-bg"></div>
+                <video class="r2-video-layer" id="r2-ans-video" src="../graphic/R2_showans.webm" playsinline preload="auto"></video>
+
+                <img class="r2-p2-wrong r2-p2-pos-1" id="r2-proj-wrong-1" src="../graphic/R2_Wrong.png" alt="" />
+                <div class="r2-p2-text r2-p2-name r2-p2-pos-1" id="r2-proj-name-1"><span class="r2-p2-inner" id="r2-proj-name-text-1">P1</span></div>
+                <div class="r2-p2-text r2-p2-ans r2-p2-pos-1" id="r2-proj-ans-1"><span class="r2-p2-inner" id="r2-proj-ans-text-1"></span></div>
+
+                <img class="r2-p2-wrong r2-p2-pos-2" id="r2-proj-wrong-2" src="../graphic/R2_Wrong.png" alt="" />
+                <div class="r2-p2-text r2-p2-name r2-p2-pos-2" id="r2-proj-name-2"><span class="r2-p2-inner" id="r2-proj-name-text-2">P2</span></div>
+                <div class="r2-p2-text r2-p2-ans r2-p2-pos-2" id="r2-proj-ans-2"><span class="r2-p2-inner" id="r2-proj-ans-text-2"></span></div>
+
+                <img class="r2-p2-wrong r2-p2-pos-3" id="r2-proj-wrong-3" src="../graphic/R2_Wrong.png" alt="" />
+                <div class="r2-p2-text r2-p2-name r2-p2-pos-3" id="r2-proj-name-3"><span class="r2-p2-inner" id="r2-proj-name-text-3">P3</span></div>
+                <div class="r2-p2-text r2-p2-ans r2-p2-pos-3" id="r2-proj-ans-3"><span class="r2-p2-inner" id="r2-proj-ans-text-3"></span></div>
+
+                <img class="r2-p2-wrong r2-p2-pos-4" id="r2-proj-wrong-4" src="../graphic/R2_Wrong.png" alt="" />
+                <div class="r2-p2-text r2-p2-name r2-p2-pos-4" id="r2-proj-name-4"><span class="r2-p2-inner" id="r2-proj-name-text-4">P4</span></div>
+                <div class="r2-p2-text r2-p2-ans r2-p2-pos-4" id="r2-proj-ans-4"><span class="r2-p2-inner" id="r2-proj-ans-text-4"></span></div>
             </div>
         </div>
 
@@ -125,6 +182,17 @@
                 if (!filePrefix || currentLoadedTab === tabCode) return;
                 currentLoadedTab = tabCode;
 
+                if (typeof window.cleanupCurrentRound === 'function') {
+                    window.cleanupCurrentRound();
+                    window.cleanupCurrentRound = null;
+                }
+
+                const r1Ui = document.getElementById('round1-ui');
+                if (r1Ui) r1Ui.style.display = (tabCode === 'R1') ? 'block' : 'none';
+
+                const r2Ui = document.getElementById('r2-projector-ui');
+                if (r2Ui) r2Ui.style.display = (tabCode === 'R2') ? 'block' : 'none';
+
                 const cssLink = document.getElementById('projector-css');
                 if (cssLink) {
                     cssLink.href = `../css/Projector_${filePrefix}.css`;
@@ -140,14 +208,6 @@
                 newScript.type = 'module';
                 newScript.src = `../script/${filePrefix}.js?t=${Date.now()}`;
                 document.body.appendChild(newScript);
-
-                if (typeof window.cleanupCurrentRound === 'function') {
-                    window.cleanupCurrentRound();
-                    window.cleanupCurrentRound = null;
-                }
-                
-                const r1Ui = document.getElementById('round1-ui');
-                if (r1Ui) r1Ui.style.display = (tabCode === 'R1') ? 'grid' : 'none';
             }
 
             onValue(ref(db, 'games/active_tab'), (snapshot) => {
@@ -164,7 +224,6 @@
             const roundIntroVideo = document.getElementById('roundIntroVideo');
 
             if (roundIntroVideo) {
-                // Khi chạy hết video thì dừng ở frame cuối cho đến khi bấm lần 2 để ẩn
                 roundIntroVideo.addEventListener('ended', () => {
                     roundIntroVideo.pause();
                 });
@@ -249,7 +308,6 @@
                 }
             });
 
-            // Nếu bấm RESET ĐỒ HỌA, tự động ẩn luôn video intro vòng thi nếu đang hiện
             let isInitialCmdLoad = true;
             onValue(ref(db, 'games/commands'), (snapshot) => {
                 if (isInitialCmdLoad) {
@@ -316,7 +374,6 @@
                     return;
                 }
 
-                // Gọi play trực tiếp trong thao tác click để trình duyệt cấp quyền phát tiếng.
                 pending.audio.currentTime = 0;
                 pending.audio.play().then(() => {
                     if (soundCommandVersions[pending.soundId] !== pending.commandVersion) return;

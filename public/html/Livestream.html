@@ -46,14 +46,12 @@
         <video id="roundIntroVideo" playsinline preload="auto"></video>
         <button id="enableSoundBtn" type="button" hidden>Bật âm thanh Livestream</button>
 
-        <!-- Video Đồ họa nền Vòng 1 (KhoiDong.webm) -->
+        <!-- GIAO DIỆN VÒNG 1: KHỞI ĐỘNG -->
         <div id="round1-ui" class="round-ui">
-            <video id="graphic_r1" class="video-overlay" style="display: none;">
-                <source src="../graphic/KhoiDong.webm" type="video/webm">
-            </video>
-            <video id="graphic_time" class="video-overlay" style="display: none; z-index: 1;">
-                <source src="../graphic/60s.webm" type="video/webm">
-            </video>
+            <video id="graphic_r1" class="video-overlay" src="../graphic/KhoiDong.webm" playsinline preload="auto"></video>
+            <video id="graphic_time" class="video-overlay" src="../graphic/60s.webm" playsinline preload="auto"></video>
+            <audio id="audio_r1_clock" preload="auto"></audio>
+
             <div id="playerContainer"></div>
             <div id="questionText" class="question"></div>
             <div id="timer5sBox" class="countdown-5s-box">5</div>
@@ -99,6 +97,14 @@
                 if (!filePrefix || currentLoadedTab === tabCode) return;
                 currentLoadedTab = tabCode;
 
+                if (typeof window.cleanupCurrentRound === 'function') {
+                    window.cleanupCurrentRound();
+                    window.cleanupCurrentRound = null;
+                }
+
+                const r1Ui = document.getElementById('round1-ui');
+                if (r1Ui) r1Ui.style.display = (tabCode === 'R1') ? 'block' : 'none';
+
                 const cssLink = document.getElementById('livestream-css');
                 if (cssLink) {
                     cssLink.href = `../css/${filePrefix}.css`;
@@ -114,14 +120,6 @@
                 newScript.type = 'module';
                 newScript.src = `../script/${filePrefix}.js?t=${Date.now()}`;
                 document.body.appendChild(newScript);
-
-                if (typeof window.cleanupCurrentRound === 'function') {
-                    window.cleanupCurrentRound();
-                    window.cleanupCurrentRound = null;
-                }
-                
-                const r1Ui = document.getElementById('round1-ui');
-                if (r1Ui) r1Ui.style.display = (tabCode === 'R1') ? 'block' : 'none';
             }
 
             onValue(ref(db, 'games/active_tab'), (snapshot) => {
