@@ -1,18 +1,18 @@
 /* Ẩn status bar nếu còn sót lại ở file nào khác */
-.status-bar-container { display: none !important; }
+.status-bar-container {
+  display: none !important;
+}
 
 /* ==========================================================================
-   CHIA CỘT MAIN CONTENT
+   GIAO DIỆN CHÍNH VÒNG 1
    ========================================================================== */
-.main-content-grid {
-  width: 100%;
-  position: relative;
-  background-color: var(--black);
-  padding: 10px;
+#round1-ui {
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1fr 220px; /* QA to bên trái, Bảng điểm 220px bên phải */
+  width: 100%;
+  height: 100%;
   gap: 12px;
-  flex: 1;
   min-height: 0;
 }
 
@@ -34,8 +34,13 @@
   position: relative;
 }
 
-.question-box { flex: 7; } /* Cột câu hỏi cao hơn */
-.answer-box { flex: 3; }
+.question-box {
+  flex: 7; /* Cột câu hỏi cao hơn */
+}
+
+.answer-box {
+  flex: 3;
+}
 
 /* Header của Box Câu hỏi */
 .question-header {
@@ -50,7 +55,39 @@
   align-items: center;
   gap: 20px;
 }
-.question-header .divider { color: #888; }
+
+.question-header .divider {
+  color: #888;
+}
+
+#btnResetTime {
+  margin-left: auto;
+  width: 40px;
+  height: 32px;
+  background: #dc2626;
+  color: white;
+  border: 1.5px solid white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  display: none;
+}
+
+#btnPlayPauseTime {
+  margin-left: auto;
+  margin-right: 15px;
+  width: 40px;
+  height: 32px;
+  background: #2563eb;
+  color: white;
+  border: 1.5px solid white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  display: none;
+}
 
 .question-content, .answer-content {
   padding: 15px 20px;
@@ -68,7 +105,11 @@
   align-items: flex-end;
   padding: 10px 15px;
 }
-.answer-actions { justify-content: flex-end; gap: 10px; }
+
+.answer-actions {
+  justify-content: flex-end;
+  gap: 10px;
+}
 
 .left-actions {
   display: flex;
@@ -82,14 +123,14 @@
   border: 1.5px solid var(--white);
   color: var(--white);
   font-weight: 800;
-  
+
   /* Cố định tuyệt đối kích cỡ của nút */
-  width: 130px; 
-  height: 40px; 
+  width: 130px;
+  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0; 
+  padding: 0;
   white-space: nowrap; /* Không cho chữ rớt dòng */
 
   cursor: pointer;
@@ -98,22 +139,45 @@
   transition: all 0.2s;
   border-radius: 2px;
 }
-.action-btn:hover { background-color: var(--blue-hover); }
+
+.action-btn:hover {
+  background-color: var(--blue-hover);
+}
+
 .action-btn.dimmed {
   background-color: #000033; /* Xanh nền tối lại */
   border-color: #555555;
   color: #888888;
 }
-.action-btn.dimmed:hover { 
-  background-color: #000055; 
+
+.action-btn.dimmed:hover {
+  background-color: #000055;
+}
+
+.reset-graphic-btn {
+  background-color: #cc0000;
 }
 
 /* Nút Điểm */
-.score-btn { font-size: 15px;}
-.add-btn { background-color: #008000; }
-.add-btn:hover { background-color: #005500; }
-.sub-btn { background-color: #cc0000; }
-.sub-btn:hover { background-color: #990000; }
+.score-btn {
+  font-size: 15px;
+}
+
+.add-btn {
+  background-color: #008000;
+}
+
+.add-btn:hover {
+  background-color: #005500;
+}
+
+.sub-btn {
+  background-color: #cc0000;
+}
+
+.sub-btn:hover {
+  background-color: #990000;
+}
 
 /* Khung đếm ngược 5s */
 .timer-5s-box {
@@ -130,7 +194,11 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-.timer-5s-box:hover { background-color: rgba(255, 255, 0, 0.15); }
+
+.timer-5s-box:hover {
+  background-color: rgba(255, 255, 0, 0.15);
+}
+
 .timer-5s-box.running {
   background-color: var(--yellow-border);
   color: var(--black);
@@ -158,8 +226,8 @@
 }
 
 /* Di chuột lên thẻ: Đổi viền */
-.player-vertical-card:hover { 
-  border-color: #00dafc; 
+.player-vertical-card:hover {
+  border-color: #00dafc;
 }
 
 /* Trạng thái đang hoạt động (Đến lượt): Nền đỏ */
@@ -169,7 +237,7 @@
 }
 
 .player-v-name {
-  background: linear-gradient(90deg, #00dafc, #007cbe); 
+  background: linear-gradient(90deg, #00dafc, #007cbe);
   border-bottom: 2px solid #13007d;
   padding: 5px 0px 0px 0px;
   text-align: center;
@@ -182,13 +250,13 @@
   text-transform: uppercase;
   height: 50px;
 }
+
 .player-vertical-card.is-turn .player-v-name {
   background: var(--yellow-border);
 }
 
 .player-v-score {
-  /* Nếu muốn cố định chiều cao bằng px thay vì flex: 1, bạn sửa thành: */
-  height: 100px; 
+  height: 100px;
   padding: 25px 0px 0px 0px;
   display: flex;
   justify-content: center;
@@ -199,12 +267,15 @@
 }
 
 /* ==========================================================================
-   4. MODAL CẤU HÌNH VÒNG 1 (OPTION SCREEN)
+   MODAL CẤU HÌNH VÒNG 1 (OPTION SCREEN)
    ========================================================================== */
 .modal-overlay {
   display: none;
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.85);
   z-index: 1000;
   justify-content: center;
@@ -222,7 +293,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
 
 .modal-header {
@@ -233,19 +304,100 @@
   padding-bottom: 10px;
 }
 
-.modal-header h2 { font-size: 20px; color: #38bdf8; }
+.modal-header h2 {
+  font-size: 20px;
+  color: #38bdf8;
+}
 
 .close-btn {
-  background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; transition: color 0.2s;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.2s;
 }
-.close-btn:hover { color: #ff5252; }
 
-.config-group-title { font-size: 14px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+.close-btn:hover {
+  color: #ff5252;
+}
+
+.config-group-title {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
 
 .config-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+}
+
+.config-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.config-grid-compact {
+  gap: 10px;
+}
+
+.config-lc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.config-lc-header .config-group-title {
+  margin-bottom: 0;
+}
+
+.config-lc-count-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.config-lc-count-wrap label {
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+}
+
+#numLuotChung {
+  width: 50px;
+  background: #1e293b;
+  color: white;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  padding: 4px;
+  text-align: center;
+}
+
+#luotChungList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.lc-config-item-group {
+  border-left: 2px solid #38bdf8;
+  padding-left: 10px;
+}
+
+.lc-config-item-title {
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: #38bdf8;
 }
 
 .config-item {
@@ -254,7 +406,11 @@
   gap: 6px;
 }
 
-.config-item label { font-size: 13px; font-weight: bold; color: #cbd5e1; }
+.config-item label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #cbd5e1;
+}
 
 .config-item input, .config-item select {
   background: #1e293b;
@@ -267,11 +423,13 @@
   outline: none;
 }
 
-.config-item input:focus, .config-item select:focus { border-color: #38bdf8; }
+.config-item input:focus, .config-item select:focus {
+  border-color: #38bdf8;
+}
 
 .players-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); 
+  grid-template-columns: repeat(2, 1fr);
   gap: 15px;
 }
 
@@ -285,7 +443,7 @@
 }
 
 .player-score-name-wrapper {
-  background: linear-gradient(90deg, #00dafc, #007cbe); 
+  background: linear-gradient(90deg, #00dafc, #007cbe);
   border-bottom: 2px solid #13007d;
   padding: 8px 10px;
   height: 30px;
@@ -309,13 +467,13 @@
 }
 
 .player-score-input {
-  flex: 1; 
+  flex: 1;
   width: 100%;
-  background-color: #0b004b; 
+  background-color: #0b004b;
   color: var(--white);
   border: none;
   text-align: center;
-  font-size: 36px !important; 
+  font-size: 36px !important;
   font-weight: bold;
   outline: none;
   font-family: var(--font-main);
@@ -331,6 +489,7 @@
   -webkit-appearance: none;
   margin: 0;
 }
+
 .player-score-input[type=number] {
   -moz-appearance: textfield;
 }
@@ -348,9 +507,25 @@
   margin-top: 10px;
   transition: background 0.2s;
 }
-.save-config-btn:hover { background: #0284c7; }
 
-.custom-scroll::-webkit-scrollbar { width: 6px; }
-.custom-scroll::-webkit-scrollbar-track { background: #0f172a; border-radius: 4px; }
-.custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-.custom-scroll::-webkit-scrollbar-thumb:hover { background: #475569; }
+.save-config-btn:hover {
+  background: #0284c7;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #0f172a;
+  border-radius: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}

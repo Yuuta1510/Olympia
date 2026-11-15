@@ -22,6 +22,10 @@ html, body {
     background-color: transparent;
 }
 
+#graphic_r1 {
+    display: none;
+}
+
 #playerContainer {
     position: fixed;
     top: 0;
@@ -130,11 +134,6 @@ html, body {
     clip-path: polygon(1% 0%, 88% 0%, 100% 100%, 1% 100%);
 }
 
-#active-bg.is-trapezoid {
-    clip-path: polygon(1% 0%, 89% 0%, 100% 100%, 1% 100%);
-    width: 26.8%;
-}
-
 .question {
     position: absolute;
     text-align: left;
@@ -165,6 +164,7 @@ html, body {
 }
 
 #graphic_time {
+    display: none;
     position: fixed;
     top: 89.1%;
     left: 0;

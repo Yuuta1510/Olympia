@@ -13,17 +13,29 @@ const firebaseConfig = {
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getDatabase(app);
+const db = window.firebaseDB || getDatabase(app);
 
 let globalPlayers = {};
 let lr_config = { so_luot: 4, so_cau: 6 };
 let lc_configs = [{ so_cau: 12 }];
 
-onValue(ref(db, 'games/players'), (snapshot) => {
+let timer5sInterval = null;
+let isInitialLoad = true;
+let currentVideoDuration = -1;
+
+let turnTimeAudio = document.getElementById('audio_r1_clock');
+if (!turnTimeAudio) {
+    turnTimeAudio = document.createElement('audio');
+    turnTimeAudio.id = 'audio_r1_clock';
+    turnTimeAudio.preload = 'auto';
+    document.body.appendChild(turnTimeAudio);
+}
+
+const unsubPlayers = onValue(ref(db, 'games/players'), (snapshot) => {
     if (snapshot.exists()) globalPlayers = snapshot.val();
 });
 
-onValue(ref(db, 'games/round_1'), (snapshot) => {
+const unsubRound1 = onValue(ref(db, 'games/round_1'), (snapshot) => {
     if (snapshot.exists()) {
         const data = snapshot.val();
         if (data.luot_rieng) lr_config = data.luot_rieng;
@@ -57,10 +69,10 @@ function updateProjectorInfo(quesIndex) {
         let playerIndex = Math.ceil(quesIndex / A);
         relativeQues = quesIndex - ((playerIndex - 1) * A);
         totalTurnQues = A;
-        
-        let pName = (globalPlayers && globalPlayers[playerIndex] && globalPlayers[playerIndex].name) 
-                    ? globalPlayers[playerIndex].name 
-                    : `THÍ SINH ${playerIndex}`;
+
+        let pName = (globalPlayers && globalPlayers[playerIndex] && globalPlayers[playerIndex].name)
+            ? globalPlayers[playerIndex].name
+            : `THÍ SINH ${playerIndex}`;
         turnName = `KHỞI ĐỘNG RIÊNG - ${pName.toUpperCase()}`;
     } else if (lc_configs && lc_configs.length > 0) {
         let remainingIndex = quesIndex - ((A > 0 && LR_Count > 0) ? (LR_Count * A) : 0);
@@ -111,7 +123,7 @@ function compressText(elementId, maxWidth, align) {
     } else if (align === 'right') {
         el.style.alignSelf = 'flex-end';
         el.style.transformOrigin = 'right';
-    } else { 
+    } else {
         el.style.alignSelf = 'center';
         el.style.transformOrigin = 'center';
     }
@@ -125,8 +137,9 @@ function compressText(elementId, maxWidth, align) {
 
 async function drawAllPlayers(playersData) {
     const container = document.getElementById('playerContainer');
-    container.style.display = 'block'; // Đổi từ 'flex' sang 'block'
-    
+    if (!container) return;
+    container.style.display = 'block';
+
     if (playersData) {
         const existingPlayers = container.querySelectorAll('.player');
         if (existingPlayers.length > 0) {
@@ -138,24 +151,23 @@ async function drawAllPlayers(playersData) {
                 if (scoreEl) scoreEl.textContent = player.score || 0;
                 compressText(`player-name-${stt}`, 190, 'left');
             }
-            return; 
+            return;
         }
 
         container.innerHTML = '<div id="active-bg"></div>';
         for (const [stt, player] of Object.entries(playersData)) {
             if (!player) continue;
             const row = document.createElement('div');
-            // Gán thêm class định vị riêng cho từng thí sinh (player-pos-1, player-pos-2, ...)
             row.className = `player player-pos-${stt}`;
 
             const nameEl = document.createElement('div');
             nameEl.className = 'player-name';
             nameEl.id = `player-name-${stt}`;
             nameEl.textContent = `${stt}. ${player.name || ""}`;
-            
+
             const scoreEl = document.createElement('div');
             scoreEl.className = 'player-score';
-            scoreEl.id = `player-score-${stt}`; 
+            scoreEl.id = `player-score-${stt}`;
             scoreEl.textContent = player.score || 0;
 
             row.appendChild(nameEl);
@@ -181,28 +193,12 @@ function activePlayer(index) {
 
 function drawQuestion(textStr) {
     const textQues = document.getElementById('questionText');
+    if (!textQues) return;
     textQues.style.display = 'block';
     textQues.textContent = textStr;
 }
 
-let timer5sInterval = null;
-let isInitialLoad = true;
-let turnTimeAudio = document.getElementById('audio_r1_clock');
-if (!turnTimeAudio) {
-    turnTimeAudio = document.createElement('audio');
-    turnTimeAudio.id = 'audio_r1_clock';
-    turnTimeAudio.preload = 'auto';
-    turnTimeAudio.style.display = 'none';
-    document.body.appendChild(turnTimeAudio);
-}
-
-let currentVideoDuration = -1;
-
-if (typeof window.currentRoundUnsubscribe === 'function') {
-    window.currentRoundUnsubscribe();
-}
-
-window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snapshot) => {
+const unsubCmds = onValue(ref(db, 'games/commands'), async (snapshot) => {
     if (isInitialLoad) {
         isInitialLoad = false;
         return;
@@ -215,16 +211,15 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
     if (data.action === 'show_graphic') {
         const videoEl = document.getElementById('graphic_r1');
         if (videoEl) {
-            // Tự động nhận diện nếu trang hiện tại là Projector
-            const isProjector = window.location.pathname.toLowerCase().includes('projector') || 
+            const isProjector = window.location.pathname.toLowerCase().includes('projector') ||
                                 document.title.toLowerCase().includes('projector');
-            
+
             const fileNormal = isProjector ? '../graphic/KhoiDong_Proj.webm' : '../graphic/KhoiDong.webm';
             const fileTime   = isProjector ? '../graphic/KhoiDongTime_Proj.webm' : '../graphic/KhoiDongTime.webm';
 
             videoEl.src = data.isTimeLimited ? fileTime : fileNormal;
             videoEl.style.display = 'block';
-            videoEl.currentTime = 0; 
+            videoEl.currentTime = 0;
             videoEl.play().catch(err => console.error("Lỗi phát video nền:", err));
         }
     } else if (data.action === 'hide_graphic') {
@@ -240,42 +235,37 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
         }
     } else if (data.action === 'play_turn_time') {
         const timeEl = document.getElementById('graphic_time');
-        const reqDuration = data.duration || 60; // Số giây cấu hình (ví dụ 90)
+        const reqDuration = data.duration || 60;
 
-        // 1. Kiểm tra và tải nguồn Video & Audio mới nếu cần (Bóc tách độc lập)
         if (currentVideoDuration !== reqDuration) {
             currentVideoDuration = reqDuration;
-            
-            // Xử lý Video độc lập
+
             if (timeEl) {
                 timeEl.src = `../graphic/${reqDuration}s.webm`;
-                timeEl.playbackRate = 1.0; // Reset speed mặc định
+                timeEl.playbackRate = 1.0;
                 timeEl.onerror = () => {
                     console.warn(`Không tìm thấy video ${reqDuration}s.webm, Fallback về 60s.webm`);
-                    timeEl.onerror = null; 
+                    timeEl.onerror = null;
                     timeEl.src = `../graphic/60s.webm`;
                     timeEl.playbackRate = 60 / reqDuration;
                     if (!timeEl.paused || data.action === 'play_turn_time') timeEl.play().catch(e => console.error(e));
                 };
             }
-            
-            // Xử lý Audio độc lập
+
             turnTimeAudio.src = `../sounds/R1_${reqDuration}s.mp3`;
-            turnTimeAudio.playbackRate = 1.0; // Reset speed mặc định
+            turnTimeAudio.playbackRate = 1.0;
             turnTimeAudio.onerror = () => {
                 console.warn(`Không tìm thấy audio R1_${reqDuration}s.mp3, Fallback về R1_60s.mp3`);
-                turnTimeAudio.onerror = null; 
+                turnTimeAudio.onerror = null;
                 turnTimeAudio.src = `../sounds/R1_60s.mp3`;
                 turnTimeAudio.playbackRate = 60 / reqDuration;
                 if (!turnTimeAudio.paused || data.action === 'play_turn_time') turnTimeAudio.play().catch(e => console.error(e));
             };
         } else {
-            // Nếu đã nạp file rồi, đảm bảo playbackRate được áp dụng đúng
             if (timeEl) timeEl.playbackRate = timeEl.src.includes('60s.webm') && reqDuration !== 60 ? 60 / reqDuration : 1.0;
             turnTimeAudio.playbackRate = turnTimeAudio.src.includes('60s.mp3') && reqDuration !== 60 ? 60 / reqDuration : 1.0;
         }
-        
-        // Nếu có cờ đếm lại từ đầu, ép thời gian của clock và nhạc về 0
+
         if (data.restart) {
             if (timeEl) timeEl.currentTime = 0;
             turnTimeAudio.currentTime = 0;
@@ -287,11 +277,10 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
                 timeEl.play().catch(err => console.error("Lỗi phát time video:", err));
             }
         }
-        
+
         if (turnTimeAudio.paused) {
             turnTimeAudio.play().catch(err => console.error("Lỗi phát nhạc turn time:", err));
         }
-        
     } else if (data.action === 'pause_turn_time') {
         const timeEl = document.getElementById('graphic_time');
         if (timeEl && !timeEl.paused) {
@@ -300,13 +289,11 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
         if (!turnTimeAudio.paused) {
             turnTimeAudio.pause();
         }
-        
     } else if (data.action === 'time_out') {
         const timeEl = document.getElementById('graphic_time');
         if (timeEl) {
             timeEl.pause();
         }
-        
     } else if (data.action === 'stop_turn_time') {
         const timeEl = document.getElementById('graphic_time');
         if (timeEl) {
@@ -320,7 +307,7 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
         if (container) container.style.display = 'none';
     } else if (data.action === 'active_player') {
         await drawAllPlayers(data.players);
-        activePlayer(data.index); 
+        activePlayer(data.index);
     } else if (data.action === 'show_question') {
         drawQuestion(data.text);
         if (data.quesIndex) {
@@ -335,11 +322,11 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
     } else if (data.action === 'start_5s') {
         const timerBox = document.getElementById('timer5sBox');
         if (!timerBox) return;
-        
+
         timerBox.style.display = 'flex';
         let timeLeft = 5;
         timerBox.textContent = timeLeft;
-        
+
         if (timer5sInterval) clearInterval(timer5sInterval);
         timer5sInterval = setInterval(() => {
             timeLeft--;
@@ -348,13 +335,17 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
             } else {
                 timerBox.textContent = 0;
                 clearInterval(timer5sInterval);
-                setTimeout(() => { timerBox.style.display = 'none'; }, 1500); 
+                timer5sInterval = null;
+                setTimeout(() => { timerBox.style.display = 'none'; }, 1500);
             }
         }, 1000);
     } else if (data.action === 'stop_5s') {
         const timerBox = document.getElementById('timer5sBox');
         if (timerBox) timerBox.style.display = 'none';
-        if (timer5sInterval) clearInterval(timer5sInterval);
+        if (timer5sInterval) {
+            clearInterval(timer5sInterval);
+            timer5sInterval = null;
+        }
     } else if (data.action === 'reset_graphic') {
         hideProjectorInfo();
         const videoEl = document.getElementById('graphic_r1');
@@ -369,18 +360,60 @@ window.currentRoundUnsubscribe = onValue(ref(db, 'games/commands'), async (snaps
             timeEl.pause();
             timeEl.currentTime = 0;
         }
-        
-        // Đảm bảo dọn dẹp âm thanh khi ấn Reset
+
         turnTimeAudio.pause();
         turnTimeAudio.currentTime = 0;
-        
-        document.getElementById('playerContainer').style.display = 'none';
-        document.getElementById('questionText').style.display = 'none';
-        
+
+        const container = document.getElementById('playerContainer');
+        if (container) container.style.display = 'none';
+
+        const textQues = document.getElementById('questionText');
+        if (textQues) textQues.style.display = 'none';
+
         const timerBox = document.getElementById('timer5sBox');
         if (timerBox) {
             timerBox.style.display = 'none';
-            if (timer5sInterval) clearInterval(timer5sInterval);
+            if (timer5sInterval) {
+                clearInterval(timer5sInterval);
+                timer5sInterval = null;
+            }
         }
     }
 });
+
+window.cleanupCurrentRound = () => {
+    if (typeof unsubPlayers === 'function') unsubPlayers();
+    if (typeof unsubRound1 === 'function') unsubRound1();
+    if (typeof unsubCmds === 'function') unsubCmds();
+
+    if (timer5sInterval) {
+        clearInterval(timer5sInterval);
+        timer5sInterval = null;
+    }
+
+    if (turnTimeAudio) {
+        turnTimeAudio.onerror = null;
+        turnTimeAudio.pause();
+        turnTimeAudio.currentTime = 0;
+    }
+
+    ['graphic_r1', 'graphic_time'].forEach(id => {
+        const v = document.getElementById(id);
+        if (v) {
+            v.onerror = null;
+            v.style.display = 'none';
+            v.pause();
+            v.currentTime = 0;
+        }
+    });
+
+    hideProjectorInfo();
+    const container = document.getElementById('playerContainer');
+    if (container) container.style.display = 'none';
+
+    const textQues = document.getElementById('questionText');
+    if (textQues) textQues.style.display = 'none';
+
+    const timerBox = document.getElementById('timer5sBox');
+    if (timerBox) timerBox.style.display = 'none';
+};
