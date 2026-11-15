@@ -11,35 +11,46 @@
     display: block;
 }
 
-/* KHUNG ẢNH 16:9 - GÓC TRÊN TRÁI */
-.r2-ctrl-image-area {
+/* ==========================================
+   1. KHUNG ẢNH 16:9 - GÓC TRÊN TRÁI
+   ========================================== */
+#r2-controller-ui .r2-ctrl-image-area {
     position: absolute;
     top: 5%;
-    left: 5%;
-    width: 40%;
+    left: 1.5%;
+    right: auto;
+    width: 32%;
     height: 52.5%;
     border: 3px solid #fff;
     background: #fff;
     overflow: hidden;
 }
+
 .r2-ctrl-target-img {
     position: absolute;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
 .r2-ctrl-piece {
     position: absolute;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+    pointer-events: auto;
 }
-.r2-ctrl-piece.hidden { opacity: 0; }
+
+.r2-ctrl-piece.hidden {
+    opacity: 0;
+}
+
 #r2-cp-1 { clip-path: polygon(0 0, 50% 0, 50% 25%, 25% 25%, 25% 50%, 0 50%); } 
 #r2-cp-2 { clip-path: polygon(50% 0, 100% 0, 100% 50%, 75% 50%, 75% 25%, 50% 25%); } 
 #r2-cp-3 { clip-path: polygon(75% 50%, 100% 50%, 100% 100%, 50% 100%, 50% 75%, 75% 75%); } 
 #r2-cp-4 { clip-path: polygon(0 50%, 25% 50%, 25% 75%, 50% 75%, 50% 100%, 0 100%); } 
-#r2-cp-5 { clip-path: polygon(25% 25%, 75% 25%, 75% 75%, 25% 75%);} 
+#r2-cp-5 { clip-path: polygon(25% 25%, 75% 25%, 75% 75%, 25% 75%); } 
 
 .r2-ctrl-lbl {
     position: absolute; 
@@ -50,15 +61,28 @@
     transition: opacity 0.5s ease; 
     z-index: 10;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+    transform: translate(-50%, -50%);
 }
-.r2-ctrl-lbl.hidden { opacity: 0; }
 
-/* HÀNG NGANG - GÓC TRÊN PHẢI */
-.r2-ctrl-rows-area {
+.r2-ctrl-lbl.hidden {
+    opacity: 0;
+}
+
+#r2-lbl-1 { top: 15%; left: 15%; }
+#r2-lbl-2 { top: 15%; left: 85%; }
+#r2-lbl-3 { top: 85%; left: 85%; }
+#r2-lbl-4 { top: 85%; left: 15%; }
+#r2-lbl-5 { top: 50%; left: 50%; }
+
+/* ==========================================
+   2. HÀNG NGANG - GÓC TRÊN PHẢI
+   ========================================== */
+#r2-controller-ui .r2-ctrl-rows-area {
     position: absolute;
     top: 5%;
-    right: 5%;
-    width: 49%;
+    left: auto;
+    right: 25%;
+    width: 40%;
     height: 52.7%;
     display: flex;
     flex-direction: column; 
@@ -113,8 +137,14 @@
 .r2-ctrl-char.selected { background: #0ea5e9; color: #000; border-color: #38bdf8; }
 .r2-ctrl-char.cancelled { background: #475569; color: transparent; border-color: #94a3b8; }
 .r2-ctrl-char.unselected { background: transparent; color: transparent; }
-/* Hàng gợi ý (không có chữ cái) */
 .r2-ctrl-char.empty-hint { display: none; }
+
+.r2-ctrl-row-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+}
 
 .r2-ctrl-row-number {
     width: 50px;
@@ -128,14 +158,44 @@
     align-items: center;
     border: 2px solid #fff;
     border-radius: 4px;
+    cursor: pointer;
 }
 
-/* CÂU HỎI VÀ BẢNG ĐIỂM (2X2) - GÓC DƯỚI */
-.r2-ctrl-question {
+.r2-ctrl-row-number.center-row {
+    background: #d97706;
+}
+
+.r2-ctrl-row-state-btns {
+    display: flex;
+    gap: 4px;
+}
+
+.r2-ctrl-state-btn {
+    color: white;
+    border: 1.5px solid white;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.r2-ctrl-state-btn.correct {
+    background: #16a34a;
+}
+
+.r2-ctrl-state-btn.wrong {
+    background: #dc2626;
+}
+
+/* ==========================================
+   3. CÂU HỎI VÀ CỤM NÚT ĐIỀU KHIỂN - GÓC DƯỚI TRÁI
+   ========================================== */
+#r2-controller-ui .r2-ctrl-question {
     position: absolute;
     bottom: 5%;
-    left: 5%;
-    width: 64%;
+    left: 1.5%;
+    right: auto;
+    width: 48%;
     height: 35%;
     font-size: 28px;
     font-weight: bold;
@@ -147,58 +207,28 @@
     display: flex;
     flex-direction: column;
 }
-.r2-ctrl-score-grid {
-    position: absolute;
-    bottom: 5%;
-    right: 5%;
-    width: 15%;
-    height: 35%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-.r2-c-score-card {
-    display: flex;
-    flex-direction: column; 
-    border: 2px solid #4f5050;
-    border-radius: 6px;
-    background: #0b004b;
-}
-.r2-c-score-name {
-    background: linear-gradient(90deg, #00dafc, #007cbe);
-    height: 40px;
-    padding: 2px 0px 19px 0px;
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-    color: #0d0055;
-}
-.r2-c-score-val {
+
+#r2-ctrl-q-text {
+    opacity: 0.3;
     flex: 1;
-    display: flex;
-    height: 120px;
-    padding: 0px 0px 12px 0px;
-    justify-content: center;
-    align-items: center;
-    font-size: 55px;
-    font-weight: bold;
-    color: #fff;
+    margin-bottom: 8px;
 }
 
-/* ĐÃ DI CHUYỂN: Cụm 4 nút dạt về góc dưới bên phải trong Box Câu hỏi */
 .r2-ctrl-page-btns {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    gap: 8px;
+    gap: 6px;
     z-index: 30;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin-top: auto;
 }
 
 .r2-ctrl-btn {
     height: 36px;
-    padding: 0 14px;
+    white-space: nowrap;
+    flex: 1;
+    padding: 8px 6px;
     background-color: #000099;
     border: 1.5px solid #FFFFFF;
     border-radius: 2px;
@@ -208,7 +238,6 @@
     font-weight: bold;
     text-transform: uppercase;
     cursor: pointer;
-    white-space: nowrap;
 }
 
 .r2-ctrl-btn:hover {
@@ -221,7 +250,526 @@
     color: #FFFF00;
 }
 
+#r2-btn-wait-bg {
+    background: #dc2626;
+    color: white;
+    border: 1.5px solid #fff;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#r2-btn-toggle-ques {
+    background: #2563eb;
+    color: white;
+    border: 1.5px solid #fff;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#r2-btn-toggle-15s {
+    background: #9333ea;
+    color: white;
+    border: 1.5px solid #fff;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#r2-btn-reveal-all {
+    background-color: #9333ea;
+    border-color: #fff;
+}
+
+/* ==========================================
+   4. BẢNG ĐIỂM THÍ SINH (2X2) - GÓC DƯỚI GIỮA PHẢI
+   ========================================== */
+#r2-controller-ui .r2-ctrl-score-grid {
+    position: absolute;
+    bottom: 5%;
+    left: auto;
+    right: 25%;
+    width: 25%;
+    height: 35%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.r2-c-score-card {
+    display: flex;
+    flex-direction: column; 
+    border: 2px solid #4f5050;
+    border-radius: 6px;
+    background: #0b004b;
+    cursor: pointer;
+}
+
 .r2-c-score-card.buzzed {
     border-color: #facc15;
     box-shadow: 0 0 15px #facc15;
+}
+
+.r2-c-score-name {
+    background: linear-gradient(90deg, #00dafc, #007cbe);
+    height: 40px;
+    padding: 2px 0px 19px 0px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #0d0055;
+}
+
+.r2-c-score-val {
+    flex: 1;
+    display: flex;
+    height: 120px;
+    padding: 0px 0px 12px 0px;
+    justify-content: center;
+    align-items: center;
+    font-size: 55px;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* ==========================================
+   5. PANEL ĐÁP ÁN THÍ SINH - CỘT PHẢI
+   ========================================== */
+#r2-controller-ui .r2-ctrl-answers-panel {
+    position: absolute;
+    top: 4%;
+    bottom: 4%;
+    right: 1.5%;
+    width: 22%;
+    background: rgba(15, 23, 42, 0.95);
+    border: 2px solid #38bdf8;
+    border-radius: 6px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
+    z-index: 20;
+}
+
+#r2-controller-ui .r2-ctrl-ans-header {
+    font-size: 14px;
+    font-weight: 800;
+    color: #38bdf8;
+    text-align: center;
+    text-transform: uppercase;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #334155;
+}
+
+#r2-controller-ui .r2-ctrl-ans-list {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+#r2-controller-ui .r2-ctrl-ans-card {
+    flex: 1;
+    background: #0b004b;
+    border: 1.5px solid #475569;
+    border-radius: 5px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
+#r2-controller-ui .r2-ctrl-ans-card.buzzed {
+    border-color: #facc15;
+    box-shadow: 0 0 8px rgba(250, 204, 21, 0.45);
+}
+
+#r2-controller-ui .r2-ctrl-ans-card.wrong {
+    background: #2a0a12;
+    border-color: #ef4444;
+}
+
+#r2-controller-ui .r2-ctrl-ans-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+}
+
+#r2-controller-ui .r2-ctrl-ans-player {
+    font-size: 13px;
+    font-weight: 800;
+    color: #facc15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#r2-controller-ui .r2-ctrl-ans-status {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: #1e293b;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+#r2-controller-ui .r2-ctrl-ans-status.has-answer {
+    background: #166534;
+    color: #bbf7d0;
+}
+
+#r2-controller-ui .r2-ctrl-ans-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+#r2-controller-ui .r2-ctrl-ans-input {
+    flex: 1;
+    min-width: 0;
+    background: #020617;
+    color: #ffffff;
+    border: 1.5px solid #334155;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#r2-controller-ui .r2-ctrl-ans-input:focus {
+    border-color: #38bdf8;
+}
+
+#r2-controller-ui .r2-ctrl-ans-card.wrong .r2-ctrl-ans-input {
+    color: #fca5a5;
+    border-color: #dc2626;
+    text-decoration: line-through;
+}
+
+#r2-controller-ui .r2-ctrl-ans-input.saved-flash {
+    border-color: #22c55e !important;
+}
+
+#r2-controller-ui .r2-ctrl-ans-wrong-btn {
+    flex-shrink: 0;
+    padding: 5px 8px;
+    background: #1e293b;
+    color: #cbd5e1;
+    border: 1.5px solid #475569;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+#r2-controller-ui .r2-ctrl-ans-wrong-btn:hover {
+    border-color: #f87171;
+    color: #fca5a5;
+}
+
+#r2-controller-ui .r2-ctrl-ans-wrong-btn.active {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #fca5a5;
+    box-shadow: 0 0 6px rgba(220, 38, 38, 0.65);
+}
+
+#r2-controller-ui .r2-ctrl-ans-reset-btn {
+    width: 100%;
+    padding: 8px;
+    background: #dc2626;
+    color: #ffffff;
+    border: 1.5px solid #ffffff;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+#r2-controller-ui .r2-ctrl-ans-reset-btn:hover {
+    background: #b91c1c;
+}
+
+/* ==========================================
+   6. STYLE MODAL CONFIG VÒNG 2
+   ========================================== */
+.r2-cfg-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.r2-cfg-modal-content {
+    background: #0f172a;
+    border: 2px solid #000080;
+    border-radius: 8px;
+    width: 960px;
+    max-width: 96vw;
+    padding: 22px 26px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+    font-family: "UTM Avo", Arial, sans-serif;
+    transform-origin: center center;
+}
+
+.r2-cfg-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 10px;
+}
+
+.r2-cfg-modal-header h2 {
+    font-size: 20px;
+    color: #38bdf8;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.r2-cfg-close-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.r2-cfg-close-btn:hover {
+    color: #ff5252;
+}
+
+.r2-cfg-group-title {
+    font-size: 13px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.r2-cfg-players-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    width: 100%;
+}
+
+.r2-cfg-player-card {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #334155;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #0b1120;
+}
+
+.r2-cfg-name-wrapper {
+    background: linear-gradient(90deg, #0284c7, #0369a1);
+    border-bottom: 2px solid #334155;
+    padding: 8px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    min-height: 38px;
+}
+
+.r2-cfg-name {
+    color: #ffffff;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    white-space: nowrap;
+    outline: none;
+    transform-origin: center;
+    display: inline-block;
+    flex-shrink: 0;
+    min-width: 24px;
+    cursor: text;
+}
+
+.r2-cfg-score-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 8px 6px 8px;
+    background-color: #0b1120;
+}
+
+.r2-cfg-sub-label {
+    font-size: 10.5px;
+    font-weight: bold;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.r2-cfg-sub-label.center {
+    text-align: center;
+}
+
+.r2-cfg-score-input {
+    width: 100%;
+    background-color: transparent;
+    color: #ffffff;
+    border: none;
+    text-align: center;
+    font-size: 36px;
+    font-weight: bold;
+    outline: none;
+    font-family: "UTM Avo", Arial, sans-serif;
+    padding: 2px 0;
+}
+
+.r2-cfg-score-input:focus {
+    background-color: #162038;
+    border-radius: 4px;
+}
+
+.r2-cfg-bonus-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    background-color: #111c33;
+    border-top: 1.5px solid #1e293b;
+}
+
+.r2-cfg-preset-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 0.9fr;
+    gap: 6px;
+}
+
+.r2-cfg-preset-btn {
+    padding: 6px 4px;
+    border-radius: 4px;
+    border: 1.5px solid #475569;
+    background-color: #1e293b;
+    color: #ffffff;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.r2-cfg-preset-btn:hover {
+    border-color: #38bdf8;
+    background-color: #27364f;
+}
+
+.r2-cfg-preset-btn.primary {
+    background-color: #0284c7;
+    border-color: #38bdf8;
+    color: #ffffff;
+}
+
+.r2-cfg-preset-btn.primary:hover {
+    background-color: #0369a1;
+}
+
+.r2-cfg-preset-btn.reset {
+    background-color: #334155;
+    color: #cbd5e1;
+}
+
+.r2-cfg-bonus-input-wrap {
+    display: flex;
+    align-items: center;
+    background-color: #020617;
+    border: 1.5px solid #334155;
+    border-radius: 4px;
+    padding: 0 8px;
+}
+
+.r2-cfg-bonus-input-wrap:focus-within {
+    border-color: #facc15;
+}
+
+.r2-cfg-bonus-prefix {
+    font-size: 15px;
+    font-weight: bold;
+    color: #facc15;
+    margin-right: 4px;
+    user-select: none;
+}
+
+.r2-cfg-bonus-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #facc15;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    padding: 6px 2px;
+    outline: none;
+}
+
+.r2-cfg-score-input::-webkit-outer-spin-button,
+.r2-cfg-score-input::-webkit-inner-spin-button,
+.r2-cfg-bonus-input::-webkit-outer-spin-button,
+.r2-cfg-bonus-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.r2-cfg-score-input[type=number],
+.r2-cfg-bonus-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.r2-cfg-preview-total {
+    font-size: 12px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.r2-cfg-preview-total.has-bonus {
+    color: #38bdf8;
+}
+
+.r2-cfg-save-btn {
+    background: #0ea5e9;
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-weight: bold;
+    font-size: 15px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.r2-cfg-save-btn:hover {
+    background: #0284c7;
 }

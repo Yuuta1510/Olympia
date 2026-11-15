@@ -8,27 +8,53 @@
     overflow: hidden;
     font-family: "UTM Avo", sans-serif;
 }
+
+#r2-wait-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../graphic/R2_Wait.png');
+    background-size: cover;
+    background-position: center;
+    z-index: 9999;
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .r2-bg-layer {
     position: absolute;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     background: url('../graphic/R2_bg.png') center/cover no-repeat;
     z-index: 0;
 }
+
 .r2-video-layer {
     position: absolute;
     width: 100%;
     height: 100%;
-    object-fit:cover;
+    object-fit: cover;
     z-index: 1;
 }
 
-/* PAGE 1 */
+#r2-15s-video {
+    display: none;
+    z-index: 1;
+}
+
+/* ==========================================
+   PAGE 1: HÌNH ẢNH, HÀNG NGANG, CÂU HỎI & CHUÔNG
+   ========================================== */
 #r2-page-1 {
     position: absolute;
     width: 100%;
     height: 100%;
     z-index: 2;
 }
+
 .r2-image-area {
     position: absolute; 
     top: 0; 
@@ -38,6 +64,7 @@
     z-index: 2;
     pointer-events: none;
 }
+
 .r2-main-img {
     position: absolute;
     width: 39%;       
@@ -50,13 +77,16 @@
     position: absolute;
     height: auto;
 }
-.r2-piece.hidden { opacity: 0; }
+
+.r2-piece.hidden {
+    opacity: 0;
+}
 
 #r2-p1 { width: 19.7%; top: 13.3%; left: 8%; }
 #r2-p2 { width: 19.7%; top: 13.3%; left: 27.5%; }
 #r2-p3 { width: 19.7%; top: 35.1%; left: 27.5%; }
 #r2-p4 { width: 19.7%; top: 35.1%; left: 8%; }
-#r2-p5 { width: 17.4%; height: 19.2%; top: 25.5%; left: 18.9%; }
+#r2-p5 { width: 17.4%; height: 19.2%; top: 25.5%; left: 18.9%; } 
 
 .r2-rows-area {
     position: absolute;
@@ -68,6 +98,7 @@
     align-items: flex-start;
     gap: 13px;
 }
+
 .r2-cnv-title {
     position: absolute;
     top: -31%;
@@ -83,7 +114,7 @@
 }
 
 /* CẤU TRÚC ẨN HÀNG 5 VÀ 6 TRÊN PROJECTOR */
-.r2-rows-area > .r2-row-container:nth-child(6){
+.r2-rows-area > .r2-row-container:nth-child(6) {
     display: none !important;
 }
 
@@ -92,6 +123,7 @@
     gap: 3px;
     justify-content: flex-start;
 }
+
 .r2-char {
     width: 54px;
     height: 54px;
@@ -105,10 +137,11 @@
     color: #040034;
     text-transform: uppercase;
 }
+
 .r2-char.unselected { background-image: url('../graphic/Letter.png'); color: transparent; }
 .r2-char.selected { background-image: url('../graphic/Letter2.png'); color: transparent; }
 .r2-char.cancelled { background-image: url('../graphic/Letter0.png'); color: transparent; }
-.r2-char.opened { background-image: url('../graphic/Letter2.png');}
+.r2-char.opened { background-image: url('../graphic/Letter2.png'); }
 
 .r2-question-box {
     position: absolute;
@@ -118,9 +151,12 @@
     font-size: 24px;
     font-weight: bold;
     color: #fff;
+    display: none;
 }
 
-/* PAGE 2 */
+/* ==========================================
+   PAGE 2: TÊN & ĐÁP ÁN THÍ SINH
+   ========================================== */
 #r2-page-2 {
     position: absolute;
     inset: 0;
@@ -159,16 +195,33 @@
     pointer-events: none;
     opacity: 0;
 }
-.r2-p2-wrong.fade-in { opacity: 0.5; }
+
+.r2-p2-wrong.fade-in {
+    opacity: 0.5;
+}
 
 .r2-p2-text {
     position: absolute;
     z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
-.r2-p2-text.fade-in { opacity: 1; }
+
+.r2-p2-text.fade-in {
+    opacity: 1;
+}
+
+.r2-p2-inner {
+    display: inline-block;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transform-origin: center center;
+}
 
 .r2-p2-name {
     left: 23.5%;
@@ -179,6 +232,7 @@
     text-align: center;
     color: white;
 }
+
 .r2-p2-ans {
     left: 51%;
     width: 25.5%;
@@ -196,7 +250,9 @@
 .r2-p2-pos-3 { top: 54%; }
 .r2-p2-pos-4 { top: 67.5%; }
 
-/* Khung bọc danh sách những người nhấn chuông */
+/* ==========================================
+   KHUNG BỌC DANH SÁCH NGƯỜI NHẤN CHUÔNG
+   ========================================== */
 .r2-buzzer-container {
     position: absolute;
     bottom: -7%;
