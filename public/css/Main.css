@@ -6,7 +6,6 @@
 
 body {
     font-family: "UTM Avo", Arial, sans-serif;
-    font-weight: bold;
     background-color: transparent;
     color: white;
     width: 100vw;
@@ -15,11 +14,18 @@ body {
     margin: 0;
 }
 
-/* Ẩn các phần tử của các vòng thi khi đang ở phần Main */
+/* Ẩn các phần tử của các vòng thi và đồ họa dành riêng cho Projector */
 #graphic_r1,
 #playerContainer,
 #questionText,
-#timer5sBox {
+#timer5sBox,
+#projPointSummaryGroup,
+#projTotalGroup {
+    display: none !important;
+}
+
+/* Màn Projector không hiện Lowerthird (đã hỗ trợ riêng trên màn Livestream) */
+body:has(#projector-bg) #mainLowerthirdGroup {
     display: none !important;
 }
 
@@ -35,6 +41,28 @@ body {
     overflow: hidden;
 }
 
+#mainGraphicRoot[hidden] {
+    display: none !important;
+}
+
+#projMainBgLayer {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 6;
+    pointer-events: none;
+    overflow: hidden;
+    background-color: #000000;
+}
+
+#projMainThumbnailImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
 /* Video Intro toàn màn hình */
 #mainIntroVideo {
     position: fixed;
@@ -48,7 +76,7 @@ body {
     background-color: transparent;
 }
 
-/* Tổ hợp đồ họa Lowerthird (gồm Video + Lớp Text) */
+/* Tổ hợp đồ họa Lowerthird (gồm Video + Lớp Text - Chỉ dành cho Livestream) */
 #mainLowerthirdGroup {
     position: fixed;
     top: 0;
@@ -60,7 +88,7 @@ body {
     opacity: 1;
 }
 
-/* Keyframes giúp cả Video và Text mờ dần mượt mà trong đúng 1.5s */
+/* Keyframes giúp cả Video và Text mờ dần mượt mà trong đúng 1.5s khi bấm ẨN LOWERTHIRD */
 @keyframes ltGroupFadeOut {
     0% { opacity: 1; }
     100% { opacity: 0; }
@@ -90,7 +118,6 @@ body {
     opacity: 0;
 }
 
-/* Keyframes giúp Text fade in trong 1s sau khoảng delay 0.5s */
 @keyframes ltTextFadeIn {
     0% { opacity: 0; }
     100% { opacity: 1; }
@@ -103,11 +130,111 @@ body {
 .livestream-lt-text-item {
     position: absolute;
     color: #ffffff;
-    font-family: "UTM Avo", Arial, sans-serif;
-    font-weight: bold;
     white-space: pre-wrap;
     padding: 2px 6px;
     border: 1.5px solid transparent;
     line-height: 1.2;
     text-align: left;
+}
+
+#mainLowerthirdTickerViewport {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 15%;
+    right: 0;
+    z-index: 22;
+    overflow: hidden;
+    display: none;
+}
+
+.livestream-lt-ticker-item {
+    position: absolute;
+    left: 0;
+    color: #ffffff;
+    white-space: nowrap;
+    padding: 2px 6px;
+    border: 1.5px solid transparent;
+    line-height: 1.2;
+    text-align: left;
+    will-change: transform;
+}
+
+#lsPointSummaryGroup {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 20;
+    display: none;
+    opacity: 1;
+    pointer-events: none;
+}
+
+#lsPointSummaryGroup.is-visible {
+    display: block;
+    opacity: 1;
+    transition: none;
+}
+
+#lsPointSummaryGroup.is-fading-out {
+    display: block;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+#lsPointSummaryVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#lsPointSummaryTextWrap {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+}
+
+#lsPointSummaryTextWrap.is-instant-visible {
+    opacity: 1;
+    transition: none;
+}
+
+#lsPointSummaryTextWrap.is-fading-in {
+    opacity: 1;
+    transition: opacity 1.5s ease;
+}
+
+#lsPointSummaryName {
+    position: absolute;
+    left: 30%;
+    top: 72%;
+    transform: translateY(-50%);
+    transform-origin: left center;
+    width: 40%;
+    text-align: center;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-weight: bold;
+    font-size: 27px;
+    color: #ffffff;
+    -webkit-text-stroke: 3px #000000;
+    paint-order: stroke fill;
+    text-shadow: 0px 0px 8px rgba(0, 0, 0, 1);
+    white-space: nowrap;
+}
+
+#lsPointSummaryScore {
+    position: absolute;
+    left: 30%;
+    top: 84%;
+    transform: translateY(-50%);
+    width: 40%;
+    text-align: center;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-weight: bold;
+    font-size: 80px;
+    color: #ffffff;
+    white-space: nowrap;
 }

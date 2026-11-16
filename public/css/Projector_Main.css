@@ -1,0 +1,369 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "UTM Avo", Arial, sans-serif;
+    background-color: transparent;
+    color: white;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+}
+
+/* Ẩn các phần tử của các vòng thi và đồ họa dành riêng cho Livestream */
+#graphic_r1,
+#playerContainer,
+#questionText,
+#timer5sBox,
+#lsPointSummaryGroup {
+    display: none !important;
+}
+
+/* Khung chứa toàn màn hình của phần Main */
+#mainGraphicRoot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+}
+
+#mainGraphicRoot[hidden] {
+    display: none !important;
+}
+
+#projMainBgLayer {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 6;
+    pointer-events: none;
+    overflow: hidden;
+    background-color: #000000;
+}
+
+#projMainThumbnailImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Video Intro toàn màn hình */
+#mainIntroVideo {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 15;
+    display: none;
+    background-color: transparent;
+    pointer-events: none;
+}
+
+/* Tổ hợp đồ họa Lowerthird (gồm Video + Lớp Text) */
+#mainLowerthirdGroup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 20;
+    display: none;
+    opacity: 1;
+}
+
+/* Keyframes giúp cả Video và Text mờ dần mượt mà trong đúng 1.5s */
+@keyframes ltGroupFadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+#mainLowerthirdGroup.fade-out-15s {
+    animation: ltGroupFadeOut 1.5s ease forwards !important;
+}
+
+#mainLowerthirdVideo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 21;
+}
+
+#mainLowerthirdTexts {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 22;
+    opacity: 0;
+}
+
+@keyframes ltTextFadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+#mainLowerthirdTexts.fade-in-text {
+    animation: ltTextFadeIn 1s ease 0.5s forwards;
+}
+
+.livestream-lt-text-item {
+    position: absolute;
+    color: #ffffff;
+    white-space: pre-wrap;
+    padding: 2px 6px;
+    border: 1.5px solid transparent;
+    line-height: 1.2;
+    text-align: left;
+}
+
+#mainLowerthirdTickerViewport {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 15%;
+    right: 0;
+    z-index: 22;
+    overflow: hidden;
+    display: none;
+}
+
+.livestream-lt-ticker-item {
+    position: absolute;
+    left: 0;
+    color: #ffffff;
+    white-space: nowrap;
+    padding: 2px 6px;
+    border: 1.5px solid transparent;
+    line-height: 1.2;
+    text-align: left;
+    will-change: transform;
+}
+
+#projPointSummaryGroup {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 20;
+    display: none;
+    opacity: 1;
+    pointer-events: none;
+}
+
+#projPointSummaryGroup.is-visible {
+    display: block;
+    opacity: 1;
+    transition: none;
+}
+
+#projPointSummaryGroup.is-fading-out {
+    display: block;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+#projPointSummaryVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#projPointSummaryTextWrap {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+}
+
+#projPointSummaryTextWrap.is-instant-visible {
+    opacity: 1;
+    transition: none;
+}
+
+#projPointSummaryTextWrap.is-fading-in {
+    opacity: 1;
+    transition: opacity 1.5s ease;
+}
+
+.fit-text-inner {
+    display: inline-block;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transform-origin: center center;
+}
+
+#projPointSummaryName {
+    position: absolute;
+    left: 31%;
+    top: 40%;
+    transform: translateY(-50%);
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-weight: bold;
+    font-size: 32px;
+    color: #ffffff;
+    -webkit-text-stroke: 3px #000000;
+    paint-order: stroke fill;
+    text-shadow: 0px 0px 8px rgba(0, 0, 0, 1);
+    white-space: nowrap;
+}
+
+#projPointSummaryScore {
+    position: absolute;
+    left: 31%;
+    top: 52%;
+    transform: translateY(-50%);
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-weight: bold;
+    font-size: 100px;
+    color: #ffffff;
+    white-space: nowrap;
+}
+
+#projTotalGroup {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 25;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#projTotalGroup.is-preparing {
+    display: block;
+    opacity: 0;
+    transition: none;
+}
+
+#projTotalGroup.is-fading-in {
+    display: block;
+    opacity: 1;
+    transition: opacity 0.6s ease;
+}
+
+#projTotalVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#projTotalPlayersGrid {
+    position: absolute;
+    left: 10.6%;
+    top: 18%;
+    display: grid;
+    grid-template-columns: repeat(4, 266px);
+    gap: 49.6px;
+    align-items: end;
+    z-index: 2;
+}
+
+.proj-total-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: 266px;
+    min-width: 0;
+    height: 100%;
+}
+
+.proj-total-avatar-wrap {
+    width: 266px;
+    height: 340px;
+    flex-shrink: 0;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    clip-path: polygon(50% 0%, 100% 13%, 100% 100%, 0% 100%, 0% 13%);
+    opacity: 0;
+    transition: none;
+}
+
+.proj-total-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+
+.proj-total-avatar.is-hidden {
+    visibility: hidden;
+}
+
+.proj-total-name {
+    width: 100%; /* Bó buộc bằng đúng 266px của cột (có thể đặt px cụ thể như 250px) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-weight: bold;
+    font-size: 28px;
+    color: #ffffff;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+    opacity: 0;
+    transition: none;
+}
+
+.proj-total-score {
+    width: 100%; /* Bó buộc bằng đúng 266px của cột */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-weight: bold;
+    font-size: 60px;
+    color: #facc15;
+    white-space: nowrap;
+    padding: 0.4vh 0 1.2vh;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.85);
+    opacity: 0;
+    transition: none;
+}
+
+#projTotalGroup.is-fading-in .proj-total-avatar-wrap {
+    opacity: 1;
+    transition: opacity 1s ease 1.5s; /* Fade-in 0.5s sau khi delay 1.0s */
+}
+
+#projTotalGroup.is-fading-in .proj-total-name {
+    opacity: 1;
+    transition: opacity 1s ease 1.5s; /* Fade-in 0.5s sau khi delay 1.2s */
+}
+
+#projTotalGroup.is-fading-in .proj-total-score {
+    opacity: 1;
+    transition: opacity 1s ease 1.8s; /* Fade-in 0.5s sau khi delay 1.4s */
+}
