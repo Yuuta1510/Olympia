@@ -214,8 +214,8 @@ const unsubCmds = onValue(ref(db, 'games/commands'), async (snapshot) => {
             const isProjector = window.location.pathname.toLowerCase().includes('projector') ||
                                 document.title.toLowerCase().includes('projector');
 
-            const fileNormal = isProjector ? '../graphic/KhoiDong_Proj.webm' : '../graphic/KhoiDong.webm';
-            const fileTime   = isProjector ? '../graphic/KhoiDongTime_Proj.webm' : '../graphic/KhoiDongTime.webm';
+            const fileNormal = isProjector ? '../graphic/pro_r1_showques.webm' : '../graphic/r1_showques.webm';
+            const fileTime   = isProjector ? '../graphic/pro_r1_showquestime.webm' : '../graphic/r1_showquestime.webm';
 
             videoEl.src = data.isTimeLimited ? fileTime : fileNormal;
             videoEl.style.display = 'block';
@@ -241,12 +241,12 @@ const unsubCmds = onValue(ref(db, 'games/commands'), async (snapshot) => {
             currentVideoDuration = reqDuration;
 
             if (timeEl) {
-                timeEl.src = `../graphic/${reqDuration}s.webm`;
+                timeEl.src = `../graphic/r1_${reqDuration}s.webm`;
                 timeEl.playbackRate = 1.0;
                 timeEl.onerror = () => {
                     console.warn(`Không tìm thấy video ${reqDuration}s.webm, Fallback về 60s.webm`);
                     timeEl.onerror = null;
-                    timeEl.src = `../graphic/60s.webm`;
+                    timeEl.src = `../graphic/r1_60s.webm`;
                     timeEl.playbackRate = 60 / reqDuration;
                     if (!timeEl.paused || data.action === 'play_turn_time') timeEl.play().catch(e => console.error(e));
                 };
@@ -262,7 +262,7 @@ const unsubCmds = onValue(ref(db, 'games/commands'), async (snapshot) => {
                 if (!turnTimeAudio.paused || data.action === 'play_turn_time') turnTimeAudio.play().catch(e => console.error(e));
             };
         } else {
-            if (timeEl) timeEl.playbackRate = timeEl.src.includes('60s.webm') && reqDuration !== 60 ? 60 / reqDuration : 1.0;
+            if (timeEl) timeEl.playbackRate = timeEl.src.includes('r1_60s.webm') && reqDuration !== 60 ? 60 / reqDuration : 1.0;
             turnTimeAudio.playbackRate = turnTimeAudio.src.includes('60s.mp3') && reqDuration !== 60 ? 60 / reqDuration : 1.0;
         }
 

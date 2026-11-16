@@ -407,8 +407,8 @@ function bindR2VideoFallback() {
     ansVideo.dataset.fallbackBound = 'true';
 
     ansVideo.addEventListener('error', () => {
-        if (!ansVideo.src.endsWith('R2_ShowAns.webm')) {
-            ansVideo.src = '../graphic/R2_ShowAns.webm';
+        if (!ansVideo.src.endsWith('r2_showans.webm')) {
+            ansVideo.src = '../graphic/r2_showans.webm';
         }
     });
 }

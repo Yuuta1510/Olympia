@@ -15,7 +15,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-image: url('../graphic/R2_Wait.png');
+    background-image: url('../graphic/r2_wait.png');
     background-size: cover;
     background-position: center;
     z-index: 9999;
@@ -28,7 +28,7 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url('../graphic/R2_bg.png') center/cover no-repeat;
+    background: url('../graphic/r2_bg.png') center/cover no-repeat;
     z-index: 0;
 }
 
@@ -138,10 +138,10 @@
     text-transform: uppercase;
 }
 
-.r2-char.unselected { background-image: url('../graphic/Letter.png'); color: transparent; }
-.r2-char.selected { background-image: url('../graphic/Letter2.png'); color: transparent; }
-.r2-char.cancelled { background-image: url('../graphic/Letter0.png'); color: transparent; }
-.r2-char.opened { background-image: url('../graphic/Letter2.png'); }
+.r2-char.unselected { background-image: url('../graphic/r2_letter.png'); color: transparent; }
+.r2-char.selected { background-image: url('../graphic/r2_activeletter.png'); color: transparent; }
+.r2-char.cancelled { background-image: url('../graphic/r2_hideletter.png'); color: transparent; }
+.r2-char.opened { background-image: url('../graphic/r2_activeletter.png'); }
 
 .r2-question-box {
     position: absolute;
@@ -171,7 +171,7 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    background: url('../graphic/bg.png') center / cover no-repeat;
+    background: url('../graphic/r0_bg.png') center / cover no-repeat;
     z-index: 1;
 }
 
@@ -271,7 +271,7 @@
     width: 15%;
     height: 15%;
     flex-shrink: 0;
-    background: url('../graphic/R2_Buzzed.png') center / contain no-repeat;
+    background: url('../graphic/r2_buzzed.png') center / contain no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
