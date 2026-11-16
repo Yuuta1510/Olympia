@@ -200,9 +200,11 @@
         border-color: white;
       }
 
-      /* Ẩn mặc định giao diện Vòng 2 khi đang ở Vòng 1 */
+      /* Ẩn mặc định giao diện các tab chưa kích hoạt khi mở trang ở Vòng 1 */
       #r2-controller-ui,
-      #r2ConfigModal {
+      #r2ConfigModal,
+      #main-controller-ui,
+      #mainConfigDialog {
         display: none;
       }
     </style>
@@ -227,6 +229,155 @@
         </div>
 
         <div class="main-content-grid">
+          <!-- GIAO DIỆN TAB MAIN -->
+          <div id="main-controller-ui">
+            <div class="qa-column">
+              <div class="lt-editor-workspace">
+                <!-- Khung Preview 16:9 -->
+                <div class="lt-preview-wrapper" id="ltPreviewWrapper">
+                  <div class="lt-canvas-16-9" id="ltCanvas">
+                    <video id="ltPreviewVideo" class="lt-bg-video" muted playsinline preload="auto"></video>
+                    <div class="lt-clip-guide" id="ltClipGuide">
+                      <span class="lt-clip-guide-badge" id="ltClipGuideBadge">Cắt trái 15%</span>
+                    </div>
+                    <div class="lt-text-layer" id="ltTextLayer"></div>
+                  </div>
+                </div>
+
+                <!-- Bảng điều chỉnh Nền Projector, Bộ Setup (Presets) & Text bên phải Preview -->
+                <div class="lt-controls-panel">
+                  <!-- KHU VỰC 1: CHỌN NỀN MÀN CHIẾU PROJECTOR (5 THUMBNAIL) -->
+                  <div class="lt-section-box">
+                    <div class="lt-panel-header">
+                      <span class="lt-panel-title">1. Nền Màn Chiếu (Projector)</span>
+                      <span class="proj-bg-active-badge" id="projBgActiveBadge"></span>
+                    </div>
+                    <div class="proj-bg-grid" id="projBgSelectorGrid"></div>
+                  </div>
+
+                  <!-- KHU VỰC 2: QUẢN LÝ BỘ SETUP (PRESETS) & VIDEO LOWERTHIRD (LIVESTREAM) -->
+                  <div class="lt-section-box">
+                    <div class="lt-panel-header">
+                      <span class="lt-panel-title">2. LowerThird (Livestream)</span>
+                      <div class="lt-btn-group">
+                        <button type="button" class="lt-small-btn" id="btnAddLtPreset" title="Tạo bộ trống mới">+ Tạo mới</button>
+                        <button type="button" class="lt-small-btn secondary" id="btnDuplicateLtPreset" title="Nhân bản bộ hiện tại">Nhân bản</button>
+                        <button type="button" class="lt-small-btn danger" id="btnRemoveLtPreset" title="Xóa bộ hiện tại">Xóa bộ</button>
+                      </div>
+                    </div>
+
+                    <div class="lt-items-list" id="ltPresetsList"></div>
+
+                    <div class="lt-coord-grid">
+                      <div class="lt-field-group">
+                        <label for="ltPresetNameInput">Tên bộ Setup:</label>
+                        <input type="text" id="ltPresetNameInput" placeholder="VD: TS 1, Tin vắn..." />
+                      </div>
+                      <div class="lt-field-group">
+                        <label for="ltPresetVideoSelect">Type</label>
+                        <select id="ltPresetVideoSelect">
+                          <option value="lt1">Introduce</option>
+                          <option value="lt2">Credit</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="lt-coord-grid" id="ltTickerSettingsRow">
+                      <div class="lt-field-group">
+                        <label for="ltClipLeftInput">Cắt trái X (%):</label>
+                        <input type="number" id="ltClipLeftInput" min="0" max="85" step="0.5" value="15" />
+                      </div>
+                      <div class="lt-field-group">
+                        <label for="ltTickerSpeedInput">Tốc độ chạy (%/s):</label>
+                        <input type="number" id="ltTickerSpeedInput" min="2" max="40" step="1" value="12" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- KHU VỰC 3: QUẢN LÝ CÁC TEXT TRONG BỘ ĐANG CHỌN -->
+                  <div class="lt-section-box lt-section-box-grow">
+                    <div class="lt-panel-header">
+                      <span class="lt-panel-title">3. Các Text trong Bộ</span>
+                      <div class="lt-btn-group">
+                        <button type="button" class="lt-small-btn" id="btnAddLtText">+ Thêm Text</button>
+                        <button type="button" class="lt-small-btn danger" id="btnRemoveLtText">Xóa Text</button>
+                      </div>
+                    </div>
+
+                    <div class="lt-items-list" id="ltItemsList"></div>
+
+                    <!-- Font chữ + Bold / Italic -->
+                    <div class="lt-font-style-grid">
+                      <div class="lt-field-group">
+                        <label for="ltInputFont">Font chữ (bôi đen từ để đổi riêng):</label>
+                        <select id="ltInputFont">
+                          <option value='"UTM Avo", Arial, sans-serif'>UTM Avo (Mặc định)</option>
+                          <option value="Arial, Helvetica, sans-serif">Arial</option>
+                          <option value='"Segoe UI", Tahoma, sans-serif'>Segoe UI</option>
+                          <option value="Tahoma, Geneva, sans-serif">Tahoma</option>
+                          <option value='"Times New Roman", Times, serif'>Times New Roman</option>
+                          <option value='"Roboto", Arial, sans-serif'>Roboto</option>
+                          <option value='"Montserrat", Arial, sans-serif'>Montserrat</option>
+                          <option value='"Oswald", Arial, sans-serif'>Oswald</option>
+                          <option value='"UTM Bebas", Impact, sans-serif'>UTM Bebas</option>
+                          <option value='"UTM Trajan", Georgia, serif'>UTM Trajan</option>
+                          <option value="__custom__">Nhập tên font khác...</option>
+                        </select>
+                      </div>
+                      <div class="lt-style-toggle-group">
+                        <button type="button" class="lt-style-toggle-btn" id="ltBtnBold" title="In đậm (Bold)"><b>B</b></button>
+                        <button type="button" class="lt-style-toggle-btn" id="ltBtnItalic" title="In nghiêng (Italic)"><i>I</i></button>
+                      </div>
+                    </div>
+
+                    <div class="lt-field-group" id="ltCustomFontGroup">
+                      <label for="ltInputCustomFont">Tên Font tùy chỉnh (trên máy):</label>
+                      <input type="text" id="ltInputCustomFont" placeholder="VD: SVN-Gilroy, Myriad Pro..." />
+                    </div>
+
+                    <div class="lt-field-group">
+                      <label>Nội dung Text (hiển thị kèm Font thực tế):</label>
+                      <div id="ltRichEditor" class="lt-rich-editor" contenteditable="false" data-placeholder="Chọn 1 Text để sửa..."></div>
+                    </div>
+
+                    <div class="lt-field-group">
+                      <label for="ltInputSize"><span>Kích cỡ chữ (Size):</span> <span id="ltSizeVal">-</span></label>
+                      <input type="range" id="ltInputSize" min="0.5" max="8" step="0.1" value="2.2" />
+                    </div>
+
+                    <div class="lt-coord-grid">
+                      <div class="lt-field-group">
+                        <label id="ltLabelX" for="ltInputX">Vị trí Ngang X (%):</label>
+                        <input type="number" id="ltInputX" step="0.1" min="0" max="100" />
+                      </div>
+                      <div class="lt-field-group">
+                        <label for="ltInputY">Vị trí Dọc Y (%):</label>
+                        <input type="number" id="ltInputY" step="0.1" min="0" max="100" />
+                      </div>
+                    </div>
+
+                    <div class="lt-editor-hint">
+                      💡 Bôi đen 1 cụm từ trong ô <b>Nội dung Text</b> rồi chọn Font / <b>B</b> / <i>I</i> để phối nhiều font trong cùng 1 dòng.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cột phải: Chạy Intro chung, Lowerthird, 4 Intro vòng thi & Tổng kết điểm -->
+            <div class="sidebar-column">
+              <button type="button" class="sidebar-action-btn" id="btnMainIntro">CHẠY INTRO</button>
+              <button type="button" class="sidebar-action-btn" id="btnMainLT">LOWERTHIRD</button>
+              <button type="button" class="sidebar-action-btn round-intro-btn" id="btnRoundIntro_r1" data-round="r1">INTRO VÒNG 1</button>
+              <button type="button" class="sidebar-action-btn round-intro-btn" id="btnRoundIntro_r2" data-round="r2">INTRO VÒNG 2</button>
+              <button type="button" class="sidebar-action-btn round-intro-btn" id="btnRoundIntro_r3" data-round="r3">INTRO VÒNG 3</button>
+              <button type="button" class="sidebar-action-btn round-intro-btn" id="btnRoundIntro_r4" data-round="r4">INTRO VÒNG 4</button>
+              <button type="button" class="sidebar-action-btn" id="btnPointSummary">TỔNG KẾT ĐIỂM</button>
+              <button type="button" class="sidebar-action-btn danger-reset" id="btnMainReset">RESET ĐỒ HỌA</button>
+              <button type="button" class="sidebar-action-btn" aria-hidden="true"></button>
+            </div>
+          </div>
+
           <!-- GIAO DIỆN VÒNG 1: KHỞI ĐỘNG -->
           <div id="round1-ui">
             <div class="qa-column">
@@ -455,8 +606,9 @@
       </div>
     </div>
 
-    <!-- MODAL CÀI ĐẶT VÒNG 1 -->
+    <!-- MODAL CÀI ĐẶT CHUNG (DÙNG CHO VÒNG 1 & TAB MAIN) -->
     <div class="modal-overlay" id="configModal">
+      <!-- NỘI DUNG CÀI ĐẶT VÒNG 1 -->
       <div class="modal-content" id="configModalContent">
         <div class="modal-header">
           <h2>&#9881; CÀI ĐẶT VÒNG 1</h2>
@@ -554,6 +706,285 @@
         </div>
 
         <button type="button" class="save-config-btn" id="saveR1ConfigBtn">LƯU</button>
+      </div>
+
+      <!-- NỘI DUNG CÀI ĐẶT TAB MAIN -->
+      <div class="main-cfg-dialog" id="mainConfigDialog">
+        <div class="main-cfg-header">
+          <h2>&#9881; CÀI ĐẶT ÂM LƯỢNG, THÍ SINH &amp; THUMBNAIL GAME (MAIN)</h2>
+          <button type="button" class="main-cfg-close-btn" id="mainCfgCloseBtn" title="Lưu &amp; Đóng">&#10006;</button>
+        </div>
+
+        <div>
+          <div class="main-cfg-section-title">
+            <span>1. Âm lượng hệ thống riêng biệt (Livestream &amp; Projector)</span>
+          </div>
+          <div class="main-cfg-vol-grid">
+            <div class="main-cfg-vol-card">
+              <div class="main-cfg-vol-header">
+                <span>MÀN LIVESTREAM</span>
+                <span class="main-cfg-vol-badge" id="mainCfgVolBadge-livestream">100%</span>
+              </div>
+              <div class="main-cfg-vol-controls">
+                <button type="button" class="main-cfg-vol-mute-btn" id="mainCfgVolMute-livestream" data-screen="livestream" title="Tắt / Bật tiếng Livestream">🔊</button>
+                <input type="range" class="main-cfg-vol-slider" id="mainCfgVolSlider-livestream" data-screen="livestream" min="0" max="100" step="1" value="100" />
+                <input type="number" class="main-cfg-vol-num" id="mainCfgVolInput-livestream" data-screen="livestream" min="0" max="100" step="1" value="100" />
+              </div>
+            </div>
+
+            <div class="main-cfg-vol-card">
+              <div class="main-cfg-vol-header">
+                <span>MÀN PROJECTOR</span>
+                <span class="main-cfg-vol-badge" id="mainCfgVolBadge-projector">100%</span>
+              </div>
+              <div class="main-cfg-vol-controls">
+                <button type="button" class="main-cfg-vol-mute-btn" id="mainCfgVolMute-projector" data-screen="projector" title="Tắt / Bật tiếng Projector">🔊</button>
+                <input type="range" class="main-cfg-vol-slider" id="mainCfgVolSlider-projector" data-screen="projector" min="0" max="100" step="1" value="100" />
+                <input type="number" class="main-cfg-vol-num" id="mainCfgVolInput-projector" data-screen="projector" min="0" max="100" step="1" value="100" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="main-cfg-section-title">
+            <span>2. Thông tin thí sinh, điểm số, thông tin bổ sung &amp; Avatar (Firebase Storage)</span>
+          </div>
+          <div class="main-cfg-players-grid">
+            <div class="main-cfg-player-card">
+              <div class="main-cfg-avatar-col">
+                <div class="main-cfg-avatar-box">
+                  <img id="mainCfgAvatarImg-1" alt="Avatar TS 1" />
+                  <span class="main-cfg-avatar-fallback">TS 1</span>
+                </div>
+                <input type="file" class="main-cfg-hidden-file" id="mainCfgAvatarFile-1" data-player-index="1" accept="image/*" />
+                <div class="main-cfg-mini-actions">
+                  <button type="button" class="main-cfg-btn main-cfg-avatar-upload-btn" id="mainCfgAvatarBtn-1" data-player-index="1">Chọn ảnh</button>
+                  <button type="button" class="main-cfg-btn secondary main-cfg-avatar-reset-btn" data-player-index="1" title="Quay về ảnh mặc định">Mặc định</button>
+                </div>
+                <div class="main-cfg-status-text" id="mainCfgAvatarStatus-1">Ảnh mặc định</div>
+              </div>
+              <div class="main-cfg-fields-col">
+                <div class="main-cfg-row-2col">
+                  <div class="main-cfg-field">
+                    <label for="mainCfgName-1">Tên Thí Sinh 1:</label>
+                    <input type="text" class="main-cfg-name-input" id="mainCfgName-1" data-player-index="1" placeholder="Nhập tên thí sinh 1..." />
+                  </div>
+                  <div class="main-cfg-field">
+                    <label for="mainCfgScore-1">Điểm số:</label>
+                    <div class="main-cfg-score-wrap">
+                      <button type="button" class="main-cfg-score-step" data-player-index="1" data-delta="-10" title="Trừ 10 điểm">-10</button>
+                      <input type="number" class="main-cfg-score-input" id="mainCfgScore-1" data-player-index="1" value="0" />
+                      <button type="button" class="main-cfg-score-step" data-player-index="1" data-delta="10" title="Cộng 10 điểm">+10</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="main-cfg-field">
+                  <label for="mainCfgInfo-1">Thông tin:</label>
+                  <textarea class="main-cfg-info-input" id="mainCfgInfo-1" data-player-index="1"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="main-cfg-player-card">
+              <div class="main-cfg-avatar-col">
+                <div class="main-cfg-avatar-box">
+                  <img id="mainCfgAvatarImg-2" alt="Avatar TS 2" />
+                  <span class="main-cfg-avatar-fallback">TS 2</span>
+                </div>
+                <input type="file" class="main-cfg-hidden-file" id="mainCfgAvatarFile-2" data-player-index="2" accept="image/*" />
+                <div class="main-cfg-mini-actions">
+                  <button type="button" class="main-cfg-btn main-cfg-avatar-upload-btn" id="mainCfgAvatarBtn-2" data-player-index="2">Chọn ảnh</button>
+                  <button type="button" class="main-cfg-btn secondary main-cfg-avatar-reset-btn" data-player-index="2" title="Quay về ảnh mặc định">Mặc định</button>
+                </div>
+                <div class="main-cfg-status-text" id="mainCfgAvatarStatus-2">Ảnh mặc định</div>
+              </div>
+              <div class="main-cfg-fields-col">
+                <div class="main-cfg-row-2col">
+                  <div class="main-cfg-field">
+                    <label for="mainCfgName-2">Tên Thí Sinh 2:</label>
+                    <input type="text" class="main-cfg-name-input" id="mainCfgName-2" data-player-index="2" placeholder="Nhập tên thí sinh 2..." />
+                  </div>
+                  <div class="main-cfg-field">
+                    <label for="mainCfgScore-2">Điểm số:</label>
+                    <div class="main-cfg-score-wrap">
+                      <button type="button" class="main-cfg-score-step" data-player-index="2" data-delta="-10" title="Trừ 10 điểm">-10</button>
+                      <input type="number" class="main-cfg-score-input" id="mainCfgScore-2" data-player-index="2" value="0" />
+                      <button type="button" class="main-cfg-score-step" data-player-index="2" data-delta="10" title="Cộng 10 điểm">+10</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="main-cfg-field">
+                  <label for="mainCfgInfo-2">Thông tin:</label>
+                  <textarea class="main-cfg-info-input" id="mainCfgInfo-2" data-player-index="2"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="main-cfg-player-card">
+              <div class="main-cfg-avatar-col">
+                <div class="main-cfg-avatar-box">
+                  <img id="mainCfgAvatarImg-3" alt="Avatar TS 3" />
+                  <span class="main-cfg-avatar-fallback">TS 3</span>
+                </div>
+                <input type="file" class="main-cfg-hidden-file" id="mainCfgAvatarFile-3" data-player-index="3" accept="image/*" />
+                <div class="main-cfg-mini-actions">
+                  <button type="button" class="main-cfg-btn main-cfg-avatar-upload-btn" id="mainCfgAvatarBtn-3" data-player-index="3">Chọn ảnh</button>
+                  <button type="button" class="main-cfg-btn secondary main-cfg-avatar-reset-btn" data-player-index="3" title="Quay về ảnh mặc định">Mặc định</button>
+                </div>
+                <div class="main-cfg-status-text" id="mainCfgAvatarStatus-3">Ảnh mặc định</div>
+              </div>
+              <div class="main-cfg-fields-col">
+                <div class="main-cfg-row-2col">
+                  <div class="main-cfg-field">
+                    <label for="mainCfgName-3">Tên Thí Sinh 3:</label>
+                    <input type="text" class="main-cfg-name-input" id="mainCfgName-3" data-player-index="3" placeholder="Nhập tên thí sinh 3..." />
+                  </div>
+                  <div class="main-cfg-field">
+                    <label for="mainCfgScore-3">Điểm số:</label>
+                    <div class="main-cfg-score-wrap">
+                      <button type="button" class="main-cfg-score-step" data-player-index="3" data-delta="-10" title="Trừ 10 điểm">-10</button>
+                      <input type="number" class="main-cfg-score-input" id="mainCfgScore-3" data-player-index="3" value="0" />
+                      <button type="button" class="main-cfg-score-step" data-player-index="3" data-delta="10" title="Cộng 10 điểm">+10</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="main-cfg-field">
+                  <label for="mainCfgInfo-3">Thông tin:</label>
+                  <textarea class="main-cfg-info-input" id="mainCfgInfo-3" data-player-index="3"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="main-cfg-player-card">
+              <div class="main-cfg-avatar-col">
+                <div class="main-cfg-avatar-box">
+                  <img id="mainCfgAvatarImg-4" alt="Avatar TS 4" />
+                  <span class="main-cfg-avatar-fallback">TS 4</span>
+                </div>
+                <input type="file" class="main-cfg-hidden-file" id="mainCfgAvatarFile-4" data-player-index="4" accept="image/*" />
+                <div class="main-cfg-mini-actions">
+                  <button type="button" class="main-cfg-btn main-cfg-avatar-upload-btn" id="mainCfgAvatarBtn-4" data-player-index="4">Chọn ảnh</button>
+                  <button type="button" class="main-cfg-btn secondary main-cfg-avatar-reset-btn" data-player-index="4" title="Quay về ảnh mặc định">Mặc định</button>
+                </div>
+                <div class="main-cfg-status-text" id="mainCfgAvatarStatus-4">Ảnh mặc định</div>
+              </div>
+              <div class="main-cfg-fields-col">
+                <div class="main-cfg-row-2col">
+                  <div class="main-cfg-field">
+                    <label for="mainCfgName-4">Tên Thí Sinh 4:</label>
+                    <input type="text" class="main-cfg-name-input" id="mainCfgName-4" data-player-index="4" placeholder="Nhập tên thí sinh 4..." />
+                  </div>
+                  <div class="main-cfg-field">
+                    <label for="mainCfgScore-4">Điểm số:</label>
+                    <div class="main-cfg-score-wrap">
+                      <button type="button" class="main-cfg-score-step" data-player-index="4" data-delta="-10" title="Trừ 10 điểm">-10</button>
+                      <input type="number" class="main-cfg-score-input" id="mainCfgScore-4" data-player-index="4" value="0" />
+                      <button type="button" class="main-cfg-score-step" data-player-index="4" data-delta="10" title="Cộng 10 điểm">+10</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="main-cfg-field">
+                  <label for="mainCfgInfo-4">Thông tin:</label>
+                  <textarea class="main-cfg-info-input" id="mainCfgInfo-4" data-player-index="4"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="main-cfg-section-title">
+            <span>3. Ảnh Thumbnail của Game &amp; Nền màn chiếu (Firebase Storage)</span>
+          </div>
+          <div class="main-cfg-thumbs-grid">
+            <div class="main-cfg-thumb-card is-primary">
+              <div class="main-cfg-thumb-title">
+                <span>R0 - Nền Chính</span>
+                <span class="main-cfg-primary-pill">Chính</span>
+              </div>
+              <div class="main-cfg-thumb-preview">
+                <img id="mainCfgThumbImg-R0" alt="Nền Chính" />
+                <span class="proj-bg-thumb-fallback">R0</span>
+              </div>
+              <input type="file" class="main-cfg-hidden-file" id="mainCfgThumbFile-R0" data-bg-key="R0" accept="image/*" />
+              <div class="main-cfg-mini-actions">
+                <button type="button" class="main-cfg-btn main-cfg-thumb-upload-btn" id="mainCfgThumbBtn-R0" data-bg-key="R0">Tải ảnh</button>
+                <button type="button" class="main-cfg-btn secondary main-cfg-thumb-reset-btn" data-bg-key="R0">Mặc định</button>
+              </div>
+              <div class="main-cfg-status-text" id="mainCfgThumbStatus-R0">Ảnh mặc định</div>
+            </div>
+
+            <div class="main-cfg-thumb-card">
+              <div class="main-cfg-thumb-title">
+                <span>R1 - Vòng 1</span>
+              </div>
+              <div class="main-cfg-thumb-preview">
+                <img id="mainCfgThumbImg-R1" alt="Vòng 1" />
+                <span class="proj-bg-thumb-fallback">R1</span>
+              </div>
+              <input type="file" class="main-cfg-hidden-file" id="mainCfgThumbFile-R1" data-bg-key="R1" accept="image/*" />
+              <div class="main-cfg-mini-actions">
+                <button type="button" class="main-cfg-btn main-cfg-thumb-upload-btn" id="mainCfgThumbBtn-R1" data-bg-key="R1">Tải ảnh</button>
+                <button type="button" class="main-cfg-btn secondary main-cfg-thumb-reset-btn" data-bg-key="R1">Mặc định</button>
+              </div>
+              <div class="main-cfg-status-text" id="mainCfgThumbStatus-R1">Ảnh mặc định</div>
+            </div>
+
+            <div class="main-cfg-thumb-card">
+              <div class="main-cfg-thumb-title">
+                <span>R2 - Vòng 2</span>
+              </div>
+              <div class="main-cfg-thumb-preview">
+                <img id="mainCfgThumbImg-R2" alt="Vòng 2" />
+                <span class="proj-bg-thumb-fallback">R2</span>
+              </div>
+              <input type="file" class="main-cfg-hidden-file" id="mainCfgThumbFile-R2" data-bg-key="R2" accept="image/*" />
+              <div class="main-cfg-mini-actions">
+                <button type="button" class="main-cfg-btn main-cfg-thumb-upload-btn" id="mainCfgThumbBtn-R2" data-bg-key="R2">Tải ảnh</button>
+                <button type="button" class="main-cfg-btn secondary main-cfg-thumb-reset-btn" data-bg-key="R2">Mặc định</button>
+              </div>
+              <div class="main-cfg-status-text" id="mainCfgThumbStatus-R2">Ảnh mặc định</div>
+            </div>
+
+            <div class="main-cfg-thumb-card">
+              <div class="main-cfg-thumb-title">
+                <span>R3 - Vòng 3</span>
+              </div>
+              <div class="main-cfg-thumb-preview">
+                <img id="mainCfgThumbImg-R3" alt="Vòng 3" />
+                <span class="proj-bg-thumb-fallback">R3</span>
+              </div>
+              <input type="file" class="main-cfg-hidden-file" id="mainCfgThumbFile-R3" data-bg-key="R3" accept="image/*" />
+              <div class="main-cfg-mini-actions">
+                <button type="button" class="main-cfg-btn main-cfg-thumb-upload-btn" id="mainCfgThumbBtn-R3" data-bg-key="R3">Tải ảnh</button>
+                <button type="button" class="main-cfg-btn secondary main-cfg-thumb-reset-btn" data-bg-key="R3">Mặc định</button>
+              </div>
+              <div class="main-cfg-status-text" id="mainCfgThumbStatus-R3">Ảnh mặc định</div>
+            </div>
+
+            <div class="main-cfg-thumb-card">
+              <div class="main-cfg-thumb-title">
+                <span>R4 - Vòng 4</span>
+              </div>
+              <div class="main-cfg-thumb-preview">
+                <img id="mainCfgThumbImg-R4" alt="Vòng 4" />
+                <span class="proj-bg-thumb-fallback">R4</span>
+              </div>
+              <input type="file" class="main-cfg-hidden-file" id="mainCfgThumbFile-R4" data-bg-key="R4" accept="image/*" />
+              <div class="main-cfg-mini-actions">
+                <button type="button" class="main-cfg-btn main-cfg-thumb-upload-btn" id="mainCfgThumbBtn-R4" data-bg-key="R4">Tải ảnh</button>
+                <button type="button" class="main-cfg-btn secondary main-cfg-thumb-reset-btn" data-bg-key="R4">Mặc định</button>
+              </div>
+              <div class="main-cfg-status-text" id="mainCfgThumbStatus-R4">Ảnh mặc định</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="main-cfg-footer">
+          <span class="main-cfg-global-status" id="mainCfgGlobalStatus">Âm lượng Livestream và Projector hoạt động độc lập và cập nhật trực tiếp.</span>
+          <button type="button" class="main-cfg-save-btn" id="mainCfgSaveBtn">LƯU &amp; ĐÓNG</button>
+        </div>
       </div>
     </div>
 
@@ -709,6 +1140,9 @@
 
         const r2Ui = document.getElementById('r2-controller-ui');
         if (r2Ui) r2Ui.style.display = (suffix === 'R2') ? 'block' : 'none';
+
+        const mainUi = document.getElementById('main-controller-ui');
+        if (mainUi) mainUi.style.display = (suffix === 'M') ? 'contents' : 'none';
 
         const cssLink = document.getElementById('round-css');
         if (cssLink) {
