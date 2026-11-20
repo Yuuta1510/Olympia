@@ -174,7 +174,7 @@ body {
 #projPointSummaryGroup.is-fading-out {
     display: block;
     opacity: 0;
-    transition: opacity 0.5s ease;
+    transition: opacity 1s ease;
 }
 
 #projPointSummaryVideo {
@@ -266,6 +266,19 @@ body {
     transition: opacity 0.6s ease;
 }
 
+#projTotalGroup.is-instant-visible {
+    display: block;
+    opacity: 1;
+    transition: none !important;
+}
+
+#projTotalGroup.is-instant-visible .proj-total-avatar-wrap,
+#projTotalGroup.is-instant-visible .proj-total-name,
+#projTotalGroup.is-instant-visible .proj-total-score {
+    opacity: 1;
+    transition: none !important;
+}
+
 #projTotalVideo {
     position: absolute;
     inset: 0;
@@ -322,7 +335,7 @@ body {
 }
 
 .proj-total-name {
-    width: 100%; /* Bó buộc bằng đúng 266px của cột (có thể đặt px cụ thể như 250px) */
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -338,16 +351,16 @@ body {
 }
 
 .proj-total-score {
-    width: 100%; /* Bó buộc bằng đúng 266px của cột */
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: "UTM Avo", Arial, sans-serif;
     font-weight: bold;
-    font-size: 60px;
+    font-size: 80px;
     color: #facc15;
     white-space: nowrap;
-    padding: 0.4vh 0 1.2vh;
+    transform: translateY(-10%);
     text-shadow: 0 3px 8px rgba(0, 0, 0, 0.85);
     opacity: 0;
     transition: none;

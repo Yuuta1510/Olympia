@@ -865,6 +865,9 @@ let savedSelectionRange = null;
 let pointSummaryStep = 0;
 let pointSummaryOrder = [];
 
+// Trạng thái Hiện kết quả trận đấu (bật/tắt bảng tổng kết frame cuối không animation)
+let isMatchResultActive = false;
+
 function buildOrderedPlayers(playersObj) {
   const list = [];
   for (let i = 1; i <= 4; i++) {
@@ -903,6 +906,13 @@ function updatePointSummaryBtnUI() {
   if (!btn) return;
   btn.innerText = getPointSummaryBtnText();
   btn.classList.toggle('is-running', pointSummaryStep > 0);
+}
+
+function syncMatchResultBtnUI() {
+  const btn = document.getElementById('btnMatchResult');
+  if (!btn) return;
+  btn.classList.toggle('is-running', isMatchResultActive);
+  btn.innerText = isMatchResultActive ? 'ẨN KẾT QUẢ' : 'KẾT QUẢ TRẬN ĐẤU';
 }
 
 function escapeHTML(str) {
@@ -1207,6 +1217,10 @@ function bindMainWorkspaceEvents() {
     window.triggerPointSummary(e.currentTarget);
   }, { signal });
 
+  document.getElementById('btnMatchResult')?.addEventListener('click', (e) => {
+    window.triggerMatchResult(e.currentTarget);
+  }, { signal });
+
   document.getElementById('btnMainReset')?.addEventListener('click', (e) => {
     window.triggerMainReset(e.currentTarget);
   }, { signal });
@@ -1324,6 +1338,7 @@ function renderMainWorkspace() {
   syncMainLowerthirdBtnUI();
   syncRoundIntroButtonsUI();
   updatePointSummaryBtnUI();
+  syncMatchResultBtnUI();
 
   bindMainWorkspaceEvents();
   bindMainConfigModalEvents();
@@ -2190,6 +2205,11 @@ window.triggerMainLowerthird = function(btn) {
 window.triggerPointSummary = function(btn) {
   flashButtonYellow(btn);
 
+  if (isMatchResultActive) {
+    isMatchResultActive = false;
+    syncMatchResultBtnUI();
+  }
+
   if (pointSummaryStep === 0) {
     pointSummaryOrder = buildSortedPlayers(latestPlayersData);
   }
@@ -2216,6 +2236,33 @@ window.triggerPointSummary = function(btn) {
       sortedPlayers: pointSummaryOrder,
       players: orderedPlayers
     });
+    if (pointSummaryStep === 1 && typeof window.playMusic === 'function') {
+      window.playMusic('Main_PointSummary.mp3', false, false);
+    }
+  }
+};
+
+window.triggerMatchResult = function(btn) {
+  flashButtonYellow(btn);
+
+  if (!isMatchResultActive) {
+    if (pointSummaryStep > 0) {
+      pointSummaryStep = 0;
+      pointSummaryOrder = [];
+      updatePointSummaryBtnUI();
+    }
+    isMatchResultActive = true;
+    syncMatchResultBtnUI();
+    sendCommand({
+      action: 'show_match_result',
+      players: buildOrderedPlayers(latestPlayersData)
+    });
+  } else {
+    isMatchResultActive = false;
+    syncMatchResultBtnUI();
+    sendCommand({
+      action: 'hide_match_result'
+    });
   }
 };
 
@@ -2226,9 +2273,11 @@ window.triggerMainReset = function(btn) {
   activeRoundIntro = null;
   pointSummaryStep = 0;
   pointSummaryOrder = [];
+  isMatchResultActive = false;
   syncMainIntroBtnUI();
   syncRoundIntroButtonsUI();
   updatePointSummaryBtnUI();
+  syncMatchResultBtnUI();
 
   const btnLT = document.getElementById('btnMainLT');
   const tText = document.getElementById('timeText');

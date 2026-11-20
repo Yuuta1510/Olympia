@@ -58,6 +58,11 @@ const PROJ_TOTAL_SOURCES = [
     'graphic/pro_main_total.webm',
     'Graphic/pro_main_total.webm',
     'pro_main_total.webm',
+    '../graphic/main_total.webm',
+    '/graphic/main_total.webm',
+    'graphic/main_total.webm',
+    'Graphic/main_total.webm',
+    'main_total.webm',
 ];
 
 let currentActiveVideoType = 'lt1';
@@ -218,6 +223,43 @@ function setVideoSourceWithFallback(videoEl, srcList, onReadyCallback) {
             videoEl.onloadeddata = null;
             onReadyCallback();
         };
+    }
+}
+
+function seekVideoToLastFrame(videoEl, onReady) {
+    if (!videoEl) return;
+
+    const finishSeek = () => {
+        if (typeof onReady === 'function') onReady();
+    };
+
+    const applyLastFrame = () => {
+        videoEl.pause();
+        if (videoEl.duration && isFinite(videoEl.duration)) {
+            const targetTime = Math.max(0, videoEl.duration - 0.05);
+            if (Math.abs(videoEl.currentTime - targetTime) < 0.01 && !videoEl.seeking && videoEl.readyState >= 2) {
+                finishSeek();
+            } else {
+                let done = false;
+                const handleDone = () => {
+                    if (done) return;
+                    done = true;
+                    finishSeek();
+                };
+                videoEl.addEventListener('seeked', handleDone, { once: true });
+                videoEl.currentTime = targetTime;
+                setTimeout(handleDone, 350); // Dự phòng nếu trình duyệt không bắn seeked
+            }
+        } else {
+            finishSeek();
+        }
+    };
+
+    if (videoEl.readyState >= 1 && videoEl.duration && isFinite(videoEl.duration)) {
+        applyLastFrame();
+    } else {
+        videoEl.addEventListener('loadedmetadata', applyLastFrame, { once: true });
+        videoEl.load();
     }
 }
 
@@ -615,7 +657,7 @@ function hideMainLowerthird() {
 }
 
 // =========================================================================
-// 3. ĐIỀU KHIỂN TỔNG KẾT ĐIỂM (LIVESTREAM & PROJECTOR)
+// 3. ĐIỀU KHIỂN TỔNG KẾT ĐIỂM & KẾT QUẢ TRẬN ĐẤU (LIVESTREAM & PROJECTOR)
 // =========================================================================
 function getOrderedPlayersList(rawPlayers) {
     const source = (Array.isArray(rawPlayers) && rawPlayers.length >= 4) ? null : (rawPlayers || cachedPlayers);
@@ -700,7 +742,8 @@ function hideProjectorPointSummaryImmediate() {
         psVid.currentTime = 0;
     }
     if (totalGroup) {
-        totalGroup.classList.remove('is-preparing', 'is-fading-in');
+        delete totalGroup.dataset.pendingShow;
+        totalGroup.classList.remove('is-preparing', 'is-fading-in', 'is-instant-visible');
     }
     if (totalVid) {
         totalVid.pause();
@@ -781,7 +824,7 @@ function handlePointSummaryCommand(data) {
         if (!psGroup || !psVid || !psTextWrap || !psNameEl || !psScoreEl || !totalGroup || !totalVid) return;
 
         if (step === 1) {
-            totalGroup.classList.remove('is-preparing', 'is-fading-in');
+            totalGroup.classList.remove('is-preparing', 'is-fading-in', 'is-instant-visible');
             totalVid.pause();
             totalVid.currentTime = 0;
 
@@ -812,7 +855,8 @@ function handlePointSummaryCommand(data) {
             setFitTextContent(psScoreEl, p.score);
 
         } else if (step === 5) {
-            totalGroup.classList.remove('is-fading-in');
+            // 1. Nạp dữ liệu 4 thí sinh & cho video Main_Total fade-in trước ngay tại 0ms
+            totalGroup.classList.remove('is-fading-in', 'is-instant-visible');
             totalGroup.classList.add('is-preparing');
 
             for (let i = 1; i <= 4; i++) {
@@ -833,19 +877,73 @@ function handlePointSummaryCommand(data) {
             totalGroup.classList.remove('is-preparing');
             totalGroup.classList.add('is-fading-in');
 
-            psGroup.classList.remove('is-visible');
-            psGroup.classList.add('is-fading-out');
-            psFadeOutTimer = setTimeout(() => {
-                psGroup.classList.remove('is-visible', 'is-fading-out');
-                psTextWrap.classList.remove('is-instant-visible', 'is-fading-in');
-                psVid.pause();
-                psVid.currentTime = 0;
-            }, 600);
+            const PS_FADE_OUT_DELAY_MS = 500;    // Độ trễ trước khi PointSummary fade-out
+            const PS_FADE_OUT_DURATION_MS = 600;
+
+            psFadeInTimer = setTimeout(() => {
+                psGroup.classList.remove('is-visible');
+                psGroup.classList.add('is-fading-out');
+
+                psFadeOutTimer = setTimeout(() => {
+                    psGroup.classList.remove('is-visible', 'is-fading-out');
+                    psTextWrap.classList.remove('is-instant-visible', 'is-fading-in');
+                    psVid.pause();
+                    psVid.currentTime = 0;
+                }, PS_FADE_OUT_DURATION_MS);
+            }, PS_FADE_OUT_DELAY_MS);
 
         } else if (step >= 6) {
             hideProjectorPointSummaryImmediate();
         }
     }
+}
+
+function showMatchResultInstant(data) {
+    if (!isProjectorScreen()) return;
+
+    const psGroup = document.getElementById('projPointSummaryGroup');
+    const psVid = document.getElementById('projPointSummaryVideo');
+    const psTextWrap = document.getElementById('projPointSummaryTextWrap');
+    const totalGroup = document.getElementById('projTotalGroup');
+    const totalVid = document.getElementById('projTotalVideo');
+    if (!totalGroup || !totalVid) return;
+
+    clearPointSummaryTimers();
+
+    if (psGroup) psGroup.classList.remove('is-visible', 'is-fading-out');
+    if (psTextWrap) psTextWrap.classList.remove('is-instant-visible', 'is-fading-in');
+    if (psVid) {
+        psVid.pause();
+        psVid.currentTime = 0;
+    }
+
+    const orderedPlayers = getOrderedPlayersList(data?.players);
+
+    totalGroup.classList.remove('is-preparing', 'is-fading-in', 'is-instant-visible');
+    totalGroup.dataset.pendingShow = 'true';
+
+    for (let i = 1; i <= 4; i++) {
+        const pl = orderedPlayers[i - 1] || { index: i, name: `PLAYER ${i}`, score: 0, avatarUrl: '' };
+        const imgEl = document.getElementById(`projTotalImg-${i}`);
+        const nameEl = document.getElementById(`projTotalName-${i}`);
+        const scoreEl = document.getElementById(`projTotalScore-${i}`);
+
+        if (imgEl) setImageSourceWithFallback(imgEl, i, pl.avatarUrl);
+        if (nameEl) setFitTextContent(nameEl, pl.name);
+        if (scoreEl) setFitTextContent(scoreEl, pl.score);
+    }
+
+    seekVideoToLastFrame(totalVid, () => {
+        if (totalGroup.dataset.pendingShow !== 'true') return;
+        delete totalGroup.dataset.pendingShow;
+        totalGroup.classList.add('is-instant-visible');
+        refitAllVisiblePointSummaryTexts();
+    });
+}
+
+function hideMatchResultInstant() {
+    if (!isProjectorScreen()) return;
+    hideProjectorPointSummaryImmediate();
 }
 
 function resetAllMainGraphics() {
@@ -914,7 +1012,7 @@ const unsubPlayers = onValue(ref(db, 'games/players'), (snapshot) => {
 
         // Cập nhật trực tiếp nếu bảng Proj_Total đang hiển thị trên Projector
         const totalGroup = document.getElementById('projTotalGroup');
-        if (isProjectorScreen() && totalGroup && totalGroup.classList.contains('is-fading-in')) {
+        if (isProjectorScreen() && totalGroup && (totalGroup.classList.contains('is-fading-in') || totalGroup.classList.contains('is-instant-visible'))) {
             for (let i = 1; i <= 4; i++) {
                 const p = cachedPlayers[i] || {};
                 const imgEl = document.getElementById(`projTotalImg-${i}`);
@@ -954,6 +1052,10 @@ const unsubCommands = onValue(ref(db, 'games/commands'), (snapshot) => {
         if (!isProjectorScreen()) hideMainLowerthird();
     } else if (data.action === 'point_summary') {
         handlePointSummaryCommand(data);
+    } else if (data.action === 'show_match_result') {
+        showMatchResultInstant(data);
+    } else if (data.action === 'hide_match_result') {
+        hideMatchResultInstant();
     } else if (data.action === 'reset_main_graphic' || data.action === 'reset_graphic') {
         resetAllMainGraphics();
     }
