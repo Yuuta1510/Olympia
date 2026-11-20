@@ -28,6 +28,7 @@ let currentQuesIndex = 1;
 let round1Questions = [];
 let globalPlayers = {};
 let activePlayerIndex = null;
+let isWaitBgShown = false;
 let isGraphicShown = false;
 let isPlayersShown = false;
 let isQuestionShown = false;
@@ -299,6 +300,7 @@ function isCommonQuestion(questionIndex) {
 
 window.triggerAction = function(btn, keyStr) {
   let resetBuzzersForNextQuestion = false;
+  const btnWaitBg = document.getElementById('btn-wait-bg');
   const btnGraphic = document.getElementById('btn-graphic');
   const btnPlayers = document.getElementById('btn-players');
   const btnQuestion = document.getElementById('btn-question');
@@ -327,9 +329,11 @@ window.triggerAction = function(btn, keyStr) {
   } else if (keyStr === 'r') {
     document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
     activePlayerIndex = null;
+    isWaitBgShown = false;
     isPlayersShown = false;
     isGraphicShown = false;
     isQuestionShown = false;
+    if (btnWaitBg) btnWaitBg.classList.add('dimmed');
     if (btnGraphic) btnGraphic.classList.add('dimmed');
     if (btnPlayers) btnPlayers.classList.add('dimmed');
     if (btnQuestion) btnQuestion.classList.add('dimmed');
@@ -360,6 +364,17 @@ window.triggerAction = function(btn, keyStr) {
     if (resetBuzzersForNextQuestion) {
       activePlayerIndex = null;
       document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
+    }
+  }
+
+  if (keyStr === 'w') {
+    isWaitBgShown = !isWaitBgShown;
+    if (isWaitBgShown) {
+      channel.postMessage({ action: 'show_wait_bg' });
+      if (btnWaitBg) btnWaitBg.classList.remove('dimmed');
+    } else {
+      channel.postMessage({ action: 'hide_wait_bg' });
+      if (btnWaitBg) btnWaitBg.classList.add('dimmed');
     }
   }
 
@@ -781,5 +796,8 @@ window.cleanupCurrentRound = () => {
     round1EventsController.abort();
     round1EventsController = null;
   }
+  isWaitBgShown = false;
+  const btnWaitBg = document.getElementById('btn-wait-bg');
+  if (btnWaitBg) btnWaitBg.classList.add('dimmed');
   window.closeConfig();
 };

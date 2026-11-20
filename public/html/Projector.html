@@ -51,7 +51,7 @@
                 left: 0;
                 width: 100vw;
                 height: 100vh;
-                background: transparent;
+                background: #000 url('../graphic/r0_bg.png') center / cover no-repeat;
                 z-index: -1;
                 pointer-events: none;
             }
@@ -116,6 +116,7 @@
 
         <!-- GIAO DIỆN VÒNG 1: KHỞI ĐỘNG -->
         <div id="round1-ui" class="round-ui">
+            <div id="r1-wait-bg"></div>
             <video id="graphic_r1" class="video-overlay" src="../graphic/pro_r1_showques.webm" playsinline preload="auto"></video>
             <video id="graphic_time" class="video-overlay" src="../graphic/r1_60s.webm" playsinline preload="auto"></video>
             <audio id="audio_r1_clock" preload="auto"></audio>

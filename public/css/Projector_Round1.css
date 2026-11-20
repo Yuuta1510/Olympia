@@ -11,6 +11,17 @@ html, body {
     text-align: center;
 }
 
+#r1-wait-bg {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url('../graphic/r1_wait.png') center / cover no-repeat;
+    z-index: 0;
+    display: none;
+    pointer-events: none;
+}
+
 .video-overlay {
     position: fixed;
     top: 0;
@@ -18,7 +29,7 @@ html, body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    z-index: 0;
+    z-index: 1;
     background-color: transparent;
 }
 
@@ -34,7 +45,7 @@ html, body {
     height: 100%;
     pointer-events: none;
     z-index: 2;
-    overflow: hidden; /* Ngăn vệt nghiêng của active-bg tràn khỏi màn hình */
+    overflow: hidden;
 }
 
 .player {
@@ -136,6 +147,7 @@ html, body {
     top: 18%;
     width: 57%;
     font-size: 36px;
+    z-index: 2;
 }
 
 .countdown-5s-box {
@@ -155,7 +167,7 @@ html, body {
     align-items: center;
     justify-content: center;
     padding-bottom: 10px;
-    z-index: 10;
+    z-index: 3;
 }
 
 #graphic_time {
@@ -166,7 +178,7 @@ html, body {
     width: 100%;
     height: auto;
     object-fit: contain;
-    z-index: 1;
+    z-index: 3;
 }
 
 .proj-turn-name {

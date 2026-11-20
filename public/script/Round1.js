@@ -31,6 +31,12 @@ if (!turnTimeAudio) {
     document.body.appendChild(turnTimeAudio);
 }
 
+function isProjectorScreen() {
+    return Boolean(document.getElementById('projector-bg')) ||
+           window.location.pathname.toLowerCase().includes('projector') ||
+           document.title.toLowerCase().includes('projector');
+}
+
 const unsubPlayers = onValue(ref(db, 'games/players'), (snapshot) => {
     if (snapshot.exists()) globalPlayers = snapshot.val();
 });
@@ -208,11 +214,20 @@ const unsubCmds = onValue(ref(db, 'games/commands'), async (snapshot) => {
     const data = snapshot.val();
     if (!data || !data.action) return;
 
-    if (data.action === 'show_graphic') {
+    if (data.action === 'show_wait_bg') {
+        if (isProjectorScreen()) {
+            const waitBgEl = document.getElementById('r1-wait-bg');
+            if (waitBgEl) waitBgEl.style.display = 'block';
+        }
+    } else if (data.action === 'hide_wait_bg') {
+        if (isProjectorScreen()) {
+            const waitBgEl = document.getElementById('r1-wait-bg');
+            if (waitBgEl) waitBgEl.style.display = 'none';
+        }
+    } else if (data.action === 'show_graphic') {
         const videoEl = document.getElementById('graphic_r1');
         if (videoEl) {
-            const isProjector = window.location.pathname.toLowerCase().includes('projector') ||
-                                document.title.toLowerCase().includes('projector');
+            const isProjector = isProjectorScreen();
 
             const fileNormal = isProjector ? '../graphic/pro_r1_showques.webm' : '../graphic/r1_showques.webm';
             const fileTime   = isProjector ? '../graphic/pro_r1_showquestime.webm' : '../graphic/r1_showquestime.webm';
@@ -348,6 +363,8 @@ const unsubCmds = onValue(ref(db, 'games/commands'), async (snapshot) => {
         }
     } else if (data.action === 'reset_graphic') {
         hideProjectorInfo();
+        const waitBgEl = document.getElementById('r1-wait-bg');
+        if (waitBgEl) waitBgEl.style.display = 'none';
         const videoEl = document.getElementById('graphic_r1');
         const timeEl = document.getElementById('graphic_time');
         if (videoEl) {
@@ -416,4 +433,7 @@ window.cleanupCurrentRound = () => {
 
     const timerBox = document.getElementById('timer5sBox');
     if (timerBox) timerBox.style.display = 'none';
+
+    const waitBgEl = document.getElementById('r1-wait-bg');
+    if (waitBgEl) waitBgEl.style.display = 'none';
 };
