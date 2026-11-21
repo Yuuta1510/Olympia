@@ -203,6 +203,8 @@
       /* Ẩn mặc định giao diện các tab chưa kích hoạt khi mở trang ở Vòng 1 */
       #r2-controller-ui,
       #r2ConfigModal,
+      #r5-controller-ui,
+      #r5ConfigModal,
       #main-controller-ui,
       #mainConfigDialog {
         display: none;
@@ -597,6 +599,63 @@
                 </div>
               </div>
               <button type="button" class="r2-ctrl-ans-reset-btn" id="r2-btn-reset-player-ans">RESET ĐÁP ÁN TS</button>
+            </div>
+          </div>
+
+          <!-- GIAO DIỆN VÒNG 5: CÂU HỎI PHỤ -->
+          <div id="r5-controller-ui">
+            <div class="r5-qa-column">
+              <!-- BOX CÂU HỎI -->
+              <div class="r5-question-box">
+                <div class="r5-question-header">
+                  <span class="r5-badge" id="r5RoundBadge">CÂU HỎI PHỤ</span>
+                  <span class="r5-divider">-</span>
+                  <span class="r5-badge" id="r5QuesBadge">CÂU HỎI 1/0</span>
+                  <span class="r5-divider">-</span>
+                  <span class="r5-badge" id="r5TimeBadge">THỜI GIAN: 15.0s</span>
+                  <button type="button" id="r5BtnResetTime" title="Đặt lại đồng hồ 15s">🔄</button>
+                  <button type="button" id="r5BtnPlayPauseTime" title="Chạy / Tạm dừng đồng hồ 15s">▶</button>
+                </div>
+
+                <div class="r5-question-content" id="r5PreviewQuestion">Đang tải câu hỏi phụ...</div>
+
+                <div class="r5-question-actions">
+                  <div class="r5-left-actions">
+                    <button type="button" class="r5-action-btn" id="r5BtnShowQues">HIỆN CÂU HỎI</button>
+                    <button type="button" class="r5-action-btn" id="r5BtnHideQues">ẨN CÂU HỎI</button>
+                    <button type="button" class="r5-action-btn" id="r5BtnStart15s">CHẠY 15S</button>
+                    <button type="button" class="r5-action-btn" id="r5BtnPrevQues">◀ PREV</button>
+                    <button type="button" class="r5-action-btn" id="r5BtnNextQues">NEXT ▶</button>
+                    <button type="button" class="r5-action-btn" id="r5BtnResetBuzz">RESET CHUÔNG</button>
+                    <button type="button" class="r5-action-btn danger" id="r5BtnResetGraphic">RESET ĐỒ HỌA</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- BOX ĐÁP ÁN & CHẤM ĐIỂM -->
+              <div class="r5-answer-box">
+                <div class="r5-answer-info">
+                  <div class="r5-answer-content" id="r5PreviewAnswer">...</div>
+                  <div class="r5-status-banner" id="r5StatusBanner">Sẵn sàng — Chờ hiện câu hỏi</div>
+                </div>
+                <div class="r5-answer-actions">
+                  <button type="button" class="r5-score-btn win-btn" id="r5BtnRight" disabled>✔ ĐÚNG (CHIẾN THẮNG)</button>
+                  <button type="button" class="r5-score-btn wrong-btn" id="r5BtnWrong" disabled>✖ SAI (CHẠY TIẾP 15S)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- CỘT PHẢI: DANH SÁCH THÍ SINH CÂU HỎI PHỤ (2 - 8 THÍ SINH ĐỘC LẬP) -->
+            <div class="r5-players-column">
+              <div class="r5-players-toolbar">
+                <span class="r5-players-count-label" id="r5PlayersCountLabel">THÍ SINH (2/8)</span>
+                <div class="r5-players-toolbar-btns">
+                  <button type="button" class="r5-mini-btn" id="r5BtnRemovePlayer" title="Giảm 1 thí sinh (tối thiểu 2)">- TS</button>
+                  <button type="button" class="r5-mini-btn" id="r5BtnAddPlayer" title="Thêm 1 thí sinh (tối đa 8)">+ TS</button>
+                  <button type="button" class="r5-mini-btn accent" id="r5BtnOpenConfig" title="Nhập tên thí sinh Vòng 5">⚙ TÊN TS</button>
+                </div>
+              </div>
+              <div class="r5-players-list" id="r5PlayersList"></div>
             </div>
           </div>
         </div>
@@ -1097,6 +1156,25 @@
       </div>
     </div>
 
+    <!-- MODAL CÀI ĐẶT VÒNG 5: CÂU HỎI PHỤ -->
+    <div class="r5-cfg-modal-overlay" id="r5ConfigModal">
+      <div class="r5-cfg-modal-content">
+        <div class="r5-cfg-modal-header">
+          <h2>&#9881; CÀI ĐẶT VÒNG 5 - CÂU HỎI PHỤ (2 - 8 THÍ SINH)</h2>
+          <button type="button" class="r5-cfg-close-btn" id="r5CfgCloseBtn">✖</button>
+        </div>
+
+        <div class="r5-cfg-count-row">
+          <label for="r5CfgPlayerCount">Số lượng thí sinh tham gia Câu hỏi phụ (2 – 8):</label>
+          <input type="number" id="r5CfgPlayerCount" min="2" max="8" value="2" />
+        </div>
+
+        <div class="r5-cfg-players-grid" id="r5CfgPlayersGrid"></div>
+
+        <button type="button" class="r5-cfg-save-btn" id="r5CfgSaveBtn">LƯU DANH SÁCH THÍ SINH</button>
+      </div>
+    </div>
+
     <script type="module">
       import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
       import { getDatabase, ref, set, onValue, runTransaction, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
@@ -1141,6 +1219,9 @@
 
         const r2Ui = document.getElementById('r2-controller-ui');
         if (r2Ui) r2Ui.style.display = (suffix === 'R2') ? 'block' : 'none';
+
+        const r5Ui = document.getElementById('r5-controller-ui');
+        if (r5Ui) r5Ui.style.display = (suffix === 'R5') ? 'grid' : 'none';
 
         const mainUi = document.getElementById('main-controller-ui');
         if (mainUi) mainUi.style.display = (suffix === 'M') ? 'contents' : 'none';

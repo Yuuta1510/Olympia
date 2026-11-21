@@ -1,0 +1,497 @@
+/* =========================================================================
+   CONTROLLER VÒNG 5: CÂU HỎI PHỤ (Controller_R5.css)
+   ========================================================================= */
+
+#r5-controller-ui {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 290px;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.r5-qa-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* BOX CÂU HỎI */
+.r5-question-box {
+  flex: 1.45;
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.r5-question-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #000080;
+  border-bottom: 1.5px solid #ffffff;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
+.r5-badge {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffff00;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.r5-divider {
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+#r5BtnResetTime,
+#r5BtnPlayPauseTime {
+  height: 30px;
+  min-width: 36px;
+  padding: 0 8px;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#r5BtnResetTime {
+  margin-left: auto;
+  background-color: #dc2626;
+}
+
+#r5BtnPlayPauseTime {
+  background-color: #2563eb;
+}
+
+.r5-question-content {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1.4;
+  color: #ffffff;
+  overflow-y: auto;
+  display: flex;
+  align-items: left;
+}
+
+.r5-question-actions {
+  border-top: 1px solid #334155;
+  padding: 8px 10px;
+  background-color: #060b16;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.r5-left-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.r5-action-btn {
+  height: 34px;
+  padding: 0 12px;
+  background-color: #000099;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: 3px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.r5-action-btn:hover {
+  border-color: #ffff00;
+  color: #ffff00;
+}
+
+.r5-action-btn.is-active {
+  background-color: #1d4ed8;
+  border-color: #ffff00;
+  color: #ffff00;
+}
+
+.r5-action-btn.danger {
+  background-color: #b91c1c;
+}
+
+.r5-action-btn.danger:hover {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+/* BOX ĐÁP ÁN & CHẤM ĐIỂM */
+.r5-answer-box {
+  flex: 1;
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  padding: 10px 14px;
+  gap: 12px;
+  min-height: 0;
+}
+
+.r5-answer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  min-width: 0;
+}
+
+.r5-answer-content {
+  font-size: 34px;
+  font-weight: bold;
+  color: #34d399;
+  overflow-y: auto;
+}
+
+.r5-status-banner {
+  display: none !important;
+}
+
+.r5-answer-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: bottom;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.r5-score-btn {
+  width: 220px; /* Đặt chiều rộng cố định bằng nhau */
+  height: 42px;
+  padding: 0 14px;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.r5-score-btn.win-btn {
+  background-color: #059669;
+}
+
+.r5-score-btn.win-btn:hover:not(:disabled) {
+  background-color: #047857;
+  border-color: #ffff00;
+}
+
+.r5-score-btn.wrong-btn {
+  background-color: #d97706;
+}
+
+.r5-score-btn.wrong-btn:hover:not(:disabled) {
+  background-color: #b45309;
+  border-color: #ffff00;
+}
+
+.r5-score-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* CỘT PHẢI: DANH SÁCH 2 - 8 THÍ SINH */
+.r5-players-column {
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.r5-players-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+}
+
+.r5-players-count-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #38bdf8;
+}
+
+.r5-players-toolbar-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.r5-mini-btn {
+  background-color: #1e293b;
+  color: #ffffff;
+  border: 1px solid #64748b;
+  border-radius: 3px;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.r5-mini-btn:hover {
+  border-color: #ffff00;
+  color: #ffff00;
+}
+
+.r5-mini-btn.accent {
+  background-color: #000099;
+  border-color: #ffffff;
+}
+
+.r5-players-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.r5-player-card {
+  flex: 1;
+  min-height: 42px;
+  background-color: #000080;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.r5-player-card:hover:not(.is-eliminated) {
+  border-color: #ffff00;
+  filter: brightness(1.5);
+}
+
+/* Đang bấm chuông giành quyền trả lời */
+.r5-player-card.is-buzzed {
+  background-color: #cc0000;
+  border-color: #ffff00;
+  box-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+}
+
+/* Đã trả lời sai trong câu hỏi hiện tại (hết 1 lượt trả lời) */
+.r5-player-card.is-eliminated {
+  background-color: #1e293b;
+  border-color: #475569;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.r5-player-card.is-eliminated .r5-p-name {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+/* Chiến thắng Câu hỏi phụ */
+.r5-player-card.is-winner {
+  background-color: #059669;
+  border-color: #ffff00;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.8);
+}
+
+.r5-p-left {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.r5-p-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r5-p-sub {
+  font-size: 10px;
+  color: #cbd5e1;
+  text-transform: uppercase;
+}
+
+.r5-p-edit-btn {
+  background: rgba(15, 23, 42, 0.75);
+  color: #f8fafc;
+  border: 1px solid #94a3b8;
+  border-radius: 3px;
+  padding: 3px 6px;
+  font-size: 11px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.r5-p-edit-btn:hover {
+  border-color: #ffff00;
+  color: #ffff00;
+}
+
+/* MODAL CÀI ĐẶT TÊN THÍ SINH VÒNG 5 */
+.r5-cfg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.78);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.r5-cfg-modal-content {
+  width: 680px;
+  max-width: 95vw;
+  background-color: #0f172a;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.r5-cfg-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 10px;
+}
+
+.r5-cfg-modal-header h2 {
+  font-size: 16px;
+  color: #ffff00;
+}
+
+.r5-cfg-close-btn {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.r5-cfg-count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #1e293b;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+}
+
+.r5-cfg-count-row label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #f8fafc;
+}
+
+.r5-cfg-count-row input {
+  width: 80px;
+  padding: 6px 8px;
+  background-color: #0f172a;
+  color: #ffff00;
+  border: 1.5px solid #38bdf8;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.r5-cfg-players-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.r5-cfg-player-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background-color: #1e293b;
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: 1px solid #475569;
+}
+
+.r5-cfg-player-item label {
+  font-size: 11px;
+  color: #38bdf8;
+  font-weight: bold;
+}
+
+.r5-cfg-player-item input {
+  background-color: #0f172a;
+  color: #ffffff;
+  border: 1px solid #64748b;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.r5-cfg-save-btn {
+  background-color: #059669;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.r5-cfg-save-btn:hover {
+  background-color: #047857;
+  border-color: #ffff00;
+}
