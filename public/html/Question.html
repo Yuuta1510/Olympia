@@ -354,25 +354,25 @@
                 <option value="round_2">Vòng 2: Vượt Chướng Ngại Vật</option>
                 <option value="round_3">Vòng 3: Tăng Tốc</option>
                 <option value="round_4">Vòng 4: Về Đích</option>
-                <option value="sub_final">Câu Hỏi Phụ</option>
+                <option value="round_5">Câu Hỏi Phụ</option>
               </optgroup>
             </select>
           </div>
 
-          <!-- FORM MẶC ĐỊNH (R1, R3, R4) -->
+          <!-- FORM MẶC ĐỊNH (R1, R3, R4, R5) -->
           <div id="defaultForm">
               <div class="form-group">
                 <label>Số Thứ Tự Câu:</label>
                 <input type="number" id="quesNumber" value="1" min="1" max="100">
               </div>
 
-              <div class="form-group">
-                <label>Nội dung Câu Hỏi (Cột B):</label>
+              <div class="form-group" style="margin-top: 8px;">
+                <label>Nội dung Câu Hỏi (cau_hoi):</label>
                 <textarea id="quesContent" placeholder="Nhập câu hỏi..."></textarea>
               </div>
 
-              <div class="form-group">
-                <label>Đáp Án (Cột C):</label>
+              <div class="form-group" style="margin-top: 8px;">
+                <label>Đáp Án (dap_an):</label>
                 <input type="text" id="quesAnswer" placeholder="Nhập đáp án...">
               </div>
           </div>
@@ -483,6 +483,29 @@
     let allQuestionsData = {};
     let activeR2UploadPromise = null;
 
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function setNextR5QuestionNumber() {
+      const quesNumberInput = document.getElementById('quesNumber');
+      if (!quesNumberInput) return;
+      const r5Data = allQuestionsData.round_5 || {};
+      let nextSlot = 1;
+      for (let i = 1; i <= 12; i++) {
+        if (!r5Data[i]) {
+          nextSlot = i;
+          break;
+        }
+      }
+      quesNumberInput.value = String(nextSlot);
+    }
+
     window.updateR2ImagePreview = function(url) {
       const cleanUrl = String(url || '').trim();
       const wrap = document.getElementById('r2_image_preview_wrap');
@@ -532,7 +555,6 @@
       const statusEl = document.getElementById('r2_upload_status');
       const saveBtn = document.getElementById('btnSaveQuestion');
 
-      // Hiển thị xem trước ngay từ máy trong lúc đang upload
       const localPreviewUrl = URL.createObjectURL(file);
       window.updateR2ImagePreview(localPreviewUrl);
 
@@ -589,18 +611,30 @@
     };
 
     window.toggleFormMode = function() {
-        const roundKey = document.getElementById('roundSelect').value;
-        const defaultForm = document.getElementById('defaultForm');
-        const r2Form = document.getElementById('r2Form');
+      const roundKey = document.getElementById('roundSelect').value;
+      const defaultForm = document.getElementById('defaultForm');
+      const r2Form = document.getElementById('r2Form');
+      const quesNumberInput = document.getElementById('quesNumber');
 
-        if (roundKey === 'round_2') {
-            defaultForm.style.display = 'none';
-            r2Form.style.display = 'block';
-        } else {
-            defaultForm.style.display = 'block';
-            r2Form.style.display = 'none';
-        }
-        renderQuestionList();
+      if (roundKey === 'round_2') {
+          defaultForm.style.display = 'none';
+          r2Form.style.display = 'block';
+      } else {
+          defaultForm.style.display = 'block';
+          r2Form.style.display = 'none';
+
+          if (quesNumberInput) {
+              if (roundKey === 'round_5') {
+                  quesNumberInput.min = '1';
+                  quesNumberInput.max = '12';
+                  setNextR5QuestionNumber();
+              } else {
+                  quesNumberInput.min = '1';
+                  quesNumberInput.max = '100';
+              }
+          }
+      }
+      renderQuestionList();
     };
 
     onValue(ref(db, 'questions'), (snapshot) => {
@@ -608,6 +642,9 @@
         allQuestionsData = snapshot.val();
       } else {
         allQuestionsData = {};
+      }
+      if (document.getElementById('roundSelect')?.value === 'round_5' && !document.getElementById('quesContent')?.value.trim()) {
+        setNextR5QuestionNumber();
       }
       renderQuestionList();
     });
@@ -629,16 +666,16 @@
           let hasEmpty = false;
           let r2Data = {};
           
-          for(let i=1; i<=5; i++) {
+          for (let i = 1; i <= 5; i++) {
               const q = document.getElementById(`r2_q${i}`).value.trim();
               const a = document.getElementById(`r2_a${i}`).value.trim();
-              if(!q || !a) hasEmpty = true;
+              if (!q || !a) hasEmpty = true;
               r2Data[i] = { cau_hoi: q, dap_an: a, image: imageLink };
           }
           
           const qCnv = document.getElementById('r2_q_cnv').value.trim();
           const aCnv = document.getElementById('r2_a_cnv').value.trim();
-          if(!qCnv || !aCnv) hasEmpty = true;
+          if (!qCnv || !aCnv) hasEmpty = true;
           
           r2Data['cnv'] = { cau_hoi: qCnv, dap_an: aCnv, image: imageLink };
           
@@ -652,16 +689,40 @@
           }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
           
       } else {
-          const qNum = parseInt(document.getElementById('quesNumber').value);
+          const qNum = parseInt(document.getElementById('quesNumber').value, 10);
           const qContent = document.getElementById('quesContent').value.trim();
           const qAnswer = document.getElementById('quesAnswer').value.trim();
           if (!qContent || !qAnswer) {
             alert("⚠️ Vui lòng nhập đầy đủ nội dung câu hỏi và đáp án!");
             return;
           }
+
+          if (roundKey === 'round_5') {
+              if (!Number.isInteger(qNum) || qNum < 1 || qNum > 12) {
+                  alert("⚠️ Phần Câu Hỏi Phụ chỉ lưu tối đa 12 câu (Số thứ tự từ 1 đến 12)!");
+                  return;
+              }
+              const existingR5 = allQuestionsData.round_5 || {};
+              const validKeys = Object.keys(existingR5).filter(k => existingR5[k] !== null && existingR5[k] !== undefined);
+              if (!existingR5[qNum] && validKeys.length >= 12) {
+                  alert("⚠️ Đã đạt giới hạn tối đa 12 câu hỏi phụ! Vui lòng sửa hoặc xóa bớt câu cũ.");
+                  return;
+              }
+
+              // Lưu vào questions/round_5/{1..12} chỉ gồm cau_hoi và dap_an
+              set(ref(db, `questions/round_5/${qNum}`), {
+                cau_hoi: qContent,
+                dap_an: qAnswer
+              }).then(() => {
+                alert("✅ Đã lưu câu hỏi phụ thành công!");
+                resetForm();
+                setNextR5QuestionNumber();
+              }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
+              return;
+          }
           
           let targetRound = 'round_1'; 
-          if(roundKey === 'round_3' || roundKey === 'round_4' || roundKey === 'sub_final') {
+          if (roundKey === 'round_3' || roundKey === 'round_4') {
               targetRound = roundKey;
           }
 
@@ -678,13 +739,19 @@
     };
 
     window.resetForm = function() {
-      document.getElementById('quesNumber').value = '1';
+      const roundKey = document.getElementById('roundSelect')?.value;
       document.getElementById('quesContent').value = '';
       document.getElementById('quesAnswer').value = '';
       document.getElementById('editIndex').value = '';
+
+      if (roundKey === 'round_5') {
+          setNextR5QuestionNumber();
+      } else {
+          document.getElementById('quesNumber').value = '1';
+      }
       
       window.clearR2Image();
-      for(let i=1; i<=5; i++){
+      for (let i = 1; i <= 5; i++) {
           document.getElementById(`r2_q${i}`).value = '';
           document.getElementById(`r2_a${i}`).value = '';
       }
@@ -692,10 +759,12 @@
       document.getElementById('r2_a_cnv').value = '';
     };
 
-    window.editQuestion = function(index, content, answer) {
+    window.editQuestion = function(targetRound, index) {
+      const item = allQuestionsData?.[targetRound]?.[index];
+      if (!item) return;
       document.getElementById('quesNumber').value = index;
-      document.getElementById('quesContent').value = content;
-      document.getElementById('quesAnswer').value = answer;
+      document.getElementById('quesContent').value = item.cau_hoi || '';
+      document.getElementById('quesAnswer').value = item.dap_an || '';
       document.getElementById('quesContent').focus();
     };
 
@@ -703,7 +772,7 @@
         const imgUrl = data['cnv']?.image || data[1]?.image || '';
         document.getElementById('r2_image').value = imgUrl;
         window.updateR2ImagePreview(imgUrl);
-        for(let i=1; i<=5; i++) {
+        for (let i = 1; i <= 5; i++) {
             document.getElementById(`r2_q${i}`).value = data[i]?.cau_hoi || '';
             document.getElementById(`r2_a${i}`).value = data[i]?.dap_an || '';
         }
@@ -750,42 +819,48 @@
               html += `</div>`;
 
               if (cnvImage) {
-                  html += `<div style="margin-bottom: 8px;"><img src="${cnvImage.replace(/"/g, '&quot;')}" alt="Ảnh CNV" style="max-width: 240px; width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; border: 1px solid #4f46e5;"></div>`;
+                  html += `<div style="margin-bottom: 8px;"><img src="${escapeHtml(cnvImage)}" alt="Ảnh CNV" style="max-width: 240px; width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; border: 1px solid #4f46e5;"></div>`;
               }
               
-              for(let i=1; i<=5; i++) {
-                  if(r2[i]) html += `<div style="font-size: 12px; color: #cbd5e1; margin-bottom: 4px;"><b>Hàng ${i}:</b> ${r2[i].cau_hoi} <span style="color:#34d399">(Đ/A: ${r2[i].dap_an})</span></div>`;
+              for (let i = 1; i <= 5; i++) {
+                  if (r2[i]) html += `<div style="font-size: 12px; color: #cbd5e1; margin-bottom: 4px;"><b>Hàng ${i}:</b> ${escapeHtml(r2[i].cau_hoi)} <span style="color:#34d399">(Đ/A: ${escapeHtml(r2[i].dap_an)})</span></div>`;
               }
-              if(r2['cnv']) html += `<div style="font-size: 13px; color: #fca5a5; margin-top: 6px; border-top: 1px solid #4338ca; padding-top: 6px;"><b>CNV:</b> ${r2['cnv'].cau_hoi} <span style="color:#facc15">(Đ/A: ${r2['cnv'].dap_an})</span></div>`;
+              if (r2['cnv']) html += `<div style="font-size: 13px; color: #fca5a5; margin-top: 6px; border-top: 1px solid #4338ca; padding-top: 6px;"><b>CNV:</b> ${escapeHtml(r2['cnv'].cau_hoi)} <span style="color:#facc15">(Đ/A: ${escapeHtml(r2['cnv'].dap_an)})</span></div>`;
               
               html += `</div>`;
           }
       } else {
           let targetRound = 'round_1';
-          if(roundKey === 'round_3' || roundKey === 'round_4' || roundKey === 'sub_final') targetRound = roundKey;
+          if (roundKey === 'round_3' || roundKey === 'round_4' || roundKey === 'round_5') targetRound = roundKey;
           
-          const qList = allQuestionsData[targetRound] || [];
-          qList.forEach((q, idx) => {
-            if (q !== null && q !== undefined) {
+          const rawQData = allQuestionsData[targetRound];
+          const entries = (rawQData && typeof rawQData === 'object')
+              ? Object.entries(rawQData).sort((a, b) => Number(a[0]) - Number(b[0]))
+              : [];
+
+          for (const [idx, q] of entries) {
+            if (q && typeof q === 'object') {
               count++;
               html += `
                 <div class="question-card">
                   <div class="q-info">
-                    <div class="q-title"><b>Câu ${idx}:</b> ${q.cau_hoi}</div>
-                    <div class="q-ans">Đáp án: ${q.dap_an}</div>
+                    <div class="q-title"><b>Câu ${escapeHtml(idx)}:</b> ${escapeHtml(q.cau_hoi)}</div>
+                    <div class="q-ans">Đáp án: ${escapeHtml(q.dap_an)}</div>
                   </div>
                   <div class="q-actions">
-                    <button class="q-btn" onclick="editQuestion(${idx}, \`${q.cau_hoi.replace(/"/g, '&quot;')}\`, \`${q.dap_an.replace(/"/g, '&quot;')}\`)">Sửa</button>
-                    <button class="q-btn del" onclick="deleteQuestion('${targetRound}', ${idx})">Xóa</button>
+                    <button class="q-btn" onclick="editQuestion('${targetRound}', '${escapeHtml(idx)}')">Sửa</button>
+                    <button class="q-btn del" onclick="deleteQuestion('${targetRound}', '${escapeHtml(idx)}')">Xóa</button>
                   </div>
                 </div>
               `;
             }
-          });
+          }
       }
 
       container.innerHTML = html || '<div style="text-align: center; color: #64748b; margin-top: 40px;">Chưa có câu hỏi nào.</div>';
-      document.getElementById('totalQuesCount').innerText = `Tổng số: ${count} câu`;
+      document.getElementById('totalQuesCount').innerText = (roundKey === 'round_5')
+          ? `Tổng số: ${count}/12 câu (Tối đa 12 câu)`
+          : `Tổng số: ${count} câu`;
     }
 
     window.addEventListener('load', () => {
