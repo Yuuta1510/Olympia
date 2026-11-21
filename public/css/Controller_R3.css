@@ -1,0 +1,747 @@
+/* ==========================================================================
+   CONTROLLER ROUND 3 - TĂNG TỐC
+   ========================================================================== */
+#r3-controller-ui {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  width: 100%;
+  height: 100%;
+  gap: 12px;
+  min-height: 0;
+  font-family: "UTM Avo", Arial, sans-serif;
+}
+
+/* ==========================================================================
+   1. CỘT TRÁI: 2 KHUNG XẾP DỌC TỶ LỆ CHIỀU CAO 3:7 (TEXT CÂU HỎI & MEDIA)
+   ========================================================================== */
+.r3-ctrl-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+}
+
+/* KHUNG TEXT CÂU HỎI (CHIỀU CAO TỶ LỆ 3) */
+.r3-ctrl-question-box {
+  flex: 3;
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  padding: 10px 14px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.r3-ctrl-q-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+}
+
+.r3-ctrl-q-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.r3-ctrl-q-tab {
+  background-color: #1e293b;
+  color: #cbd5e1;
+  border: 1.5px solid #475569;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.r3-ctrl-q-tab:hover {
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.r3-ctrl-q-tab.active {
+  background-color: #000099;
+  border-color: #ffff00;
+  color: #ffff00;
+}
+
+.r3-ctrl-q-answer-badge {
+  background-color: #052e16;
+  border: 1.5px solid #22c55e;
+  color: #86efac;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  white-space: nowrap;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r3-ctrl-q-answer-badge strong {
+  color: #ffffff;
+  margin-left: 4px;
+}
+
+.r3-ctrl-q-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 8px 4px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+#r3-ctrl-q-text {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  line-height: 1.35;
+  text-align: left;
+  width: 100%;
+}
+
+.r3-ctrl-q-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.r3-ctrl-left-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.r3-ctrl-btn {
+  background-color: #1e3a8a;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  height: 32px;
+  padding: 0 10px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 11.5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.r3-ctrl-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.r3-ctrl-btn.active {
+  background-color: #dc2626;
+  border-color: #ffff00;
+  color: #ffff00;
+}
+
+.r3-ctrl-btn.danger {
+  background-color: #991b1b;
+}
+
+.r3-ctrl-btn.danger:hover {
+  background-color: #dc2626;
+}
+
+/* NÚT CHÍNH (HIỆN CÂU HỎI & BẤM GIỜ) */
+.r3-ctrl-primary-btn {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 5px;
+  height: 38px;
+  min-width: 145px;
+  padding: 0 16px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 13.5px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 5;
+}
+
+.r3-ctrl-primary-btn:hover {
+  background-color: #1d4ed8;
+  border-color: #ffff00;
+}
+
+.r3-ctrl-primary-btn.active {
+  background-color: #dc2626;
+  border-color: #ffff00;
+  color: #ffff00;
+}
+
+/* KHUNG MEDIA (CHIỀU CAO TỶ LỆ 7) */
+.r3-ctrl-media-box {
+  flex: 7;
+  background-color: #050811;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.r3-ctrl-media-badges {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+}
+
+.r3-ctrl-media-type-badge {
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid #38bdf8;
+  color: #38bdf8;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.r3-ctrl-timer-badge {
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid #facc15;
+  color: #facc15;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.r3-ctrl-timer-badge.running {
+  background-color: #dc2626;
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.r3-ctrl-media-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#r3-ctrl-preview-img,
+#r3-ctrl-preview-vid {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  display: none;
+}
+
+#r3-ctrl-media-empty {
+  color: #64748b;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Nút Bấm giờ nằm ở góc dưới bên phải khung media */
+.r3-ctrl-media-box .timer-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+}
+
+/* ==========================================================================
+   2. CỘT PHẢI: QUAN SÁT ĐÁP ÁN & THỜI GIAN THÍ SINH
+   ========================================================================== */
+.r3-ctrl-right-col {
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+
+.r3-ctrl-ans-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #000080;
+  border: 1.5px solid #38bdf8;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.r3-ctrl-score-rule {
+  color: #facc15;
+  font-size: 12px;
+}
+
+.r3-ctrl-ans-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.r3-ctrl-ans-card {
+  flex: 1;
+  background-color: #111827;
+  border: 1.5px solid #334155;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.r3-ctrl-ans-card.is-right {
+  background-color: #052e16;
+  border-color: #22c55e;
+}
+
+.r3-ctrl-ans-card.is-wrong {
+  background-color: #450a0a;
+  border-color: #ef4444;
+}
+
+.r3-ctrl-ans-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.r3-ctrl-player-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.r3-ctrl-player-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #38bdf8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r3-ctrl-player-score {
+  font-size: 12px;
+  font-weight: bold;
+  color: #facc15;
+  background-color: #1e293b;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.r3-ctrl-time-rank {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.r3-ctrl-earn-badge {
+  background-color: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 38px;
+  text-align: center;
+}
+
+.r3-ctrl-earn-badge.has-points {
+  background-color: #16a34a;
+  border-color: #86efac;
+  color: #ffffff;
+}
+
+.r3-ctrl-time-input {
+  width: 64px;
+  height: 26px;
+  background-color: #0f172a;
+  color: #facc15;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 0 6px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.r3-ctrl-time-unit {
+  font-size: 12px;
+  font-weight: bold;
+  color: #cbd5e1;
+}
+
+.r3-ctrl-ans-bottom {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.r3-ctrl-ans-input {
+  flex: 1;
+  height: 30px;
+  background-color: #0f172a;
+  color: #ffffff;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 0 8px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 13.5px;
+  font-weight: bold;
+  min-width: 0;
+}
+
+.r3-ctrl-ans-input.saved-flash {
+  border-color: #22c55e;
+}
+
+.r3-ctrl-judge-btn {
+  height: 30px;
+  padding: 0 8px;
+  border: 1.5px solid #64748b;
+  border-radius: 4px;
+  background-color: #1e293b;
+  color: #cbd5e1;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 11.5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.r3-ctrl-judge-btn.right.active {
+  background-color: #16a34a;
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.r3-ctrl-judge-btn.wrong.active {
+  background-color: #dc2626;
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.r3-ctrl-ans-footer {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.r3-ctrl-award-btn {
+  flex: 3;
+  height: 36px;
+  background-color: #16a34a;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 12.5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.r3-ctrl-award-btn:hover {
+  background-color: #15803d;
+}
+
+.r3-ctrl-reset-ts-btn {
+  flex: 2;
+  height: 36px;
+  background-color: #991b1b;
+  color: #ffffff;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 11.5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.r3-ctrl-reset-ts-btn:hover {
+  background-color: #dc2626;
+}
+
+/* ==========================================================================
+   3. MODAL CÀI ĐẶT VÒNG 3 (TƯƠNG TỰ VÒNG 2)
+   ========================================================================== */
+.r3-cfg-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1200;
+  justify-content: center;
+  align-items: center;
+  font-family: "UTM Avo", Arial, sans-serif;
+}
+
+.r3-cfg-modal-content {
+  background: #0f172a;
+  border: 2px solid #000080;
+  border-radius: 10px;
+  width: 920px;
+  max-width: 96vw;
+  padding: 20px 24px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+  transform-origin: center center;
+}
+
+.r3-cfg-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 10px;
+}
+
+.r3-cfg-modal-header h2 {
+  font-size: 19px;
+  color: #38bdf8;
+}
+
+.r3-cfg-close-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.r3-cfg-close-btn:hover {
+  color: #ef4444;
+}
+
+.r3-cfg-group-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.r3-cfg-durations-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.r3-cfg-dur-item {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.r3-cfg-dur-item label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #e2e8f0;
+}
+
+.r3-cfg-dur-item input {
+  width: 72px;
+  background: #0f172a;
+  color: #facc15;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-weight: bold;
+  text-align: center;
+}
+
+.r3-cfg-players-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.r3-cfg-player-card {
+  background: #0b004b;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.r3-cfg-name-wrapper {
+  background: linear-gradient(90deg, #00dafc, #007cbe);
+  padding: 8px 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 2px solid #13007d;
+}
+
+.r3-cfg-name {
+  font-size: 17px;
+  font-weight: 900;
+  color: #0d0055;
+  text-transform: uppercase;
+  white-space: nowrap;
+  outline: none;
+  cursor: text;
+}
+
+.r3-cfg-score-section,
+.r3-cfg-bonus-section {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.r3-cfg-sub-label {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+.r3-cfg-sub-label.center {
+  text-align: center;
+}
+
+.r3-cfg-score-input {
+  width: 100%;
+  background: #0f172a;
+  color: #ffffff;
+  border: 1.5px solid #475569;
+  border-radius: 4px;
+  padding: 6px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.r3-cfg-preset-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.r3-cfg-preset-btn {
+  background: #1e293b;
+  color: #ffffff;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 4px 0;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.r3-cfg-preset-btn.primary {
+  background: #0369a1;
+  border-color: #38bdf8;
+}
+
+.r3-cfg-preset-btn.reset {
+  background: #7f1d1d;
+  border-color: #f87171;
+}
+
+.r3-cfg-bonus-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #0f172a;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 0 8px;
+}
+
+.r3-cfg-bonus-prefix {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.r3-cfg-bonus-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #22c55e;
+  padding: 5px 6px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-weight: bold;
+  outline: none;
+}
+
+.r3-cfg-preview-total {
+  font-size: 12px;
+  color: #cbd5e1;
+  text-align: center;
+}
+
+.r3-cfg-preview-total.has-bonus strong {
+  color: #facc15;
+}
+
+.r3-cfg-save-btn {
+  background: #0ea5e9;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 11px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.r3-cfg-save-btn:hover {
+  background: #0284c7;
+}

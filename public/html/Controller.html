@@ -203,6 +203,8 @@
       /* Ẩn mặc định giao diện các tab chưa kích hoạt khi mở trang ở Vòng 1 */
       #r2-controller-ui,
       #r2ConfigModal,
+      #r3-controller-ui,
+      #r3ConfigModal,
       #main-controller-ui,
       #mainConfigDialog {
         display: none;
@@ -597,6 +599,150 @@
                 </div>
               </div>
               <button type="button" class="r2-ctrl-ans-reset-btn" id="r2-btn-reset-player-ans">RESET ĐÁP ÁN TS</button>
+            </div>
+          </div>
+
+          <div id="r3-controller-ui">
+            <!-- CỘT TRÁI: 2 KHUNG XẾP DỌC TỶ LỆ CHIỀU CAO 3:7 (TEXT CÂU HỎI & MEDIA) -->
+            <div class="r3-ctrl-left-col">
+              <!-- KHUNG 1 (TỶ LỆ 3): TEXT CÂU HỎI + NÚT HIỆN CÂU HỎI GÓC DƯỚI PHẢI -->
+              <div class="r3-ctrl-question-box">
+                <div class="r3-ctrl-q-header">
+                  <div class="r3-ctrl-q-tabs">
+                    <button type="button" class="r3-ctrl-q-tab active" data-q-index="1">CÂU 1 (20s)</button>
+                    <button type="button" class="r3-ctrl-q-tab" data-q-index="2">CÂU 2 (20s)</button>
+                    <button type="button" class="r3-ctrl-q-tab" data-q-index="3">CÂU 3 (30s)</button>
+                    <button type="button" class="r3-ctrl-q-tab" data-q-index="4">CÂU 4 (30s)</button>
+                  </div>
+                  <div class="r3-ctrl-q-answer-badge">
+                    <span>ĐÁP ÁN:</span>
+                    <strong id="r3-ctrl-correct-ans">---</strong>
+                  </div>
+                </div>
+
+                <div class="r3-ctrl-q-body">
+                  <div id="r3-ctrl-q-text">Đang tải câu hỏi Vòng 3...</div>
+                </div>
+
+                <div class="r3-ctrl-q-footer">
+                  <div class="r3-ctrl-left-controls">
+                    <button type="button" id="r3-btn-wait-bg" class="r3-ctrl-btn">ẨN NỀN CHỜ</button>
+                    <button type="button" id="r3-btn-show-ques-ans" class="r3-ctrl-btn">HIỆN Đ/A CÂU HỎI</button>
+                    <button type="button" id="r3-btn-page" class="r3-ctrl-btn">CHUYỂN TRANG 2</button>
+                    <button type="button" id="r3-btn-show-ans" class="r3-ctrl-btn">HIỆN ĐÁP ÁN</button>
+                    <button type="button" id="r3-btn-reset-ans" class="r3-ctrl-btn">RESET ĐÁP ÁN</button>
+                    <button type="button" id="r3-btn-reset-graphic" class="r3-ctrl-btn danger">RESET ĐỒ HỌA</button>
+                  </div>
+                  <button type="button" id="r3-btn-show-ques" class="r3-ctrl-primary-btn">HIỆN CÂU HỎI</button>
+                </div>
+              </div>
+
+              <!-- KHUNG 2 (TỶ LỆ 7): MEDIA CÂU HỎI + NÚT BẤM GIỜ GÓC DƯỚI PHẢI -->
+              <div class="r3-ctrl-media-box">
+                <div class="r3-ctrl-media-badges">
+                  <span class="r3-ctrl-media-type-badge" id="r3-ctrl-media-type">CHƯA CÓ MEDIA</span>
+                  <span class="r3-ctrl-timer-badge" id="r3-ctrl-timer-display">THỜI GIAN: 20.0s</span>
+                </div>
+
+                <div class="r3-ctrl-media-stage">
+                  <img id="r3-ctrl-preview-img" alt="Media câu hỏi" />
+                  <video id="r3-ctrl-preview-vid" playsinline muted controls></video>
+                  <div id="r3-ctrl-media-empty">Không có hình ảnh / video cho câu hỏi này</div>
+                </div>
+
+                <button type="button" id="r3-btn-timer" class="r3-ctrl-primary-btn timer-btn">BẤM GIỜ</button>
+              </div>
+            </div>
+
+            <!-- CỘT PHẢI: QUAN SÁT ĐÁP ÁN & THỜI GIAN THÍ SINH + CHẤM ĐIỂM TĂNG TỐC -->
+            <div class="r3-ctrl-right-col">
+              <div class="r3-ctrl-ans-header">
+                <span>ĐÁP ÁN &amp; THỜI GIAN THÍ SINH</span>
+                <span class="r3-ctrl-score-rule">40 - 30 - 20 - 10</span>
+              </div>
+
+              <div class="r3-ctrl-ans-list" id="r3-ctrl-ans-list">
+                <div class="r3-ctrl-ans-card" id="r3-ctrl-ans-card-0" data-player-index="0">
+                  <div class="r3-ctrl-ans-top">
+                    <div class="r3-ctrl-player-info">
+                      <span class="r3-ctrl-player-name" id="r3-ctrl-player-name-0">1. P1</span>
+                      <span class="r3-ctrl-player-score" id="r3-ctrl-player-score-0">0đ</span>
+                    </div>
+                    <div class="r3-ctrl-time-rank">
+                      <span class="r3-ctrl-earn-badge" id="r3-ctrl-earn-0">+0</span>
+                      <input type="number" step="0.01" min="0" class="r3-ctrl-time-input" id="r3-ctrl-time-input-0" data-player-index="0" placeholder="0.00" title="Thời gian trả lời (giây)" />
+                      <span class="r3-ctrl-time-unit">s</span>
+                    </div>
+                  </div>
+                  <div class="r3-ctrl-ans-bottom">
+                    <input type="text" class="r3-ctrl-ans-input" id="r3-ctrl-ans-input-0" data-player-index="0" placeholder="Chờ hoặc nhập đáp án..." />
+                    <button type="button" class="r3-ctrl-judge-btn right" id="r3-ctrl-right-0" data-player-index="0">ĐÚNG</button>
+                    <button type="button" class="r3-ctrl-judge-btn wrong" id="r3-ctrl-wrong-0" data-player-index="0">SAI</button>
+                  </div>
+                </div>
+
+                <div class="r3-ctrl-ans-card" id="r3-ctrl-ans-card-1" data-player-index="1">
+                  <div class="r3-ctrl-ans-top">
+                    <div class="r3-ctrl-player-info">
+                      <span class="r3-ctrl-player-name" id="r3-ctrl-player-name-1">2. P2</span>
+                      <span class="r3-ctrl-player-score" id="r3-ctrl-player-score-1">0đ</span>
+                    </div>
+                    <div class="r3-ctrl-time-rank">
+                      <span class="r3-ctrl-earn-badge" id="r3-ctrl-earn-1">+0</span>
+                      <input type="number" step="0.01" min="0" class="r3-ctrl-time-input" id="r3-ctrl-time-input-1" data-player-index="1" placeholder="0.00" title="Thời gian trả lời (giây)" />
+                      <span class="r3-ctrl-time-unit">s</span>
+                    </div>
+                  </div>
+                  <div class="r3-ctrl-ans-bottom">
+                    <input type="text" class="r3-ctrl-ans-input" id="r3-ctrl-ans-input-1" data-player-index="1" placeholder="Chờ hoặc nhập đáp án..." />
+                    <button type="button" class="r3-ctrl-judge-btn right" id="r3-ctrl-right-1" data-player-index="1">ĐÚNG</button>
+                    <button type="button" class="r3-ctrl-judge-btn wrong" id="r3-ctrl-wrong-1" data-player-index="1">SAI</button>
+                  </div>
+                </div>
+
+                <div class="r3-ctrl-ans-card" id="r3-ctrl-ans-card-2" data-player-index="2">
+                  <div class="r3-ctrl-ans-top">
+                    <div class="r3-ctrl-player-info">
+                      <span class="r3-ctrl-player-name" id="r3-ctrl-player-name-2">3. P3</span>
+                      <span class="r3-ctrl-player-score" id="r3-ctrl-player-score-2">0đ</span>
+                    </div>
+                    <div class="r3-ctrl-time-rank">
+                      <span class="r3-ctrl-earn-badge" id="r3-ctrl-earn-2">+0</span>
+                      <input type="number" step="0.01" min="0" class="r3-ctrl-time-input" id="r3-ctrl-time-input-2" data-player-index="2" placeholder="0.00" title="Thời gian trả lời (giây)" />
+                      <span class="r3-ctrl-time-unit">s</span>
+                    </div>
+                  </div>
+                  <div class="r3-ctrl-ans-bottom">
+                    <input type="text" class="r3-ctrl-ans-input" id="r3-ctrl-ans-input-2" data-player-index="2" placeholder="Chờ hoặc nhập đáp án..." />
+                    <button type="button" class="r3-ctrl-judge-btn right" id="r3-ctrl-right-2" data-player-index="2">ĐÚNG</button>
+                    <button type="button" class="r3-ctrl-judge-btn wrong" id="r3-ctrl-wrong-2" data-player-index="2">SAI</button>
+                  </div>
+                </div>
+
+                <div class="r3-ctrl-ans-card" id="r3-ctrl-ans-card-3" data-player-index="3">
+                  <div class="r3-ctrl-ans-top">
+                    <div class="r3-ctrl-player-info">
+                      <span class="r3-ctrl-player-name" id="r3-ctrl-player-name-3">4. P4</span>
+                      <span class="r3-ctrl-player-score" id="r3-ctrl-player-score-3">0đ</span>
+                    </div>
+                    <div class="r3-ctrl-time-rank">
+                      <span class="r3-ctrl-earn-badge" id="r3-ctrl-earn-3">+0</span>
+                      <input type="number" step="0.01" min="0" class="r3-ctrl-time-input" id="r3-ctrl-time-input-3" data-player-index="3" placeholder="0.00" title="Thời gian trả lời (giây)" />
+                      <span class="r3-ctrl-time-unit">s</span>
+                    </div>
+                  </div>
+                  <div class="r3-ctrl-ans-bottom">
+                    <input type="text" class="r3-ctrl-ans-input" id="r3-ctrl-ans-input-3" data-player-index="3" placeholder="Chờ hoặc nhập đáp án..." />
+                    <button type="button" class="r3-ctrl-judge-btn right" id="r3-ctrl-right-3" data-player-index="3">ĐÚNG</button>
+                    <button type="button" class="r3-ctrl-judge-btn wrong" id="r3-ctrl-wrong-3" data-player-index="3">SAI</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="r3-ctrl-ans-footer">
+                <button type="button" class="r3-ctrl-award-btn" id="r3-btn-award-scores">CỘNG ĐIỂM CÂU NÀY</button>
+                <button type="button" class="r3-ctrl-reset-ts-btn" id="r3-btn-reset-player-ans">RESET ĐÁP ÁN TS</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1092,8 +1238,142 @@
             </div>
           </div>
         </div>
-
         <button type="button" class="r2-cfg-save-btn" id="r2-cfg-save-btn">LƯU</button>
+      </div>
+    </div>
+
+    <!-- MODAL CÀI ĐẶT VÒNG 3 -->
+    <div class="r3-cfg-modal-overlay" id="r3ConfigModal">
+      <div class="r3-cfg-modal-content" id="r3ConfigModalContent">
+        <div class="r3-cfg-modal-header">
+          <h2>&#9881; CÀI ĐẶT VÒNG 3 - TĂNG TỐC</h2>
+          <button type="button" class="r3-cfg-close-btn" id="r3-cfg-close-btn">✖</button>
+        </div>
+
+        <div class="r3-cfg-group-title">Thời lượng từng câu hỏi (giây)</div>
+        <div class="r3-cfg-durations-row">
+          <div class="r3-cfg-dur-item">
+            <label for="r3-cfg-dur-1">Câu 1 (s)</label>
+            <input type="number" id="r3-cfg-dur-1" min="5" max="120" value="20" />
+          </div>
+          <div class="r3-cfg-dur-item">
+            <label for="r3-cfg-dur-2">Câu 2 (s)</label>
+            <input type="number" id="r3-cfg-dur-2" min="5" max="120" value="20" />
+          </div>
+          <div class="r3-cfg-dur-item">
+            <label for="r3-cfg-dur-3">Câu 3 (s)</label>
+            <input type="number" id="r3-cfg-dur-3" min="5" max="120" value="30" />
+          </div>
+          <div class="r3-cfg-dur-item">
+            <label for="r3-cfg-dur-4">Câu 4 (s)</label>
+            <input type="number" id="r3-cfg-dur-4" min="5" max="120" value="30" />
+          </div>
+        </div>
+
+        <div class="r3-cfg-group-title">Quản lý tên, điểm số &amp; cộng điểm thí sinh</div>
+        <div class="r3-cfg-players-row">
+          <div class="r3-cfg-player-card">
+            <div class="r3-cfg-name-wrapper">
+              <div class="r3-cfg-name" contenteditable="true" id="r3-config-name-1" data-player-num="1">P1</div>
+            </div>
+            <div class="r3-cfg-score-section">
+              <span class="r3-cfg-sub-label">Tổng điểm hiện tại</span>
+              <input class="r3-cfg-score-input" type="number" id="r3-config-score-1" data-player-num="1" value="0" />
+            </div>
+            <div class="r3-cfg-bonus-section">
+              <span class="r3-cfg-sub-label center">Điểm cộng thêm</span>
+              <div class="r3-cfg-preset-row">
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="1" data-delta="40">+40</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="1" data-delta="30">+30</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="1" data-delta="20">+20</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="1" data-delta="10">+10</button>
+                <button type="button" class="r3-cfg-preset-btn reset" data-player-num="1" data-set="0">0</button>
+              </div>
+              <div class="r3-cfg-bonus-input-wrap">
+                <span class="r3-cfg-bonus-prefix">+</span>
+                <input class="r3-cfg-bonus-input" type="number" id="r3-config-add-1" data-player-num="1" value="0" placeholder="Điểm khác" />
+              </div>
+              <div class="r3-cfg-preview-total" id="r3-config-preview-1">Sau lưu: <strong>0</strong></div>
+            </div>
+          </div>
+
+          <div class="r3-cfg-player-card">
+            <div class="r3-cfg-name-wrapper">
+              <div class="r3-cfg-name" contenteditable="true" id="r3-config-name-2" data-player-num="2">P2</div>
+            </div>
+            <div class="r3-cfg-score-section">
+              <span class="r3-cfg-sub-label">Tổng điểm hiện tại</span>
+              <input class="r3-cfg-score-input" type="number" id="r3-config-score-2" data-player-num="2" value="0" />
+            </div>
+            <div class="r3-cfg-bonus-section">
+              <span class="r3-cfg-sub-label center">Điểm cộng thêm</span>
+              <div class="r3-cfg-preset-row">
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="2" data-delta="40">+40</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="2" data-delta="30">+30</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="2" data-delta="20">+20</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="2" data-delta="10">+10</button>
+                <button type="button" class="r3-cfg-preset-btn reset" data-player-num="2" data-set="0">0</button>
+              </div>
+              <div class="r3-cfg-bonus-input-wrap">
+                <span class="r3-cfg-bonus-prefix">+</span>
+                <input class="r3-cfg-bonus-input" type="number" id="r3-config-add-2" data-player-num="2" value="0" placeholder="Điểm khác" />
+              </div>
+              <div class="r3-cfg-preview-total" id="r3-config-preview-2">Sau lưu: <strong>0</strong></div>
+            </div>
+          </div>
+
+          <div class="r3-cfg-player-card">
+            <div class="r3-cfg-name-wrapper">
+              <div class="r3-cfg-name" contenteditable="true" id="r3-config-name-3" data-player-num="3">P3</div>
+            </div>
+            <div class="r3-cfg-score-section">
+              <span class="r3-cfg-sub-label">Tổng điểm hiện tại</span>
+              <input class="r3-cfg-score-input" type="number" id="r3-config-score-3" data-player-num="3" value="0" />
+            </div>
+            <div class="r3-cfg-bonus-section">
+              <span class="r3-cfg-sub-label center">Điểm cộng thêm</span>
+              <div class="r3-cfg-preset-row">
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="3" data-delta="40">+40</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="3" data-delta="30">+30</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="3" data-delta="20">+20</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="3" data-delta="10">+10</button>
+                <button type="button" class="r3-cfg-preset-btn reset" data-player-num="3" data-set="0">0</button>
+              </div>
+              <div class="r3-cfg-bonus-input-wrap">
+                <span class="r3-cfg-bonus-prefix">+</span>
+                <input class="r3-cfg-bonus-input" type="number" id="r3-config-add-3" data-player-num="3" value="0" placeholder="Điểm khác" />
+              </div>
+              <div class="r3-cfg-preview-total" id="r3-config-preview-3">Sau lưu: <strong>0</strong></div>
+            </div>
+          </div>
+
+          <div class="r3-cfg-player-card">
+            <div class="r3-cfg-name-wrapper">
+              <div class="r3-cfg-name" contenteditable="true" id="r3-config-name-4" data-player-num="4">P4</div>
+            </div>
+            <div class="r3-cfg-score-section">
+              <span class="r3-cfg-sub-label">Tổng điểm hiện tại</span>
+              <input class="r3-cfg-score-input" type="number" id="r3-config-score-4" data-player-num="4" value="0" />
+            </div>
+            <div class="r3-cfg-bonus-section">
+              <span class="r3-cfg-sub-label center">Điểm cộng thêm</span>
+              <div class="r3-cfg-preset-row">
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="4" data-delta="40">+40</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="4" data-delta="30">+30</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="4" data-delta="20">+20</button>
+                <button type="button" class="r3-cfg-preset-btn primary" data-player-num="4" data-delta="10">+10</button>
+                <button type="button" class="r3-cfg-preset-btn reset" data-player-num="4" data-set="0">0</button>
+              </div>
+              <div class="r3-cfg-bonus-input-wrap">
+                <span class="r3-cfg-bonus-prefix">+</span>
+                <input class="r3-cfg-bonus-input" type="number" id="r3-config-add-4" data-player-num="4" value="0" placeholder="Điểm khác" />
+              </div>
+              <div class="r3-cfg-preview-total" id="r3-config-preview-4">Sau lưu: <strong>0</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="r3-cfg-save-btn" id="r3-cfg-save-btn">LƯU</button>
       </div>
     </div>
 
@@ -1141,6 +1421,9 @@
 
         const r2Ui = document.getElementById('r2-controller-ui');
         if (r2Ui) r2Ui.style.display = (suffix === 'R2') ? 'block' : 'none';
+
+        const r3Ui = document.getElementById('r3-controller-ui');
+        if (r3Ui) r3Ui.style.display = (suffix === 'R3') ? 'grid' : 'none';
 
         const mainUi = document.getElementById('main-controller-ui');
         if (mainUi) mainUi.style.display = (suffix === 'M') ? 'contents' : 'none';
@@ -1259,10 +1542,13 @@
 
       const playingState = {};
 
-      window.playMusic = function(fileName, autoStop = false, playOver = false) {
+      window.playMusic = function(fileName, autoStop = false, playOver = false, playbackRate = 1) {
         const baseSoundId = soundIdForFileName(fileName);
         const fileUrl = `../sounds/${fileName}`;
         const statusRef = ref(db, `games/soundboard_status/${baseSoundId}`);
+        const rate = (Number.isFinite(Number(playbackRate)) && Number(playbackRate) > 0)
+          ? Number(playbackRate)
+          : 1;
 
         if (autoStop) {
           runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
@@ -1271,6 +1557,7 @@
               soundId: baseSoundId,
               file: fileUrl,
               action: isPlaying ? 'play' : 'stop',
+              playbackRate: rate,
               timestamp: Date.now()
             });
           });
@@ -1283,6 +1570,7 @@
             file: fileUrl,
             action: 'play',
             playOver: playOver,
+            playbackRate: rate,
             timestamp: Date.now()
           });
         }

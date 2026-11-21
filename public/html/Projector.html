@@ -194,6 +194,52 @@
             </div>
         </div>
 
+        <!-- GIAO DIỆN VÒNG 3: TĂNG TỐC -->
+        <div id="r3-projector-ui" style="display: none;">
+            <div id="r3-wait-bg"></div>
+
+            <!-- TRANG 1: CÂU HỎI, MEDIA & ĐỒNG HỒ -->
+            <div id="r3-page-1">
+                <video class="r3-video-layer" id="r3-showques-video" src="../graphic/r3_show.webm" playsinline preload="auto"></video>
+                <video class="r3-video-layer" id="r3-timer-video" playsinline preload="auto"></video>
+
+                <div class="r3-question-box" id="r3-question-box">
+                    <div class="r3-question-text" id="r3-question-text"></div>
+                </div>
+
+                <div class="r3-media-box" id="r3-media-box">
+                    <img id="r3-question-img" alt="Media câu hỏi" />
+                    <video id="r3-question-video" muted playsinline preload="auto"></video>
+                </div>
+            </div>
+
+            <!-- TRANG 2: TÊN, ĐÁP ÁN & THỜI GIAN THÍ SINH -->
+            <div id="r3-page-2">
+                <div class="r3-p2-bg"></div>
+                <video class="r3-video-layer" id="r3-ans-video" src="../graphic/r3_showans.webm" playsinline preload="auto"></video>
+
+                <img class="r3-p2-wrong r3-p2-pos-1" id="r3-proj-wrong-1" src="../graphic/r3_wrong.png" alt="" />
+                <div class="r3-p2-text r3-p2-name r3-p2-pos-1" id="r3-proj-name-1"><span class="r3-p2-inner" id="r3-proj-name-text-1">P1</span></div>
+                <div class="r3-p2-text r3-p2-ans r3-p2-pos-1" id="r3-proj-ans-1"><span class="r3-p2-inner" id="r3-proj-ans-text-1"></span></div>
+                <div class="r3-p2-text r3-p2-time r3-p2-pos-1" id="r3-proj-time-1"><span class="r3-p2-inner" id="r3-proj-time-text-1"></span></div>
+
+                <img class="r3-p2-wrong r3-p2-pos-2" id="r3-proj-wrong-2" src="../graphic/r3_wrong.png" alt="" />
+                <div class="r3-p2-text r3-p2-name r3-p2-pos-2" id="r3-proj-name-2"><span class="r3-p2-inner" id="r3-proj-name-text-2">P2</span></div>
+                <div class="r3-p2-text r3-p2-ans r3-p2-pos-2" id="r3-proj-ans-2"><span class="r3-p2-inner" id="r3-proj-ans-text-2"></span></div>
+                <div class="r3-p2-text r3-p2-time r3-p2-pos-2" id="r3-proj-time-2"><span class="r3-p2-inner" id="r3-proj-time-text-2"></span></div>
+
+                <img class="r3-p2-wrong r3-p2-pos-3" id="r3-proj-wrong-3" src="../graphic/r3_wrong.png" alt="" />
+                <div class="r3-p2-text r3-p2-name r3-p2-pos-3" id="r3-proj-name-3"><span class="r3-p2-inner" id="r3-proj-name-text-3">P3</span></div>
+                <div class="r3-p2-text r3-p2-ans r3-p2-pos-3" id="r3-proj-ans-3"><span class="r3-p2-inner" id="r3-proj-ans-text-3"></span></div>
+                <div class="r3-p2-text r3-p2-time r3-p2-pos-3" id="r3-proj-time-3"><span class="r3-p2-inner" id="r3-proj-time-text-3"></span></div>
+
+                <img class="r3-p2-wrong r3-p2-pos-4" id="r3-proj-wrong-4" src="../graphic/r3_wrong.png" alt="" />
+                <div class="r3-p2-text r3-p2-name r3-p2-pos-4" id="r3-proj-name-4"><span class="r3-p2-inner" id="r3-proj-name-text-4">P4</span></div>
+                <div class="r3-p2-text r3-p2-ans r3-p2-pos-4" id="r3-proj-ans-4"><span class="r3-p2-inner" id="r3-proj-ans-text-4"></span></div>
+                <div class="r3-p2-text r3-p2-time r3-p2-pos-4" id="r3-proj-time-4"><span class="r3-p2-inner" id="r3-proj-time-text-4"></span></div>
+            </div>
+        </div>
+
         <script type="module">
             import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
             import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
@@ -352,6 +398,9 @@
 
                 const r2Ui = document.getElementById('r2-projector-ui');
                 if (r2Ui) r2Ui.style.display = (tabCode === 'R2') ? 'block' : 'none';
+
+                const r3Ui = document.getElementById('r3-projector-ui');
+                if (r3Ui) r3Ui.style.display = (tabCode === 'R3') ? 'block' : 'none';
 
                 const cssLink = document.getElementById('projector-css');
                 if (cssLink) {
@@ -593,10 +642,13 @@
                     activeSounds[soundId] = false;
                     audio.pause();
                     audio.currentTime = 0;
+                    audio.playbackRate = 1;
                     set(ref(db, `games/soundboard_status/${soundId}`), false);
                 } else {
                     activeSounds[soundId] = true;
                     activePlaybackVersions[soundId] = commandVersion;
+                    const rate = Number(data.playbackRate);
+                    audio.playbackRate = (Number.isFinite(rate) && rate > 0) ? rate : 1;
                     audio.currentTime = 0;
                     audio.play().then(() => {
                         if (activeSounds[soundId] && soundCommandVersions[soundId] === commandVersion) {
