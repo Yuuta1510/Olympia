@@ -185,6 +185,119 @@
       border-color: #38bdf8;
     }
 
+    /* --- STYLE RIÊNG CHO FORM VÒNG 4 --- */
+    .r4-player-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .r4-player-tab {
+      background: #0f172a;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      padding: 7px 4px;
+      font-family: var(--font-main);
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: all 0.15s ease;
+    }
+
+    .r4-player-tab:hover {
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+
+    .r4-player-tab.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #facc15;
+    }
+
+    .r4-level-group {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 5px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .r4-level-group.level-30 {
+      border-color: #991b1b;
+      background: #180d14;
+    }
+
+    .r4-level-header {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .r4-level-20 .r4-level-header { color: #38bdf8; }
+    .r4-level-30 .r4-level-header { color: #facc15; border-bottom-color: #7f1d1d; }
+
+    .r4-slot-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #334155;
+    }
+
+    .r4-slot-item:last-child {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .r4-slot-label {
+      font-size: 11px;
+      font-weight: bold;
+      color: #94a3b8;
+    }
+
+    .r4-slot-item textarea {
+      background: #1e293b;
+      color: #ffffff;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: var(--font-main);
+      font-size: 12.5px;
+      min-height: 44px;
+      resize: vertical;
+      outline: none;
+    }
+
+    .r4-slot-item input {
+      background: #1e293b;
+      color: #34d399;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: var(--font-main);
+      font-size: 12.5px;
+      font-weight: bold;
+      outline: none;
+    }
+
+    .r4-slot-item textarea:focus,
+    .r4-slot-item input:focus {
+      border-color: #38bdf8;
+    }
+
     .upload-row {
       display: flex;
       gap: 8px;
@@ -316,7 +429,7 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       padding-right: 4px;
     }
 
@@ -332,6 +445,65 @@
     }
 
     .question-card:hover { border-color: #38bdf8; }
+
+    .r4-player-set-card {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .r4-player-set-card.is-editing {
+      border-color: #facc15;
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.35);
+    }
+
+    .r4-set-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 6px;
+    }
+
+    .r4-set-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #38bdf8;
+      text-transform: uppercase;
+    }
+
+    .r4-set-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .r4-set-col {
+      background: #1e293b;
+      border-radius: 4px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .r4-set-col-title {
+      font-size: 11.5px;
+      font-weight: bold;
+      text-transform: uppercase;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .r4-q-row {
+      font-size: 12px;
+      color: #e2e8f0;
+      line-height: 1.35;
+    }
 
     .q-info {
       display: flex;
@@ -471,7 +643,6 @@
             </select>
           </div>
 
-          <!-- FORM MẶC ĐỊNH (R1, R4, SUB_FINAL) -->
           <div id="defaultForm" style="display: flex; flex-direction: column; gap: 12px;">
               <div class="form-group">
                 <label>Số Thứ Tự Câu:</label>
@@ -486,6 +657,65 @@
               <div class="form-group">
                 <label>Đáp Án (Cột C):</label>
                 <input type="text" id="quesAnswer" placeholder="Nhập đáp án...">
+              </div>
+          </div>
+
+          <!-- FORM VÒNG 4 (R4: 4 Thí sinh x 6 câu [3 câu 20đ + 3 câu 30đ]) -->
+          <div id="r4Form" style="display: none; flex-direction: column; gap: 10px;">
+              <div class="form-group">
+                <label>Chọn Thí Sinh Về Đích:</label>
+                <div class="r4-player-tabs" id="r4PlayerTabs">
+                  <button type="button" class="r4-player-tab active" data-player="1" onclick="selectR4Player(1)">TS 1</button>
+                  <button type="button" class="r4-player-tab" data-player="2" onclick="selectR4Player(2)">TS 2</button>
+                  <button type="button" class="r4-player-tab" data-player="3" onclick="selectR4Player(3)">TS 3</button>
+                  <button type="button" class="r4-player-tab" data-player="4" onclick="selectR4Player(4)">TS 4</button>
+                </div>
+              </div>
+
+              <!-- Nhóm 3 câu mức 20 điểm -->
+              <div class="r4-level-group r4-level-20">
+                <div class="r4-level-header">
+                  <span id="r4Lvl1HeaderText">Gói 20 Điểm (3 câu)</span>
+                  <span style="font-size: 11px; color: #94a3b8;">Câu 1 → Câu 3</span>
+                </div>
+                <div class="r4-slot-item">
+                  <span class="r4-slot-label">Câu 1 (20đ):</span>
+                  <textarea id="r4_q_20_1" placeholder="Nhập câu hỏi 20đ thứ 1..."></textarea>
+                  <input type="text" id="r4_a_20_1" placeholder="Đáp án câu 1 (20đ)...">
+                </div>
+                <div class="r4-slot-item">
+                  <span class="r4-slot-label">Câu 2 (20đ):</span>
+                  <textarea id="r4_q_20_2" placeholder="Nhập câu hỏi 20đ thứ 2..."></textarea>
+                  <input type="text" id="r4_a_20_2" placeholder="Đáp án câu 2 (20đ)...">
+                </div>
+                <div class="r4-slot-item">
+                  <span class="r4-slot-label">Câu 3 (20đ):</span>
+                  <textarea id="r4_q_20_3" placeholder="Nhập câu hỏi 20đ thứ 3..."></textarea>
+                  <input type="text" id="r4_a_20_3" placeholder="Đáp án câu 3 (20đ)...">
+                </div>
+              </div>
+
+              <!-- Nhóm 3 câu mức 30 điểm -->
+              <div class="r4-level-group level-30 r4-level-30">
+                <div class="r4-level-header">
+                  <span id="r4Lvl2HeaderText">Gói 30 Điểm (3 câu)</span>
+                  <span style="font-size: 11px; color: #fca5a5;">Câu 1 → Câu 3</span>
+                </div>
+                <div class="r4-slot-item">
+                  <span class="r4-slot-label">Câu 1 (30đ):</span>
+                  <textarea id="r4_q_30_1" placeholder="Nhập câu hỏi 30đ thứ 1..."></textarea>
+                  <input type="text" id="r4_a_30_1" placeholder="Đáp án câu 1 (30đ)...">
+                </div>
+                <div class="r4-slot-item">
+                  <span class="r4-slot-label">Câu 2 (30đ):</span>
+                  <textarea id="r4_q_30_2" placeholder="Nhập câu hỏi 30đ thứ 2..."></textarea>
+                  <input type="text" id="r4_a_30_2" placeholder="Đáp án câu 2 (30đ)...">
+                </div>
+                <div class="r4-slot-item">
+                  <span class="r4-slot-label">Câu 3 (30đ):</span>
+                  <textarea id="r4_q_30_3" placeholder="Nhập câu hỏi 30đ thứ 3..."></textarea>
+                  <input type="text" id="r4_a_30_3" placeholder="Đáp án câu 3 (30đ)...">
+                </div>
               </div>
           </div>
 
@@ -675,7 +905,7 @@
 
   <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { getDatabase, ref, set, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
     const firebaseConfig = {
@@ -696,6 +926,15 @@
     const VIDEO_EXT_REGEX = /\.(mp4|webm|ogg|ogv|mov|m4v|mkv)(\?|#|$)/i;
 
     let allQuestionsData = {};
+    let playersData = {
+      1: { name: 'Thí sinh 1' },
+      2: { name: 'Thí sinh 2' },
+      3: { name: 'Thí sinh 3' },
+      4: { name: 'Thí sinh 4' }
+    };
+    let r4PtsLevel1 = 20;
+    let r4PtsLevel2 = 30;
+    let selectedR4Player = 1;
     let activeR2UploadPromise = null;
     let activeR3UploadPromise = null;
     let activeR3AnsUploadPromise = null;
@@ -703,7 +942,7 @@
     let activeR3AnsObjectUrl = null;
 
     function escapeHtml(str) {
-      return String(str ?? '')
+      return String(str || '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
@@ -721,6 +960,69 @@
     // ==========================================
     // XỬ LÝ UPLOAD & PREVIEW VÒNG 2
     // ==========================================
+    // Ánh xạ vị trí trong Firebase questions/round_4:
+    // Mỗi thí sinh p (1..4) có 6 câu tại index (p-1)*6 + 1 .. (p-1)*6 + 6:
+    // +1, +2, +3: Câu 1, 2, 3 mức 20 điểm
+    // +4, +5, +6: Câu 1, 2, 3 mức 30 điểm
+    function getR4DbIndex(playerIdx, level, slotNum) {
+      const base = (Number(playerIdx) - 1) * 6;
+      const levelOffset = Number(level) === 2 ? 3 : 0;
+      return base + levelOffset + Number(slotNum);
+    }
+
+    function getR4SlotData(playerIdx, level, slotNum) {
+      const raw = allQuestionsData.round_4;
+      if (!raw) return null;
+
+      const dbIdx = getR4DbIndex(playerIdx, level, slotNum);
+      if (raw[dbIdx] && (raw[dbIdx].cau_hoi || raw[dbIdx].dap_an)) {
+        return raw[dbIdx];
+      }
+
+      const targetPt = Number(level) === 2 ? r4PtsLevel2 : r4PtsLevel1;
+      const values = Array.isArray(raw) ? raw : Object.values(raw);
+      return values.find(item =>
+        item &&
+        Number(item.thi_sinh) === Number(playerIdx) &&
+        Number(item.cau_so) === Number(slotNum) &&
+        Number(item.diem) === targetPt
+      ) || null;
+    }
+
+    function updateR4PlayerTabsUI() {
+      document.querySelectorAll('.r4-player-tab').forEach(btn => {
+        const p = Number(btn.dataset.player);
+        const pName = playersData[p]?.name?.trim() || `TS ${p}`;
+        btn.textContent = `TS ${p}: ${pName}`;
+        btn.title = `TS ${p}: ${pName}`;
+        btn.classList.toggle('active', p === selectedR4Player);
+      });
+
+      const h1 = document.getElementById('r4Lvl1HeaderText');
+      const h2 = document.getElementById('r4Lvl2HeaderText');
+      if (h1) h1.textContent = `Gói ${r4PtsLevel1} Điểm (3 câu)`;
+      if (h2) h2.textContent = `Gói ${r4PtsLevel2} Điểm (3 câu)`;
+    }
+
+    function populateR4FormForPlayer(playerIdx) {
+      for (let s = 1; s <= 3; s++) {
+        const q20 = getR4SlotData(playerIdx, 1, s);
+        const q30 = getR4SlotData(playerIdx, 2, s);
+
+        document.getElementById(`r4_q_20_${s}`).value = q20?.cau_hoi || '';
+        document.getElementById(`r4_a_20_${s}`).value = q20?.dap_an || '';
+        document.getElementById(`r4_q_30_${s}`).value = q30?.cau_hoi || '';
+        document.getElementById(`r4_a_30_${s}`).value = q30?.dap_an || '';
+      }
+    }
+
+    window.selectR4Player = function(playerIdx) {
+      selectedR4Player = Number(playerIdx) || 1;
+      updateR4PlayerTabsUI();
+      populateR4FormForPlayer(selectedR4Player);
+      renderQuestionList();
+    };
+
     window.updateR2ImagePreview = function(url) {
       const cleanUrl = String(url || '').trim();
       const wrap = document.getElementById('r2_image_preview_wrap');
@@ -1019,30 +1321,61 @@
     // CHUYỂN CHẾ ĐỘ FORM THEO VÒNG THI
     // ==========================================
     window.toggleFormMode = function() {
-        const roundKey = document.getElementById('roundSelect').value;
-        const defaultForm = document.getElementById('defaultForm');
-        const r2Form = document.getElementById('r2Form');
-        const r3Form = document.getElementById('r3Form');
+      const roundKey = document.getElementById('roundSelect').value;
+      const defaultForm = document.getElementById('defaultForm');
+      const r2Form = document.getElementById('r2Form');
+      const r3Form = document.getElementById('r3Form');
+      const r4Form = document.getElementById('r4Form');
 
-        defaultForm.style.display = 'none';
-        r2Form.style.display = 'none';
-        r3Form.style.display = 'none';
+      defaultForm.style.display = 'none';
+      r2Form.style.display = 'none';
+      r3Form.style.display = 'none';
+      r4Form.style.display = 'none';
 
-        if (roundKey === 'round_2') {
-            r2Form.style.display = 'block';
-        } else if (roundKey === 'round_3') {
-            r3Form.style.display = 'flex';
-        } else {
-            defaultForm.style.display = 'flex';
-        }
-        renderQuestionList();
+      if (roundKey === 'round_2') {
+          r2Form.style.display = 'block';
+      } else if (roundKey === 'round_3') {
+          r3Form.style.display = 'flex';
+      } else if (roundKey === 'round_4') {
+        r4Form.style.display = 'flex';
+        updateR4PlayerTabsUI();
+        populateR4FormForPlayer(selectedR4Player);
+      } else {
+        defaultForm.style.display = 'flex';
+      }
+      renderQuestionList();
     };
+
+    onValue(ref(db, 'games/players'), (snapshot) => {
+      if (snapshot.exists()) {
+        playersData = snapshot.val();
+        updateR4PlayerTabsUI();
+        if (document.getElementById('roundSelect').value === 'round_4') {
+          renderQuestionList();
+        }
+      }
+    });
+
+    onValue(ref(db, 'games/round_4_config'), (snapshot) => {
+      if (snapshot.exists()) {
+        const cfg = snapshot.val();
+        if (cfg.ptsLevel1 !== undefined) r4PtsLevel1 = Number(cfg.ptsLevel1) || 20;
+        if (cfg.ptsLevel2 !== undefined) r4PtsLevel2 = Number(cfg.ptsLevel2) || 30;
+        updateR4PlayerTabsUI();
+        if (document.getElementById('roundSelect').value === 'round_4') {
+          renderQuestionList();
+        }
+      }
+    });
 
     onValue(ref(db, 'questions'), (snapshot) => {
       if (snapshot.exists()) {
         allQuestionsData = snapshot.val();
       } else {
         allQuestionsData = {};
+      }
+      if (document.getElementById('roundSelect').value === 'round_4') {
+        populateR4FormForPlayer(selectedR4Player);
       }
       renderQuestionList();
     });
@@ -1139,43 +1472,106 @@
               document.getElementById('r3_ques_num').value = String(nextNum);
               window.handleR3QuesNumChange();
           }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
+      } else if (roundKey === 'round_4') {
+        const updates = {};
+        let filledCount = 0;
+
+        for (let s = 1; s <= 3; s++) {
+          const q20 = document.getElementById(`r4_q_20_${s}`).value.trim();
+          const a20 = document.getElementById(`r4_a_20_${s}`).value.trim();
+          const idx20 = getR4DbIndex(selectedR4Player, 1, s);
+
+          if (q20 || a20) {
+            filledCount++;
+            updates[`questions/round_4/${idx20}`] = {
+              cau_hoi: q20,
+              dap_an: a20,
+              diem: r4PtsLevel1,
+              thi_sinh: selectedR4Player,
+              cau_so: s,
+              phan_thi: 'round_4'
+            };
+          } else {
+            updates[`questions/round_4/${idx20}`] = null;
+          }
+
+          const q30 = document.getElementById(`r4_q_30_${s}`).value.trim();
+          const a30 = document.getElementById(`r4_a_30_${s}`).value.trim();
+          const idx30 = getR4DbIndex(selectedR4Player, 2, s);
+
+          if (q30 || a30) {
+            filledCount++;
+            updates[`questions/round_4/${idx30}`] = {
+              cau_hoi: q30,
+              dap_an: a30,
+              diem: r4PtsLevel2,
+              thi_sinh: selectedR4Player,
+              cau_so: s,
+              phan_thi: 'round_4'
+            };
+          } else {
+            updates[`questions/round_4/${idx30}`] = null;
+          }
+        }
+
+        if (filledCount === 0) {
+          alert("⚠️ Vui lòng nhập ít nhất 1 câu hỏi cho thí sinh này trước khi lưu!");
+          return;
+        }
+
+        const pName = playersData[selectedR4Player]?.name?.trim() || `Thí sinh ${selectedR4Player}`;
+        update(ref(db), updates).then(() => {
+          alert(`✅ Đã lưu bộ 6 câu hỏi Vòng 4 cho ${pName} thành công!`);
+        }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
 
       } else {
-          const qNum = parseInt(document.getElementById('quesNumber').value);
-          const qContent = document.getElementById('quesContent').value.trim();
-          const qAnswer = document.getElementById('quesAnswer').value.trim();
-          if (!qContent || !qAnswer) {
-            alert("⚠️ Vui lòng nhập đầy đủ nội dung câu hỏi và đáp án!");
-            return;
-          }
-          
-          let targetRound = 'round_1'; 
-          if(roundKey === 'round_4' || roundKey === 'sub_final') {
-              targetRound = roundKey;
-          }
+        const qNum = parseInt(document.getElementById('quesNumber').value);
+        const qContent = document.getElementById('quesContent').value.trim();
+        const qAnswer = document.getElementById('quesAnswer').value.trim();
+        if (!qContent || !qAnswer) {
+          alert("⚠️ Vui lòng nhập đầy đủ nội dung câu hỏi và đáp án!");
+          return;
+        }
+        
+        let targetRound = 'round_1'; 
+        if (roundKey === 'round_3' || roundKey === 'round_5') {
+          targetRound = roundKey;
+        }
 
-          const quesRef = ref(db, `questions/${targetRound}/${qNum}`);
-          set(quesRef, {
-            cau_hoi: qContent,
-            dap_an: qAnswer,
-            phan_thi: roundKey
-          }).then(() => {
-            alert("✅ Đã lưu câu hỏi thành công!");
-            resetForm();
-          }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
+        const quesRef = ref(db, `questions/${targetRound}/${qNum}`);
+        set(quesRef, {
+          cau_hoi: qContent,
+          dap_an: qAnswer,
+          phan_thi: roundKey
+        }).then(() => {
+          alert("✅ Đã lưu câu hỏi thành công!");
+          resetForm();
+        }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
       }
     };
 
     window.resetForm = function() {
+      const roundKey = document.getElementById('roundSelect').value;
+
+      if (roundKey === 'round_4') {
+        for (let s = 1; s <= 3; s++) {
+          document.getElementById(`r4_q_20_${s}`).value = '';
+          document.getElementById(`r4_a_20_${s}`).value = '';
+          document.getElementById(`r4_q_30_${s}`).value = '';
+          document.getElementById(`r4_a_30_${s}`).value = '';
+        }
+        return;
+      }
+
       document.getElementById('quesNumber').value = '1';
       document.getElementById('quesContent').value = '';
       document.getElementById('quesAnswer').value = '';
       document.getElementById('editIndex').value = '';
       
       window.clearR2Image();
-      for(let i=1; i<=5; i++){
-          document.getElementById(`r2_q${i}`).value = '';
-          document.getElementById(`r2_a${i}`).value = '';
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById(`r2_q${i}`).value = '';
+        document.getElementById(`r2_a${i}`).value = '';
       }
       document.getElementById('r2_q_cnv').value = '';
       document.getElementById('r2_a_cnv').value = '';
@@ -1225,20 +1621,41 @@
         document.getElementById('quesContent').focus();
       }
     };
+    
+    window.editR4Player = function(playerIdx) {
+      window.selectR4Player(playerIdx);
+      document.getElementById('r4_q_20_1')?.focus();
+    };
 
-    window.editR2Question = function() {
-        const data = allQuestionsData.round_2;
-        if (!data) return;
-        const imgUrl = data['cnv']?.image || data[1]?.image || '';
-        document.getElementById('r2_image').value = imgUrl;
-        window.updateR2ImagePreview(imgUrl);
-        for(let i=1; i<=5; i++) {
-            document.getElementById(`r2_q${i}`).value = data[i]?.cau_hoi || '';
-            document.getElementById(`r2_a${i}`).value = data[i]?.dap_an || '';
+    window.deleteR4Player = function(playerIdx) {
+      const pName = playersData[playerIdx]?.name?.trim() || `Thí sinh ${playerIdx}`;
+      if (!confirm(`Bạn có chắc chắn muốn xóa toàn bộ 6 câu hỏi Vòng 4 của ${pName} không?`)) return;
+
+      const updates = {};
+      for (let s = 1; s <= 3; s++) {
+        updates[`questions/round_4/${getR4DbIndex(playerIdx, 1, s)}`] = null;
+        updates[`questions/round_4/${getR4DbIndex(playerIdx, 2, s)}`] = null;
+      }
+
+      update(ref(db), updates).then(() => {
+        if (selectedR4Player === Number(playerIdx)) {
+          window.resetForm();
         }
-        document.getElementById('r2_q_cnv').value = data['cnv']?.cau_hoi || '';
-        document.getElementById('r2_a_cnv').value = data['cnv']?.dap_an || '';
-        document.getElementById('r2_q1').focus();
+        alert(`🗑️ Đã xóa bộ câu hỏi của ${pName}!`);
+      });
+    };
+
+    window.editR2Question = function(data) {
+      const imgUrl = data['cnv']?.image || data[1]?.image || '';
+      document.getElementById('r2_image').value = imgUrl;
+      window.updateR2ImagePreview(imgUrl);
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById(`r2_q${i}`).value = data[i]?.cau_hoi || '';
+        document.getElementById(`r2_a${i}`).value = data[i]?.dap_an || '';
+      }
+      document.getElementById('r2_q_cnv').value = data['cnv']?.cau_hoi || '';
+      document.getElementById('r2_a_cnv').value = data['cnv']?.dap_an || '';
+      document.getElementById('r2_q1').focus();
     };
 
     window.deleteQuestion = function(round, index) {
@@ -1250,11 +1667,11 @@
     };
 
     window.deleteR2 = function() {
-        if (confirm(`Bạn có chắc chắn muốn xóa toàn bộ bộ đề Vòng 2 không?`)) {
-            remove(ref(db, `questions/round_2`)).then(() => {
-                alert("🗑️ Đã xóa Vòng 2 thành công!");
-            });
-        }
+      if (confirm(`Bạn có chắc chắn muốn xóa toàn bộ bộ đề Vòng 2 không?`)) {
+        remove(ref(db, `questions/round_2`)).then(() => {
+          alert("🗑️ Đã xóa Vòng 2 thành công!");
+        });
+      }
     };
 
     function renderQuestionList() {
@@ -1340,36 +1757,88 @@
                   `;
               }
           }
-      } else {
-          let targetRound = 'round_1';
-          if(roundKey === 'round_4' || roundKey === 'sub_final') targetRound = roundKey;
-          
-          const qRaw = allQuestionsData[targetRound] || {};
-          Object.entries(qRaw).forEach(([idx, q]) => {
-            if (q !== null && q !== undefined) {
-              count++;
-              html += `
-                <div class="question-card">
-                  <div class="q-info">
-                    <div class="q-title"><b>Câu ${idx}:</b> ${escapeHtml(q.cau_hoi)}</div>
-                    <div class="q-ans">Đáp án: ${escapeHtml(q.dap_an)}</div>
-                  </div>
-                  <div class="q-actions">
-                    <button class="q-btn" onclick="editQuestion('${targetRound}', '${idx}')">Sửa</button>
-                    <button class="q-btn del" onclick="deleteQuestion('${targetRound}', '${idx}')">Xóa</button>
-                  </div>
+      } else if (roundKey === 'round_4') {
+        for (let p = 1; p <= 4; p++) {
+          const pName = playersData[p]?.name?.trim() || `Thí sinh ${p}`;
+          const isEditing = p === selectedR4Player;
+          let col20Html = '';
+          let col30Html = '';
+
+          for (let s = 1; s <= 3; s++) {
+            const q20 = getR4SlotData(p, 1, s);
+            const q30 = getR4SlotData(p, 2, s);
+            if (q20 && (q20.cau_hoi || q20.dap_an)) count++;
+            if (q30 && (q30.cau_hoi || q30.dap_an)) count++;
+
+            col20Html += `
+              <div class="r4-q-row">
+                <b style="color:#38bdf8;">Câu ${s}:</b> ${q20?.cau_hoi ? escapeHtml(q20.cau_hoi) : '<span style="color:#64748b;">(Chưa nhập)</span>'}
+                ${q20?.dap_an ? `<div style="color:#34d399; font-size:11.5px;">↳ Đ/A: ${escapeHtml(q20.dap_an)}</div>` : ''}
+              </div>
+            `;
+
+            col30Html += `
+              <div class="r4-q-row">
+                <b style="color:#facc15;">Câu ${s}:</b> ${q30?.cau_hoi ? escapeHtml(q30.cau_hoi) : '<span style="color:#64748b;">(Chưa nhập)</span>'}
+                ${q30?.dap_an ? `<div style="color:#34d399; font-size:11.5px;">↳ Đ/A: ${escapeHtml(q30.dap_an)}</div>` : ''}
+              </div>
+            `;
+          }
+
+          html += `
+            <div class="r4-player-set-card ${isEditing ? 'is-editing' : ''}">
+              <div class="r4-set-header">
+                <div class="r4-set-title">THÍ SINH ${p}: ${escapeHtml(pName)}</div>
+                <div class="q-actions">
+                  <button class="q-btn" onclick="editR4Player(${p})">Sửa Bộ Đề</button>
+                  <button class="q-btn del" onclick="deleteR4Player(${p})">Xóa</button>
                 </div>
-              `;
-            }
-          });
+              </div>
+              <div class="r4-set-grid">
+                <div class="r4-set-col">
+                  <div class="r4-set-col-title" style="color:#38bdf8;">Gói ${r4PtsLevel1} điểm (3 câu)</div>
+                  ${col20Html}
+                </div>
+                <div class="r4-set-col">
+                  <div class="r4-set-col-title" style="color:#facc15;">Gói ${r4PtsLevel2} điểm (3 câu)</div>
+                  ${col30Html}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      } else {
+        let targetRound = 'round_1';
+        if (roundKey === 'round_3' || roundKey === 'round_5') targetRound = roundKey;
+        
+        const qList = allQuestionsData[targetRound] || [];
+        qList.forEach((q, idx) => {
+          if (q !== null && q !== undefined) {
+            count++;
+            html += `
+              <div class="question-card">
+                <div class="q-info">
+                  <div class="q-title"><b>Câu ${idx}:</b> ${escapeHtml(q.cau_hoi)}</div>
+                  <div class="q-ans">Đáp án: ${escapeHtml(q.dap_an)}</div>
+                </div>
+                <div class="q-actions">
+                  <button class="q-btn" onclick="editQuestion(${idx}, \`${String(q.cau_hoi).replace(/`/g, '\\`')}\`, \`${String(q.dap_an).replace(/`/g, '\\`')}\`)">Sửa</button>
+                  <button class="q-btn del" onclick="deleteQuestion('${targetRound}', ${idx})">Xóa</button>
+                </div>
+              </div>
+            `;
+          }
+        });
       }
 
       container.innerHTML = html || '<div style="text-align: center; color: #64748b; margin-top: 40px;">Chưa có câu hỏi nào.</div>';
-      document.getElementById('totalQuesCount').innerText = `Tổng số: ${count} câu`;
+      document.getElementById('totalQuesCount').innerText = roundKey === 'round_4'
+        ? `Tổng số: ${count}/24 câu`
+        : `Tổng số: ${count} câu`;
     }
 
     window.addEventListener('load', () => {
-        toggleFormMode();
+      toggleFormMode();
     });
   </script>
 </body>

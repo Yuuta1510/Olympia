@@ -205,6 +205,8 @@
       #r2ConfigModal,
       #r3-controller-ui,
       #r3ConfigModal,
+      #r4-controller-ui,
+      #r4ConfigModal,
       #main-controller-ui,
       #mainConfigDialog {
         display: none;
@@ -742,6 +744,134 @@
               <div class="r3-ctrl-ans-footer">
                 <button type="button" class="r3-ctrl-award-btn" id="r3-btn-award-scores">CỘNG ĐIỂM CÂU NÀY</button>
                 <button type="button" class="r3-ctrl-reset-ts-btn" id="r3-btn-reset-player-ans">RESET ĐÁP ÁN TS</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- GIAO DIỆN VÒNG 4: VỀ ĐÍCH -->
+          <div id="r4-controller-ui">
+            <!-- CỘT TRÁI: QUESTION-BOX & ANSWER-BOX -->
+            <div class="r4-left-col">
+              <!-- 1. QUESTION-BOX -->
+              <div class="r4-question-box">
+                <!-- Header: Câu hiện tại, Giá trị các câu hỏi, Đổi câu ngân hàng đề & Thời gian -->
+                <div class="r4-question-header">
+                  <div class="r4-header-left">
+                    <span class="r4-header-turn" id="r4TurnBadge">CHƯA CHỌN TS</span>
+                    <span class="r4-header-divider">|</span>
+                    <span class="r4-header-ques" id="r4QuesNumText">CÂU 1/3</span>
+                    <span class="r4-header-divider">|</span>
+                    <div class="r4-header-qvals" id="r4HeaderQVals">
+                      <button type="button" class="r4-h-qval active" id="r4HeaderQVal-0" data-slot="0" title="Chọn Câu 1">C1: 20đ</button>
+                      <button type="button" class="r4-h-qval" id="r4HeaderQVal-1" data-slot="1" title="Chọn Câu 2">C2: 20đ</button>
+                      <button type="button" class="r4-h-qval" id="r4HeaderQVal-2" data-slot="2" title="Chọn Câu 3">C3: 30đ</button>
+                    </div>
+                  </div>
+
+                  <div class="r4-header-right">
+                    <div class="r4-bank-nav" title="Đổi câu hỏi trong ngân hàng đề">
+                      <button type="button" class="r4-bank-nav-btn" id="r4BtnBankPrev">◀</button>
+                      <span class="r4-bank-code" id="r4ActiveSlotCode">#1</span>
+                      <button type="button" class="r4-bank-nav-btn" id="r4BtnBankNext">▶</button>
+                    </div>
+                    <span class="r4-header-time" id="r4TimeBadge">15s</span>
+                  </div>
+                </div>
+
+                <!-- Thanh chọn nhanh gói 6 câu (3 mức 1 - 3 mức 2) -->
+                <div class="r4-pack-bar">
+                  <span class="r4-pack-label">CHỌN GÓI (3 CÂU):</span>
+                  <div class="r4-pack-grid" id="r4PackGrid">
+                    <button type="button" class="r4-pack-cell" data-pack-idx="0">20</button>
+                    <button type="button" class="r4-pack-cell" data-pack-idx="1">20</button>
+                    <button type="button" class="r4-pack-cell" data-pack-idx="2">20</button>
+                    <button type="button" class="r4-pack-cell" data-pack-idx="3">30</button>
+                    <button type="button" class="r4-pack-cell" data-pack-idx="4">30</button>
+                    <button type="button" class="r4-pack-cell" data-pack-idx="5">30</button>
+                  </div>
+                  <button type="button" class="r4-pack-reset-btn" id="r4BtnResetPack" title="Bỏ chọn gói">↺</button>
+                </div>
+
+                <!-- Nội dung câu hỏi -->
+                <div class="r4-question-content" id="r4PreviewQuestion">Chọn thí sinh và chọn gói 3 câu hỏi để bắt đầu...</div>
+
+                <!-- Hàng nút điều khiển ở góc dưới Question-box -->
+                <div class="r4-question-actions">
+                  <div class="r4-left-actions">
+                    <button type="button" class="r4-btn primary" id="r4BtnShowPack">HIỆN GÓI</button>
+                    <button type="button" class="r4-btn success" id="r4BtnConfirmPack">CHỌN GÓI</button>
+                    <button type="button" class="r4-btn primary" id="r4BtnShowPlayers">HIỆN TÊN TS</button>
+                    <button type="button" class="r4-btn primary" id="r4BtnShowQues">HIỆN CÂU HỎI</button>
+                    <button type="button" class="r4-btn" id="r4BtnPrevSlot">◀ LÙI</button>
+                    <button type="button" class="r4-btn" id="r4BtnNextSlot">TIẾP ▶</button>
+                    <button type="button" class="r4-btn warning" id="r4BtnStartMainTimer">▶ CHẠY ĐỒNG HỒ</button>
+                    <button type="button" class="r4-btn secondary r4-btn-icon" id="r4BtnResetMainTimer" title="Đặt lại đồng hồ">🔄</button>
+                    <button type="button" class="r4-btn danger" id="r4BtnResetGraphic">RESET ĐỒ HỌA</button>
+                  </div>
+
+                  <div class="r4-right-actions">
+                    <button type="button" class="r4-star-btn" id="r4BtnStar" title="Bật / Tắt Ngôi sao hi vọng">⭐ NSHV</button>
+                    <div class="r4-timer-5s-box" id="r4BtnTimer5s" title="Mở / Tắt 5s giành quyền trả lời">5</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. ANSWER-BOX -->
+              <div class="r4-answer-box">
+                <div class="r4-answer-content" id="r4PreviewAnswer">Đáp án: ...</div>
+
+                <div class="r4-answer-actions">
+                  <button type="button" class="r4-btn score-btn success" id="r4BtnMainRight">✔ ĐÚNG</button>
+                  <button type="button" class="r4-btn score-btn danger" id="r4BtnMainWrong">✖ SAI</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- CỘT PHẢI: 4 THÍ SINH & GIÀNH QUYỀN BẤM CHUÔNG -->
+            <div class="r4-right-col">
+              <div class="r4-right-section-title">THÍ SINH VỀ ĐÍCH</div>
+              <div class="r4-players-list" id="r4PlayersList">
+                <div class="r4-player-card" id="r4PlayerCard-1" data-player="1">
+                  <div class="r4-p-top">
+                    <span class="r4-p-name" id="r4PName-1">P1</span>
+                    <span class="r4-p-score" id="r4PScore-1">0</span>
+                  </div>
+                  <button type="button" class="r4-buzz-btn" id="r4BuzzBtn-1" data-buzz-player="1">🔔 GIÀNH QUYỀN</button>
+                </div>
+
+                <div class="r4-player-card" id="r4PlayerCard-2" data-player="2">
+                  <div class="r4-p-top">
+                    <span class="r4-p-name" id="r4PName-2">P2</span>
+                    <span class="r4-p-score" id="r4PScore-2">0</span>
+                  </div>
+                  <button type="button" class="r4-buzz-btn" id="r4BuzzBtn-2" data-buzz-player="2">🔔 GIÀNH QUYỀN</button>
+                </div>
+
+                <div class="r4-player-card" id="r4PlayerCard-3" data-player="3">
+                  <div class="r4-p-top">
+                    <span class="r4-p-name" id="r4PName-3">P3</span>
+                    <span class="r4-p-score" id="r4PScore-3">0</span>
+                  </div>
+                  <button type="button" class="r4-buzz-btn" id="r4BuzzBtn-3" data-buzz-player="3">🔔 GIÀNH QUYỀN</button>
+                </div>
+
+                <div class="r4-player-card" id="r4PlayerCard-4" data-player="4">
+                  <div class="r4-p-top">
+                    <span class="r4-p-name" id="r4PName-4">P4</span>
+                    <span class="r4-p-score" id="r4PScore-4">0</span>
+                  </div>
+                  <button type="button" class="r4-buzz-btn" id="r4BuzzBtn-4" data-buzz-player="4">🔔 GIÀNH QUYỀN</button>
+                </div>
+              </div>
+
+              <!-- Chấm điểm người bấm chuông -->
+              <div class="r4-steal-panel">
+                <div class="r4-steal-status" id="r4StealStatusText">Đang khóa chuông</div>
+                <div class="r4-steal-actions">
+                  <button type="button" class="r4-btn success" id="r4BtnStealRight" disabled>✔ CHUÔNG ĐÚNG</button>
+                  <button type="button" class="r4-btn danger" id="r4BtnStealWrong" disabled>✖ CHUÔNG SAI</button>
+                </div>
+                <button type="button" class="r4-btn secondary r4-clear-buzz-btn" id="r4BtnClearBuzz">XÓA CHUÔNG</button>
               </div>
             </div>
           </div>
@@ -1372,8 +1502,66 @@
             </div>
           </div>
         </div>
-
         <button type="button" class="r3-cfg-save-btn" id="r3-cfg-save-btn">LƯU</button>
+      </div>
+    </div>
+    <!-- MODAL CÀI ĐẶT VÒNG 4 -->
+    <div class="r4-cfg-modal-overlay" id="r4ConfigModal">
+      <div class="r4-cfg-modal-content">
+        <div class="r4-cfg-header">
+          <h2>&#9881; CÀI ĐẶT VÒNG 4 - VỀ ĐÍCH</h2>
+          <button type="button" class="r4-cfg-close-btn" id="r4CfgCloseBtn">✖</button>
+        </div>
+
+        <div class="r4-cfg-section">
+          <div class="r4-cfg-title">1. Cấu hình mức điểm &amp; thời gian suy nghĩ</div>
+          <div class="r4-cfg-grid">
+            <div class="r4-cfg-field">
+              <label for="r4CfgPts1">Điểm gói mức 1:</label>
+              <input type="number" id="r4CfgPts1" value="20" step="5" />
+            </div>
+            <div class="r4-cfg-field">
+              <label for="r4CfgTime1">Thời gian mức 1 (s):</label>
+              <input type="number" id="r4CfgTime1" value="15" min="1" />
+            </div>
+            <div class="r4-cfg-field">
+              <label for="r4CfgPts2">Điểm gói mức 2:</label>
+              <input type="number" id="r4CfgPts2" value="30" step="5" />
+            </div>
+            <div class="r4-cfg-field">
+              <label for="r4CfgTime2">Thời gian mức 2 (s):</label>
+              <input type="number" id="r4CfgTime2" value="20" min="1" />
+            </div>
+            <div class="r4-cfg-field">
+              <label for="r4CfgStealTime">Thời gian giành quyền (s):</label>
+              <input type="number" id="r4CfgStealTime" value="5" min="1" />
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="r4-cfg-section">
+          <div class="r4-cfg-title">2. Cập nhật nhanh tên &amp; điểm thí sinh</div>
+          <div class="r4-cfg-players-grid">
+            <div class="r4-cfg-p-item">
+              <input type="text" id="r4CfgPName-1" placeholder="Tên TS 1" />
+              <input type="number" id="r4CfgPScore-1" value="0" />
+            </div>
+            <div class="r4-cfg-p-item">
+              <input type="text" id="r4CfgPName-2" placeholder="Tên TS 2" />
+              <input type="number" id="r4CfgPScore-2" value="0" />
+            </div>
+            <div class="r4-cfg-p-item">
+              <input type="text" id="r4CfgPName-3" placeholder="Tên TS 3" />
+              <input type="number" id="r4CfgPScore-3" value="0" />
+            </div>
+            <div class="r4-cfg-p-item">
+              <input type="text" id="r4CfgPName-4" placeholder="Tên TS 4" />
+              <input type="number" id="r4CfgPScore-4" value="0" />
+            </div>
+          </div>
+        </div>
+        <button type="button" class="r4-cfg-save-btn" id="r4CfgSaveBtn">LƯU CẤU HÌNH</button>
       </div>
     </div>
 
@@ -1424,6 +1612,9 @@
 
         const r3Ui = document.getElementById('r3-controller-ui');
         if (r3Ui) r3Ui.style.display = (suffix === 'R3') ? 'grid' : 'none';
+        
+        const r4Ui = document.getElementById('r4-controller-ui');
+        if (r4Ui) r4Ui.style.display = (suffix === 'R4') ? 'grid' : 'none';
 
         const mainUi = document.getElementById('main-controller-ui');
         if (mainUi) mainUi.style.display = (suffix === 'M') ? 'contents' : 'none';
