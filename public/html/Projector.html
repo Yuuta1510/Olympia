@@ -240,6 +240,79 @@
             </div>
         </div>
 
+        <!-- GIAO DIỆN VÒNG 4: VỀ ĐÍCH -->
+        <div id="round4-ui" class="round-ui" style="display: none;">
+            <div id="r4-wait-bg"></div>
+            <!-- Giai đoạn 1: Chọn gói câu hỏi -->
+            <div id="r4-pack-stage">
+                <video id="r4_showpack" class="r4-video-layer" src="../graphic/pro_r4_showpack.webm" playsinline preload="auto"></video>
+
+                <div id="r4-pack-shapes">
+                    <div class="r4-pack-shape" id="r4-pack-shape-0"></div>
+                    <div class="r4-pack-shape" id="r4-pack-shape-1"></div>
+                    <div class="r4-pack-shape" id="r4-pack-shape-2"></div>
+                    <div class="r4-pack-shape" id="r4-pack-shape-3"></div>
+                    <div class="r4-pack-shape" id="r4-pack-shape-4"></div>
+                    <div class="r4-pack-shape" id="r4-pack-shape-5"></div>
+                </div>
+
+                <div id="r4-pack-texts">
+                    <div class="r4-pack-text" id="r4-pack-text-0">20</div>
+                    <div class="r4-pack-text" id="r4-pack-text-1">20</div>
+                    <div class="r4-pack-text" id="r4-pack-text-2">20</div>
+                    <div class="r4-pack-text" id="r4-pack-text-3">30</div>
+                    <div class="r4-pack-text" id="r4-pack-text-4">30</div>
+                    <div class="r4-pack-text" id="r4-pack-text-5">30</div>
+                </div>
+            </div>
+
+            <!-- Giai đoạn 2: Câu hỏi & Thi đấu Về đích -->
+            <div id="r4-ques-stage">
+                <video id="r4_showques" class="r4-video-layer" src="../graphic/pro_r4_showques.webm" playsinline preload="auto"></video>
+                <video id="r4_timer" class="r4-video-layer" playsinline preload="auto"></video>
+
+                <!-- Lớp shape nền: 1 shape thí sinh đang chơi + 3 shape thí sinh còn lại -->
+                <div id="r4-ques-shapes">
+                    <div class="r4-player-shape" id="r4-proj-active-shape"></div>
+                    <div class="r4-player-shape" id="r4-proj-other-shape-1"></div>
+                    <div class="r4-player-shape" id="r4-proj-other-shape-2"></div>
+                    <div class="r4-player-shape" id="r4-proj-other-shape-3"></div>
+                </div>
+
+                <!-- Lớp text: 1 tên TS đang chơi + 3 tên TS còn lại (trái -> phải) + điểm + giá trị câu -->
+                <div id="r4-ques-texts">
+                    <div class="r4-player-text r4-proj-active-player" id="r4-proj-active-text"></div>
+
+                    <div class="r4-player-text r4-proj-other-player" id="r4-proj-other-text-1"></div>
+                    <div class="r4-player-text r4-proj-other-player" id="r4-proj-other-text-2"></div>
+                    <div class="r4-player-text r4-proj-other-player" id="r4-proj-other-text-3"></div>
+
+                    <div class="r4-active-score-text" id="r4-active-score-text">0</div>
+
+                    <div class="r4-qval-text" id="r4-qval-text-0">20</div>
+                    <div class="r4-qval-text" id="r4-qval-text-1">20</div>
+                    <div class="r4-qval-text" id="r4-qval-text-2">30</div>
+                </div>
+
+                <div class="r4-qval-shape" id="r4-qval-shape-0"></div>
+                <div class="r4-qval-shape" id="r4-qval-shape-1"></div>
+                <div class="r4-qval-shape" id="r4-qval-shape-2"></div>
+
+                <div id="r4-question-text"></div>
+                <video id="r4_star" src="../graphic/r4_star.webm" loop playsinline preload="auto"></video>
+            </div>
+        </div>
+
+        <div id="round5-ui" style="display: none;">
+            <img id="r5_ques_img" class="r5-graphic-layer" src="../graphic/pro_r5_ques.png" alt="" />
+            <video id="r5_15s_video" class="r5-graphic-layer" src="../graphic/pro_r5_15s.webm" playsinline preload="auto"></video>
+            <audio id="audio_r5_15s" src="../sounds/r5_15s.mp3" preload="auto"></audio>
+
+            <div id="r5-players-container"></div>
+            <div id="r5-question-text"></div>
+            <div id="r5-buzzer-overlay"></div>
+        </div>
+
         <script type="module">
             import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
             import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
@@ -367,7 +440,7 @@
             });
 
             // =====================================================================
-            // 1. ĐỒNG BỘ CHUYỂN TAB (MAIN, R1, R2, R3, R4, SF)
+            // 1. ĐỒNG BỘ CHUYỂN TAB (MAIN, R1, R2, R3, R4, R5)
             // =====================================================================
             const tabFileMap = {
                 'M': 'Main',
@@ -375,7 +448,7 @@
                 'R2': 'Round2',
                 'R3': 'Round3',
                 'R4': 'Round4',
-                'SF': 'SubFinal'
+                'R5': 'Round5'
             };
 
             let currentLoadedTab = 'R1';
@@ -401,6 +474,12 @@
 
                 const r3Ui = document.getElementById('r3-projector-ui');
                 if (r3Ui) r3Ui.style.display = (tabCode === 'R3') ? 'block' : 'none';
+
+                const r4Ui = document.getElementById('round4-ui');
+                if (r4Ui) r4Ui.style.display = (tabCode === 'R4') ? 'block' : 'none';
+
+                const r5Ui = document.getElementById('round5-ui');
+                if (r5Ui) r5Ui.style.display = (tabCode === 'R5') ? 'block' : 'none';
 
                 const cssLink = document.getElementById('projector-css');
                 if (cssLink) {
@@ -554,7 +633,8 @@
                 'R2_Wrong.mp3', 'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
                 'R4_15s.mp3', 'R4_20s.mp3', 'R4_20sPrac.mp3', 'R4_30s.mp3',
                 'R4_30sPrac.mp3', 'R4_40sPrac.mp3', 'R4_60sPrac.mp3', 'R4_Begin.mp3',
-                'R4_End.mp3', 'R4_Intro.mp3'
+                'R4_End.mp3', 'R4_Intro.mp3', 'R4_Star.mp3',
+                'R5_ShowQues.mp3', 'R5_15s.mp3', 'R5_Buzzed.mp3'
             ];
             const SOUND_FILES = soundFileNames.reduce((files, fileName) => {
                 files[soundIdForFileName(fileName)] = `../sounds/${fileName}`;

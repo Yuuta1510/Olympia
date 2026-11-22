@@ -30,6 +30,8 @@ const r4State = {
     slotStatuses: ['pending', 'pending', 'pending'], // 'pending' | 'right' | 'wrong'
     slotQuestionOffset: [0, 0, 0], // Cho phép đổi câu hỏi trong ngân hàng đề
 
+    waitBgShown: false,
+    playersShown: false,
     playersShown: false,          // Trạng thái tên & điểm thí sinh đang hiện trên Livestream
     questionShown: false,         // Trạng thái câu hỏi đang hiện trên Livestream
     starActive: false,
@@ -244,15 +246,16 @@ function ensureR4LayoutDOM() {
 
           <div class="r4-question-actions">
             <div class="r4-left-actions">
-              <button type="button" class="r4-btn primary" id="r4BtnShowPack">HIỆN GÓI</button>
-              <button type="button" class="r4-btn success" id="r4BtnConfirmPack">CHỌN GÓI</button>
-              <button type="button" class="r4-btn primary" id="r4BtnShowPlayers">HIỆN TÊN TS</button>
-              <button type="button" class="r4-btn primary" id="r4BtnShowQues">HIỆN CÂU HỎI</button>
-              <button type="button" class="r4-btn" id="r4BtnPrevSlot">◀ LÙI</button>
-              <button type="button" class="r4-btn" id="r4BtnNextSlot">TIẾP ▶</button>
-              <button type="button" class="r4-btn warning" id="r4BtnStartMainTimer">▶ CHẠY ĐỒNG HỒ</button>
-              <button type="button" class="r4-btn secondary r4-btn-icon" id="r4BtnResetMainTimer" title="Đặt lại đồng hồ">🔄</button>
-              <button type="button" class="r4-btn danger" id="r4BtnResetGraphic">RESET ĐỒ HỌA</button>
+                <button type="button" class="r4-btn primary" id="r4BtnWaitBg">HIỆN NỀN CHỜ</button>
+                <button type="button" class="r4-btn primary" id="r4BtnShowPack">HIỆN GÓI</button>
+                <button type="button" class="r4-btn success" id="r4BtnConfirmPack">CHỌN GÓI</button>
+                <button type="button" class="r4-btn primary" id="r4BtnShowPlayers">HIỆN TÊN TS</button>
+                <button type="button" class="r4-btn primary" id="r4BtnShowQues">HIỆN CÂU HỎI</button>
+                <button type="button" class="r4-btn" id="r4BtnPrevSlot">◀ LÙI</button>
+                <button type="button" class="r4-btn" id="r4BtnNextSlot">TIẾP ▶</button>
+                <button type="button" class="r4-btn warning" id="r4BtnStartMainTimer">▶ CHẠY ĐỒNG HỒ</button>
+                <button type="button" class="r4-btn secondary r4-btn-icon" id="r4BtnResetMainTimer" title="Đặt lại đồng hồ">🔄</button>
+                <button type="button" class="r4-btn danger" id="r4BtnResetGraphic">RESET ĐỒ HỌA</button>
             </div>
             <div class="r4-right-actions">
               <button type="button" class="r4-star-btn" id="r4BtnStar" title="Bật / Tắt Ngôi sao hi vọng">⭐ NSHV</button>
@@ -391,6 +394,12 @@ function renderR4ControllerUI() {
 
     if (timeBadge) {
         timeBadge.textContent = mainTimerDisplayText;
+    }
+
+    const btnWaitBg = document.getElementById('r4BtnWaitBg');
+    if (btnWaitBg) {
+        btnWaitBg.textContent = r4State.waitBgShown ? 'ẨN NỀN CHỜ' : 'HIỆN NỀN CHỜ';
+        btnWaitBg.classList.toggle('active', r4State.waitBgShown);
     }
 
     // 4. Nội dung Câu hỏi & Đáp án trong 2 box
@@ -789,6 +798,7 @@ function selectActivePlayer(pIdx) {
         r4State.turnOrder.push(pIdx);
     }
 
+    r4State.waitBgShown = false;
     r4State.activePlayer = pIdx;
     r4State.stage = 'idle';
     r4State.packChoices = [null, null, null];
@@ -849,8 +859,18 @@ function bindR4Events() {
     if (eventsAbortController) {
         eventsAbortController.abort();
     }
+
     eventsAbortController = new AbortController();
     const { signal } = eventsAbortController;
+
+    document.getElementById('r4BtnWaitBg')?.addEventListener('click', () => {
+        r4State.waitBgShown = !r4State.waitBgShown;
+        sendR4Command({
+            action: r4State.waitBgShown ? 'r4_show_wait_bg' : 'r4_hide_wait_bg'
+        });
+        syncR4StateToDB();
+        renderR4ControllerUI();
+    }, { signal });
 
     // Chọn thí sinh tham gia phần thi ở header của question-box
     document.querySelectorAll('.r4-h-player').forEach(btn => {
@@ -1061,6 +1081,7 @@ function bindR4Events() {
         } else {
             stopMainTimer(false, false);
             markActivePlayerCompleted();
+            r4State.waitBgShown = false;
             r4State.activePlayer = null;
             r4State.stage = 'idle';
             r4State.playersShown = false;
@@ -1117,6 +1138,7 @@ function bindR4Events() {
             r4State.activePlayer = null;
         }
 
+        r4State.waitBgShown = false;
         r4State.stage = 'idle';
         r4State.playersShown = false;
         r4State.questionShown = false;

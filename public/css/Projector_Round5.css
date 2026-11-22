@@ -1,0 +1,144 @@
+/* =========================================================================
+   LIVESTREAM VÒNG 5: CÂU HỎI PHỤ (Round5.css)
+   ========================================================================= */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: transparent;
+    color: #ffffff;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-weight: bold;
+}
+
+#round5-ui {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 5;
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Lớp ảnh r5_ques.png và video r5_15s.webm phủ toàn màn hình 16:9 */
+.r5-graphic-layer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    background-color: transparent;
+    transition: none !important;
+    animation: none !important;
+}
+
+#r5_ques_img {
+    z-index: 1;
+}
+
+#r5_15s_video {
+    display: none;
+    position: fixed;
+    top: -42%;
+    left: -0.5%;
+    width: 106%;
+    height: 150%;
+    object-fit: fill;
+    z-index: 4;
+}
+
+/* =========================================================================
+   DANH SÁCH 2 - 8 THÍ SINH XẾP HÀNG DỌC (GIỮ ĐÚNG TỶ LỆ ẢNH GỐC, CĂN LỀ TRÁI)
+   ========================================================================= */
+#r5-players-container {
+    position: absolute;
+    top: 68%; /* Vị trí mặc định cho 2-4 thí sinh */
+    left: 77%;
+    width: 19.1%;
+    height: 23.3%; /* Cố định chiều cao khung chứa sẵn */
+    z-index: 3;
+    display: none;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 3px;
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Khi số thí sinh lớn hơn 4 (có class .many-players) */
+#r5-players-container.many-players {
+    justify-content: flex-end; /* Căn trên đỉnh khung */
+    gap: 4px; /* Khoảng cách vừa phải giữa các bar */
+}
+
+.r5-ls-player-slot {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: #ffffff;
+    text-align: left;
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Ảnh thanh thí sinh (r5_player.png / r5_buzzer.png) tuân theo đúng tỷ lệ ảnh gốc */
+.r5-ls-player-bg {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Tên thí sinh căn lề trái bên trong thanh (Giữ nguyên font-size 24px cố định) */
+.r5-ls-player-name {
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    font-family: "Myriad Pro";
+    font-size: 26px;
+}
+
+/* =========================================================================
+   NỘI DUNG CÂU HỎI PHỤ (XUẤT HIỆN ĐỒNG LOẠT CÙNG r5_ques.png & r5_player.png)
+   ========================================================================= */
+#r5-question-text {
+    position: absolute;
+    top: 11%;
+    left: 8%;
+    width: 67%;
+    height: 75%;
+    z-index: 3;
+    display: none;
+    align-items: left;
+    justify-content: flex-start;
+    text-align: left;
+    font-family: "UTM Avo";
+    font-size: 40px;
+    line-height: 1.35;
+    color: #ffffff;
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Ẩn lớp phủ chuông phụ nếu còn tồn tại trong HTML */
+#r5-buzzer-overlay {
+    display: none !important;
+}

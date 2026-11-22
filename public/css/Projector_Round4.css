@@ -1,0 +1,426 @@
+/* =========================================================================
+   PROJECTOR VÒNG 4: VỀ ĐÍCH (Projector_Round4.css)
+   ========================================================================= */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: transparent;
+    color: #ffffff;
+    font-family: "UTM Avo", Arial, sans-serif;
+    font-weight: bold;
+}
+
+#round4-ui {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.r4-video-layer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    background-color: transparent;
+}
+
+#r4-wait-bg {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url('../graphic/r4_wait.png') center / cover no-repeat;
+    z-index: 20;
+    display: none;
+    pointer-events: none;
+}
+/* =========================================================================
+   GIAI ĐOẠN 1: CHỌN GÓI CÂU HỎI
+   ========================================================================= */
+#r4-pack-stage {
+    position: fixed;
+    inset: 0;
+    display: none;
+}
+
+#r4-pack-shapes {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#r4-pack-shapes.fade-in {
+    opacity: 1;
+}
+
+.r4-pack-shape {
+    position: absolute;
+    background: linear-gradient(90deg, #660840, #db1546);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.r4-pack-shape.is-selected {
+    opacity: 1;
+}
+
+#r4-pack-texts {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#r4-pack-texts.fade-in {
+    opacity: 1;
+}
+
+.r4-pack-text {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 54px;
+    color: #ffffff;
+    user-select: none;
+}
+
+/* Hàng 1 (3 câu mức 1: 20 điểm) */
+#r4-pack-shape-0 {
+    top: 37.6%;
+    left: 29.5%;
+    width: 14.9%;
+    height: 12.3%;
+    transform: skewX(-19deg);
+}
+
+#r4-pack-text-0 {
+    top: 37%;
+    left: 29.5%;
+    width: 14.6%;
+    height: 12.3%;
+}
+
+#r4-pack-shape-1 {
+    top: 37.6%;
+    left: 44.9%;
+    width: 14.6%;
+    height: 12.3%;
+    transform: skewX(-19deg);
+}
+
+#r4-pack-text-1 {
+    top: 37%;
+    left: 44.9%;
+    width: 14.6%;
+    height: 12.3%;
+}
+
+#r4-pack-shape-2 {
+    top: 37.6%;
+    left: 58.8%;
+    width: 14.6%;
+    height: 12.3%;
+    clip-path: polygon(17% 0%, 83% 0%, 100% 100%, 0% 100%);
+}
+
+#r4-pack-text-2 {
+    top: 37%;
+    left: 58.8%;
+    width: 14.6%;
+    height: 12.3%;
+}
+
+/* Hàng 2 (3 câu mức 2: 30 điểm) */
+#r4-pack-shape-3 {
+    top: 50.7%;
+    left: 28.4%;
+    width: 14.6%;
+    height: 12.3%;
+    clip-path: polygon(0% 0%, 100% 0%, 83% 100%, 17% 100%);
+}
+
+#r4-pack-text-3 {
+    top: 50.1%;
+    left: 28.4%;
+    width: 14.6%;
+    height: 12.3%;
+}
+
+#r4-pack-shape-4 {
+    top: 50.7%;
+    left: 42.3%;
+    width: 14.6%;
+    height: 12.3%;
+    transform: skewX(-19deg);
+}
+
+#r4-pack-text-4 {
+    top: 50.1%;
+    left: 42.3%;
+    width: 14.6%;
+    height: 12.3%;
+}
+
+#r4-pack-shape-5 {
+    top: 50.7%;
+    left: 57.5%;
+    width: 14.6%;
+    height: 12.3%;
+    transform: skewX(-19deg);
+}
+
+#r4-pack-text-5 {
+    top: 50.1%;
+    left: 57.5%;
+    width: 14.6%;
+    height: 12.3%;
+}
+
+/* =========================================================================
+   GIAI ĐOẠN 2: CÂU HỎI & THI ĐẤU VỀ ĐÍCH
+   ========================================================================= */
+#r4-ques-stage {
+    position: fixed;
+    inset: 0;
+    display: none;
+}
+
+#r4-ques-shapes {
+    position: fixed;
+    inset: 0;
+}
+
+/* Shape hình bình hành nền tên thí sinh */
+.r4-player-shape {
+    position: absolute;
+    transform: skewX(-12deg);
+    opacity: 0;
+    z-index: 2;
+}
+
+/* Thí sinh đang chơi: hình bình hành màu xanh */
+.r4-player-shape.is-active-player {
+    opacity: 1;
+    background: linear-gradient(90deg, #082a60, #0e3bfa);
+    border: 2px solid transparent;
+    border-image: linear-gradient(90deg, #082a60, #44d0fa) 1;
+}
+
+/* Thí sinh bấm chuông giành quyền: hình bình hành màu đỏ */
+.r4-player-shape.is-buzzer-player {
+    opacity: 1;
+    background: linear-gradient(90deg, #620535, #e70840);
+    border: 2px solid transparent;
+    border-image: linear-gradient(90deg, #620535, #fe0042) 1;
+}
+
+/* Shape gradient hình bình hành đè dưới text giá trị câu hỏi hiện tại */
+.r4-qval-shape {
+    position: absolute;
+    background: linear-gradient(90deg, #620535, #e70840);
+    transform: skewX(-13deg);
+    opacity: 0;
+    z-index: 4;
+}
+
+.r4-qval-shape.is-current-qval {
+    opacity: 0.5;
+}
+
+/* Lớp chứa text (fade in sau 3s) */
+#r4-ques-texts {
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#r4-ques-texts.fade-in {
+    opacity: 1;
+}
+
+/* --- STYLE CHUNG CHO TEXT TÊN THÍ SINH --- */
+.r4-player-text {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 0.6vw;
+    box-sizing: border-box;
+    z-index: 3;
+}
+
+/* =========================================================================
+   PHẦN 1: VỊ TRÍ THÍ SINH ĐANG CHƠI (1 VỊ TRÍ RIÊNG BIỆT)
+   ========================================================================= */
+#r4-proj-active-shape {
+    top: 9%;
+    left: 13%;
+    width: 60.8%;
+    height: 7%;
+}
+
+#r4-proj-active-text {
+    top: 9.2%;
+    left: 13.3%;
+    width: 60.2%;
+    height: 7%;
+    font-size: 38px;
+    text-transform: uppercase;
+}
+
+/* =========================================================================
+   PHẦN 2: VỊ TRÍ 3 THÍ SINH CÒN LẠI (XẾP TỪ TRÁI SANG PHẢI THEO STT 1 -> 4)
+   ========================================================================= */
+/* Vị trí thí sinh còn lại thứ 1 (Bên trái) */
+#r4-proj-other-shape-1 {
+    top: 60.3%;
+    left: 68.3%;
+    width: 21.6%;
+    height: 9.4%;
+}
+
+#r4-proj-other-text-1 {
+    top: 60.3%;
+    left: 68.3%;
+    width: 21.6%;
+    height: 9.4%;
+}
+
+/* Vị trí thí sinh còn lại thứ 2 (Ở giữa) */
+#r4-proj-other-shape-2 {
+    top: 70.3%;
+    left: 67%;
+    width: 21.6%;
+    height: 9.4%;
+}
+
+#r4-proj-other-text-2 {
+    top: 70.3%;
+    left: 67%;
+    width: 21.6%;
+    height: 9.4%;
+}
+
+/* Vị trí thí sinh còn lại thứ 3 (Bên phải) */
+#r4-proj-other-shape-3 {
+    top: 80.6%;
+    left: 65.8%;
+    width: 21.6%;
+    height: 9.4%;
+}
+
+#r4-proj-other-text-3 {
+    top: 80.6%;
+    left: 65.8%;
+    width: 21.6%;
+    height: 9.4%;
+}
+
+/* --- 1 TEXT ĐIỂM CỦA THÍ SINH ĐANG CHƠI --- */
+.r4-active-score-text {
+    position: absolute;
+    top: 13%;
+    left: 73.5%;
+    width: 15%;
+    height: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 100px;
+    color: #ffffff;
+    transform: scaleX(0.85);
+    z-index: 3;
+}
+
+/* --- 3 TEXT GIÁ TRỊ CÂU HỎI ĐÃ CHỌN & 3 SHAPE TƯƠNG ỨNG --- */
+.r4-qval-text {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    color: #ffffff;
+    z-index: 3;
+}
+
+#r4-qval-shape-0, #r4-qval-text-0 {
+    top: 50%;
+    left: 69.5%;
+    width: 7%;
+    height: 10%;
+}
+
+#r4-qval-shape-1, #r4-qval-text-1 {
+    top: 50%;
+    left: 76.8%;
+    width: 7%;
+    height: 10%;
+}
+
+#r4-qval-shape-2, #r4-qval-text-2 {
+    top: 50%;
+    left: 84.3%;
+    width: 7%;
+    height: 10%;
+}
+
+/* --- TEXT CÂU HỎI --- */
+#r4-question-text {
+    position: absolute;
+    top: 17%;
+    left: 13%;
+    width: 54%;
+    height: 50%;
+    z-index: 3;
+    display: none;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+    font-size: 32px;
+    line-height: 1.35;
+    color: #ffffff;
+}
+
+/* --- VIDEO NGÔI SAO HI VỌNG (KHÔNG ANIMATION) --- */
+#r4_star {
+    display: none;
+    position: fixed;
+    top: 23%;
+    left: 72%;
+    width: 18%;
+    height: auto;
+    object-fit: fill;
+    z-index: 4;
+}
+
+/* --- VIDEO ĐỒ HỌA THỜI GIAN --- */
+#r4_timer {
+    display: none;
+    position: fixed;
+    top: -80%;
+    left: 0.9%;
+    width: 86.2%;
+    height: 180%;
+    object-fit: fill;
+    z-index: 4;
+}

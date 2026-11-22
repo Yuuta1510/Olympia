@@ -409,6 +409,12 @@
     cursor: not-allowed;
 }
 
+.r4-btn.active {
+    border-color: #facc15;
+    color: #facc15;
+    box-shadow: 0 0 8px rgba(250, 204, 21, 0.55);
+}
+
 .r4-btn.primary {
     background-color: #1d4ed8;
 }

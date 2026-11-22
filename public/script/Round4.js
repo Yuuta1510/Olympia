@@ -54,20 +54,73 @@ function fadeInElement(el) {
 // =========================================================================
 // 2. HÀM CẬP NHẬT TEXT & SHAPE THÍ SINH
 // =========================================================================
-function renderPlayersBarAndScore(animateFadeIn = false) {
-    for (let i = 1; i <= 4; i++) {
-        const p = cachedPlayers[i] || { name: `P${i}`, score: 0 };
-        const textEl = document.getElementById(`r4-player-text-${i}`);
-        const shapeEl = document.getElementById(`r4-player-shape-${i}`);
+function isProjectorScreen() {
+    return Boolean(document.getElementById('projector-bg')) ||
+           window.location.pathname.toLowerCase().includes('projector') ||
+           document.title.toLowerCase().includes('projector');
+}
+
+// =========================================================================
+// 2. HÀM CẬP NHẬT TEXT & SHAPE THÍ SINH
+// =========================================================================
+function renderProjectorPlayersBar(animateFadeIn = false) {
+    const activeTextEl = document.getElementById('r4-proj-active-text');
+    const activeShapeEl = document.getElementById('r4-proj-active-shape');
+
+    const validActiveId = (activePlayerIndex >= 1 && activePlayerIndex <= 4)
+        ? Number(activePlayerIndex)
+        : null;
+
+    // 1. Vị trí thí sinh đang chơi
+    if (activeTextEl) {
+        const activePlayer = validActiveId
+            ? (cachedPlayers[validActiveId] || { name: `P${validActiveId}`, score: 0 })
+            : null;
+        activeTextEl.textContent = activePlayer ? activePlayer.name : '';
+
+        if (!arePlayersShown || !validActiveId) {
+            activeTextEl.style.transition = 'none';
+            activeTextEl.style.opacity = '0';
+        } else if (animateFadeIn) {
+            fadeInElement(activeTextEl);
+        } else {
+            activeTextEl.style.opacity = '1';
+        }
+    }
+
+    if (activeShapeEl) {
+        if (!arePlayersShown || !validActiveId) {
+            activeShapeEl.classList.remove('is-active-player', 'is-buzzer-player');
+            activeShapeEl.style.transition = 'none';
+            activeShapeEl.style.opacity = '0';
+        } else {
+            activeShapeEl.classList.add('is-active-player');
+            activeShapeEl.classList.remove('is-buzzer-player');
+            if (animateFadeIn) {
+                fadeInElement(activeShapeEl);
+            } else {
+                activeShapeEl.style.opacity = '1';
+            }
+        }
+    }
+
+    // 2. Vị trí 3 thí sinh còn lại xếp theo thứ tự stt 1 -> 4 từ trái sang phải
+    const remainingIds = [1, 2, 3, 4].filter(id => id !== validActiveId);
+
+    for (let slot = 1; slot <= 3; slot++) {
+        const playerId = remainingIds[slot - 1];
+        const textEl = document.getElementById(`r4-proj-other-text-${slot}`);
+        const shapeEl = document.getElementById(`r4-proj-other-shape-${slot}`);
 
         if (textEl) {
-            if (activePlayerIndex === i) {
-                textEl.textContent = p.name;
-            } else {
+            if (playerId) {
+                const p = cachedPlayers[playerId] || { name: `P${playerId}`, score: 0 };
                 textEl.textContent = `${p.name} (${p.score})`;
+            } else {
+                textEl.textContent = '';
             }
 
-            if (!arePlayersShown) {
+            if (!arePlayersShown || !playerId) {
                 textEl.style.transition = 'none';
                 textEl.style.opacity = '0';
             } else if (animateFadeIn) {
@@ -78,17 +131,16 @@ function renderPlayersBarAndScore(animateFadeIn = false) {
         }
 
         if (shapeEl) {
-            if (!arePlayersShown) {
+            if (!arePlayersShown || !playerId) {
                 shapeEl.classList.remove('is-active-player', 'is-buzzer-player');
                 shapeEl.style.transition = 'none';
                 shapeEl.style.opacity = '0';
             } else {
-                const isActive = activePlayerIndex === i;
-                const isBuzzer = buzzerPlayerIndex === i;
-                shapeEl.classList.toggle('is-active-player', isActive);
+                const isBuzzer = Number(buzzerPlayerIndex) === playerId;
+                shapeEl.classList.remove('is-active-player');
                 shapeEl.classList.toggle('is-buzzer-player', isBuzzer);
 
-                if (isActive || isBuzzer) {
+                if (isBuzzer) {
                     if (animateFadeIn) {
                         fadeInElement(shapeEl);
                     } else {
@@ -97,6 +149,59 @@ function renderPlayersBarAndScore(animateFadeIn = false) {
                 } else {
                     shapeEl.style.transition = 'none';
                     shapeEl.style.opacity = '0';
+                }
+            }
+        }
+    }
+}
+
+function renderPlayersBarAndScore(animateFadeIn = false) {
+    if (isProjectorScreen() && document.getElementById('r4-proj-active-text')) {
+        renderProjectorPlayersBar(animateFadeIn);
+    } else {
+        for (let i = 1; i <= 4; i++) {
+            const p = cachedPlayers[i] || { name: `P${i}`, score: 0 };
+            const textEl = document.getElementById(`r4-player-text-${i}`);
+            const shapeEl = document.getElementById(`r4-player-shape-${i}`);
+
+            if (textEl) {
+                if (activePlayerIndex === i) {
+                    textEl.textContent = p.name;
+                } else {
+                    textEl.textContent = `${p.name} (${p.score})`;
+                }
+
+                if (!arePlayersShown) {
+                    textEl.style.transition = 'none';
+                    textEl.style.opacity = '0';
+                } else if (animateFadeIn) {
+                    fadeInElement(textEl);
+                } else {
+                    textEl.style.opacity = '1';
+                }
+            }
+
+            if (shapeEl) {
+                if (!arePlayersShown) {
+                    shapeEl.classList.remove('is-active-player', 'is-buzzer-player');
+                    shapeEl.style.transition = 'none';
+                    shapeEl.style.opacity = '0';
+                } else {
+                    const isActive = activePlayerIndex === i;
+                    const isBuzzer = buzzerPlayerIndex === i;
+                    shapeEl.classList.toggle('is-active-player', isActive);
+                    shapeEl.classList.toggle('is-buzzer-player', isBuzzer);
+
+                    if (isActive || isBuzzer) {
+                        if (animateFadeIn) {
+                            fadeInElement(shapeEl);
+                        } else {
+                            shapeEl.style.opacity = '1';
+                        }
+                    } else {
+                        shapeEl.style.transition = 'none';
+                        shapeEl.style.opacity = '0';
+                    }
                 }
             }
         }
@@ -325,13 +430,15 @@ function hideQuestionTextOnly() {
     }
 }
 
-// Bước 5: Video đồ họa thời gian (15s -> r4_15s.webm, 20s -> r4_20s.webm, khác -> chỉnh speed r4_20s.webm)
 function startTimerVideo(duration) {
     const timerVid = document.getElementById('r4_timer');
     if (!timerVid) return;
 
     const dur = Math.max(1, Number(duration) || 15);
-    const targetSrc = dur === 15 ? '../graphic/r4_15s.webm' : '../graphic/r4_20s.webm';
+    const prefix = isProjectorScreen() ? 'pro_' : '';
+    const targetSrc = dur === 15
+        ? `../graphic/${prefix}r4_15s.webm`
+        : `../graphic/${prefix}r4_20s.webm`;
     const rate = (dur === 15 || dur === 20) ? 1 : (20 / dur);
 
     timerVid.pause();
@@ -395,11 +502,19 @@ function toggleStarVideo(isActive) {
     }
 }
 
+function toggleR4WaitBg(isVisible) {
+    if (!isProjectorScreen()) return;
+    const waitBgEl = document.getElementById('r4-wait-bg');
+    if (!waitBgEl) return;
+    waitBgEl.style.display = isVisible ? 'block' : 'none';
+}
+
 function resetAllR4Graphics() {
     clearR4Timers();
     hidePackStage();
     hideQuesStage();
     stopTimerVideo();
+    toggleR4WaitBg(false);
     activePlayerIndex = null;
     buzzerPlayerIndex = null;
     arePlayersShown = false;
@@ -431,6 +546,14 @@ function initRound4Livestream() {
         if (!data || !data.action) return;
 
         switch (data.action) {
+            case 'r4_show_wait_bg':
+                toggleR4WaitBg(true);
+                break;
+
+            case 'r4_hide_wait_bg':
+                toggleR4WaitBg(false);
+                break;
+                
             case 'r4_show_pack':
                 showPackStage(data.ptsLevel1, data.ptsLevel2, data.selectedIndices || []);
                 break;
