@@ -188,11 +188,7 @@ function handlePlayerBuzz(playerIdx) {
 
     r5State.wasTimerRunningBeforeBuzz = r5State.isTimerRunning;
     if (r5State.isTimerRunning) {
-        setTimeout(() => {
-            if (r5State.buzzedIndex !== null) {
-                pause15sTimer(false);
-            }
-        }, 500);
+        pause15sTimer(false);
     }
 
     r5State.buzzedIndex = playerIdx;
@@ -206,7 +202,8 @@ function handlePlayerBuzz(playerIdx) {
         playerIndex: playerIdx,
         playerName: r5State.players[playerIdx],
         players: r5State.players,
-        eliminatedIndices: r5State.eliminatedIndices
+        eliminatedIndices: r5State.eliminatedIndices,
+        remainingMs: r5State.remainingMs
     });
 
     syncR5StateToDB();

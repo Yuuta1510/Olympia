@@ -29,6 +29,14 @@ const lsR5State = {
 
 const unsubscribers = [];
 let lastProcessedCommandTs = 0;
+let buzzPauseTimeout = null;
+
+function clearBuzzPauseTimeout() {
+    if (buzzPauseTimeout !== null) {
+        clearTimeout(buzzPauseTimeout);
+        buzzPauseTimeout = null;
+    }
+}
 
 function preloadPlayerBarGraphics() {
     [PLAYER_BAR_IMG, BUZZED_BAR_IMG].forEach((src) => {
@@ -242,12 +250,17 @@ function handleR5Command(data) {
             break;
 
         case 'r5_buzz':
-            setTimeout(() => {
-                pause15sMedia();
-            }, 200);
+            clearBuzzPauseTimeout();
             if (Array.isArray(data.players)) lsR5State.players = data.players;
             lsR5State.buzzedIndex = typeof data.playerIndex === 'number' ? data.playerIndex : null;
             renderLivestreamPlayers();
+
+            buzzPauseTimeout = setTimeout(() => {
+                buzzPauseTimeout = null;
+                if (lsR5State.buzzedIndex !== null) {
+                    pause15sMedia();
+                }
+            }, 200);
             break;
 
         case 'r5_clear_buzz':
