@@ -638,11 +638,12 @@
                 <option value="round_2">Vòng 2: Vượt Chướng Ngại Vật</option>
                 <option value="round_3">Vòng 3: Tăng Tốc</option>
                 <option value="round_4">Vòng 4: Về Đích</option>
-                <option value="sub_final">Câu Hỏi Phụ</option>
+                <option value="round_5">Câu Hỏi Phụ</option>
               </optgroup>
             </select>
           </div>
 
+          <!-- FORM MẶC ĐỊNH (VÒNG 1 & CÂU HỎI PHỤ) -->
           <div id="defaultForm" style="display: flex; flex-direction: column; gap: 12px;">
               <div class="form-group">
                 <label>Số Thứ Tự Câu:</label>
@@ -650,12 +651,12 @@
               </div>
 
               <div class="form-group">
-                <label>Nội dung Câu Hỏi (Cột B):</label>
+                <label>Nội dung Câu Hỏi (cau_hoi):</label>
                 <textarea id="quesContent" placeholder="Nhập câu hỏi..."></textarea>
               </div>
 
               <div class="form-group">
-                <label>Đáp Án (Cột C):</label>
+                <label>Đáp Án (dap_an):</label>
                 <input type="text" id="quesAnswer" placeholder="Nhập đáp án...">
               </div>
           </div>
@@ -942,7 +943,7 @@
     let activeR3AnsObjectUrl = null;
 
     function escapeHtml(str) {
-      return String(str || '')
+      return String(str ?? '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
@@ -958,12 +959,8 @@
     }
 
     // ==========================================
-    // XỬ LÝ UPLOAD & PREVIEW VÒNG 2
+    // XỬ LÝ DỮ LIỆU VÒNG 4 & VÒNG 5
     // ==========================================
-    // Ánh xạ vị trí trong Firebase questions/round_4:
-    // Mỗi thí sinh p (1..4) có 6 câu tại index (p-1)*6 + 1 .. (p-1)*6 + 6:
-    // +1, +2, +3: Câu 1, 2, 3 mức 20 điểm
-    // +4, +5, +6: Câu 1, 2, 3 mức 30 điểm
     function getR4DbIndex(playerIdx, level, slotNum) {
       const base = (Number(playerIdx) - 1) * 6;
       const levelOffset = Number(level) === 2 ? 3 : 0;
@@ -1023,6 +1020,23 @@
       renderQuestionList();
     };
 
+    function setNextR5QuestionNumber() {
+      const quesNumberInput = document.getElementById('quesNumber');
+      if (!quesNumberInput) return;
+      const r5Data = allQuestionsData.round_5 || {};
+      let nextSlot = 1;
+      for (let i = 1; i <= 12; i++) {
+        if (!r5Data[i]) {
+          nextSlot = i;
+          break;
+        }
+      }
+      quesNumberInput.value = String(nextSlot);
+    }
+
+    // ==========================================
+    // XỬ LÝ UPLOAD & PREVIEW VÒNG 2
+    // ==========================================
     window.updateR2ImagePreview = function(url) {
       const cleanUrl = String(url || '').trim();
       const wrap = document.getElementById('r2_image_preview_wrap');
@@ -1326,6 +1340,7 @@
       const r2Form = document.getElementById('r2Form');
       const r3Form = document.getElementById('r3Form');
       const r4Form = document.getElementById('r4Form');
+      const quesNumberInput = document.getElementById('quesNumber');
 
       defaultForm.style.display = 'none';
       r2Form.style.display = 'none';
@@ -1333,15 +1348,25 @@
       r4Form.style.display = 'none';
 
       if (roundKey === 'round_2') {
-          r2Form.style.display = 'block';
+        r2Form.style.display = 'block';
       } else if (roundKey === 'round_3') {
-          r3Form.style.display = 'flex';
+        r3Form.style.display = 'flex';
       } else if (roundKey === 'round_4') {
         r4Form.style.display = 'flex';
         updateR4PlayerTabsUI();
         populateR4FormForPlayer(selectedR4Player);
       } else {
         defaultForm.style.display = 'flex';
+        if (quesNumberInput) {
+          if (roundKey === 'round_5') {
+            quesNumberInput.min = '1';
+            quesNumberInput.max = '12';
+            setNextR5QuestionNumber();
+          } else {
+            quesNumberInput.min = '1';
+            quesNumberInput.max = '100';
+          }
+        }
       }
       renderQuestionList();
     };
@@ -1377,6 +1402,9 @@
       if (document.getElementById('roundSelect').value === 'round_4') {
         populateR4FormForPlayer(selectedR4Player);
       }
+      if (document.getElementById('roundSelect')?.value === 'round_5' && !document.getElementById('quesContent')?.value.trim()) {
+        setNextR5QuestionNumber();
+      }
       renderQuestionList();
     });
 
@@ -1387,91 +1415,96 @@
       const roundKey = document.getElementById('roundSelect').value;
       
       if (roundKey === 'round_2') {
-          if (activeR2UploadPromise) {
-              try {
-                  await activeR2UploadPromise;
-              } catch (e) {
-                  alert("❌ Không thể lưu vì tải ảnh lên Firebase Storage thất bại!");
-                  return;
-              }
+        if (activeR2UploadPromise) {
+          try {
+            await activeR2UploadPromise;
+          } catch (e) {
+            alert("❌ Không thể lưu vì tải ảnh lên Firebase Storage thất bại!");
+            return;
           }
+        }
 
-          const imageLink = document.getElementById('r2_image').value.trim();
-          let hasEmpty = false;
-          let r2Data = {};
-          
-          for(let i=1; i<=5; i++) {
-              const q = document.getElementById(`r2_q${i}`).value.trim();
-              const a = document.getElementById(`r2_a${i}`).value.trim();
-              if(!q || !a) hasEmpty = true;
-              r2Data[i] = { cau_hoi: q, dap_an: a, image: imageLink };
-          }
-          
-          const qCnv = document.getElementById('r2_q_cnv').value.trim();
-          const aCnv = document.getElementById('r2_a_cnv').value.trim();
-          if(!qCnv || !aCnv) hasEmpty = true;
-          
-          r2Data['cnv'] = { cau_hoi: qCnv, dap_an: aCnv, image: imageLink };
-          
-          if (hasEmpty) {
-              alert("⚠️ Vui lòng điền đủ 5 hàng ngang và Từ khóa chướng ngại vật!");
-              return;
-          }
+        const imageLink = document.getElementById('r2_image').value.trim();
+        let hasEmpty = false;
+        let r2Data = {};
+        
+        for (let i = 1; i <= 5; i++) {
+          const q = document.getElementById(`r2_q${i}`).value.trim();
+          const a = document.getElementById(`r2_a${i}`).value.trim();
+          if (!q || !a) hasEmpty = true;
+          r2Data[i] = { cau_hoi: q, dap_an: a, image: imageLink };
+        }
+        
+        const qCnv = document.getElementById('r2_q_cnv').value.trim();
+        const aCnv = document.getElementById('r2_a_cnv').value.trim();
+        if (!qCnv || !aCnv) hasEmpty = true;
+        
+        r2Data['cnv'] = { cau_hoi: qCnv, dap_an: aCnv, image: imageLink };
+        
+        if (hasEmpty) {
+          alert("⚠️ Vui lòng điền đủ 5 hàng ngang và Từ khóa chướng ngại vật!");
+          return;
+        }
 
-          set(ref(db, `questions/round_2`), r2Data).then(() => {
-              alert("✅ Đã lưu bộ đề Vòng 2 thành công!");
-          }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
+        set(ref(db, `questions/round_2`), r2Data).then(() => {
+          alert("✅ Đã lưu bộ đề Vòng 2 thành công!");
+        }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
           
       } else if (roundKey === 'round_3') {
-          if (activeR3UploadPromise || activeR3AnsUploadPromise) {
-              try {
-                  await Promise.all([activeR3UploadPromise, activeR3AnsUploadPromise].filter(Boolean));
-              } catch (e) {
-                  alert("❌ Không thể lưu vì tải media lên Firebase Storage thất bại!");
-                  return;
-              }
+        if (activeR3UploadPromise || activeR3AnsUploadPromise) {
+          try {
+            await Promise.all([activeR3UploadPromise, activeR3AnsUploadPromise].filter(Boolean));
+          } catch (e) {
+            alert("❌ Không thể lưu vì tải media lên Firebase Storage thất bại!");
+            return;
           }
+        }
 
-          const qNum = Math.min(4, Math.max(1, parseInt(document.getElementById('r3_ques_num').value, 10) || 1));
-          const defaultDur = qNum <= 2 ? 20 : 30;
-          const duration = Math.max(5, Number(document.getElementById('r3_duration').value) || defaultDur);
-          const qContent = document.getElementById('r3_content').value.trim();
-          const qAnswer = document.getElementById('r3_answer').value.trim();
+        const qNum = parseInt(document.getElementById('r3_ques_num').value, 10);
+        if (!Number.isInteger(qNum) || qNum < 1 || qNum > 4) {
+          alert("⚠️ Vòng 3 chỉ gồm 4 câu hỏi (Câu 1 đến Câu 4)!");
+          return;
+        }
 
-          const mediaUrl = document.getElementById('r3_media_url').value.trim();
-          const selectedType = document.getElementById('r3_media_type').value;
-          const mediaType = resolveR3MediaType(mediaUrl, selectedType);
+        const defaultDur = qNum <= 2 ? 20 : 30;
+        const duration = parseInt(document.getElementById('r3_duration').value, 10) || defaultDur;
+        const content = document.getElementById('r3_content').value.trim();
+        const answer = document.getElementById('r3_answer').value.trim();
 
-          const ansMediaUrl = document.getElementById('r3_ans_media_url').value.trim();
-          const selectedAnsType = document.getElementById('r3_ans_media_type').value;
-          const ansMediaType = resolveR3MediaType(ansMediaUrl, selectedAnsType);
+        const mediaUrl = document.getElementById('r3_media_url').value.trim();
+        const selectedMediaType = document.getElementById('r3_media_type').value;
+        const resolvedMediaType = resolveR3MediaType(mediaUrl, selectedMediaType);
 
-          if (!qContent && !mediaUrl) {
-              alert("⚠️ Vui lòng nhập nội dung câu hỏi hoặc chọn file / nhập link media!");
-              return;
-          }
-          if (!qAnswer && !ansMediaUrl) {
-              alert("⚠️ Vui lòng nhập đáp án hoặc chọn media đáp án!");
-              return;
-          }
+        const ansMediaUrl = document.getElementById('r3_ans_media_url').value.trim();
+        const selectedAnsMediaType = document.getElementById('r3_ans_media_type').value;
+        const resolvedAnsMediaType = resolveR3MediaType(ansMediaUrl, selectedAnsMediaType);
 
-          const quesRef = ref(db, `questions/round_3/${qNum}`);
-          set(quesRef, {
-              cau_hoi: qContent,
-              dap_an: qAnswer,
-              media: mediaUrl,
-              media_type: mediaType,
-              answer_media: ansMediaUrl,
-              answer_media_type: ansMediaType,
-              thoi_gian: duration,
-              phan_thi: 'round_3'
-          }).then(() => {
-              alert(`✅ Đã lưu Câu ${qNum} Vòng 3 thành công!`);
-              const nextNum = qNum < 4 ? qNum + 1 : 1;
-              resetForm();
-              document.getElementById('r3_ques_num').value = String(nextNum);
-              window.handleR3QuesNumChange();
-          }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
+        if (!content && !mediaUrl) {
+          alert("⚠️ Vui lòng nhập nội dung câu hỏi hoặc chọn/nhập media câu hỏi!");
+          return;
+        }
+        if (!answer && !ansMediaUrl) {
+          alert("⚠️ Vui lòng nhập đáp án hoặc chọn/nhập media đáp án!");
+          return;
+        }
+
+        const r3Payload = {
+          cau_hoi: content,
+          dap_an: answer,
+          thoi_gian: duration,
+          media: mediaUrl,
+          media_type: resolvedMediaType === 'none' ? '' : resolvedMediaType,
+          image: resolvedMediaType === 'image' ? mediaUrl : '',
+          video: resolvedMediaType === 'video' ? mediaUrl : '',
+          answer_media: ansMediaUrl,
+          answer_media_type: resolvedAnsMediaType === 'none' ? '' : resolvedAnsMediaType,
+          phan_thi: 'round_3'
+        };
+
+        set(ref(db, `questions/round_3/${qNum}`), r3Payload).then(() => {
+          alert(`✅ Đã lưu Câu ${qNum} Vòng 3 thành công!`);
+        }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
+
       } else if (roundKey === 'round_4') {
         const updates = {};
         let filledCount = 0;
@@ -1525,20 +1558,42 @@
         }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
 
       } else {
-        const qNum = parseInt(document.getElementById('quesNumber').value);
+        const qNum = parseInt(document.getElementById('quesNumber').value, 10);
         const qContent = document.getElementById('quesContent').value.trim();
         const qAnswer = document.getElementById('quesAnswer').value.trim();
+
+        if (!Number.isInteger(qNum) || qNum < 1) {
+          alert("⚠️ Số thứ tự câu hỏi không hợp lệ!");
+          return;
+        }
         if (!qContent || !qAnswer) {
           alert("⚠️ Vui lòng nhập đầy đủ nội dung câu hỏi và đáp án!");
           return;
         }
-        
-        let targetRound = 'round_1'; 
-        if (roundKey === 'round_3' || roundKey === 'round_5') {
-          targetRound = roundKey;
+
+        if (roundKey === 'round_5') {
+          if (qNum > 12) {
+            alert("⚠️ Phần Câu Hỏi Phụ chỉ lưu tối đa 12 câu (Số thứ tự từ 1 đến 12)!");
+            return;
+          }
+          const existingR5 = allQuestionsData.round_5 || {};
+          const validKeys = Object.keys(existingR5).filter(k => existingR5[k] !== null && existingR5[k] !== undefined);
+          if (!existingR5[qNum] && validKeys.length >= 12) {
+            alert("⚠️ Đã đạt giới hạn tối đa 12 câu hỏi phụ! Vui lòng sửa hoặc xóa bớt câu cũ.");
+            return;
+          }
+
+          set(ref(db, `questions/round_5/${qNum}`), {
+            cau_hoi: qContent,
+            dap_an: qAnswer
+          }).then(() => {
+            alert("✅ Đã lưu câu hỏi phụ thành công!");
+            resetForm();
+          }).catch(err => alert("❌ Lỗi khi lưu: " + err.message));
+          return;
         }
 
-        const quesRef = ref(db, `questions/${targetRound}/${qNum}`);
+        const quesRef = ref(db, `questions/round_1/${qNum}`);
         set(quesRef, {
           cau_hoi: qContent,
           dap_an: qAnswer,
@@ -1551,7 +1606,7 @@
     };
 
     window.resetForm = function() {
-      const roundKey = document.getElementById('roundSelect').value;
+      const roundKey = document.getElementById('roundSelect')?.value;
 
       if (roundKey === 'round_4') {
         for (let s = 1; s <= 3; s++) {
@@ -1563,10 +1618,15 @@
         return;
       }
 
-      document.getElementById('quesNumber').value = '1';
       document.getElementById('quesContent').value = '';
       document.getElementById('quesAnswer').value = '';
       document.getElementById('editIndex').value = '';
+
+      if (roundKey === 'round_5') {
+        setNextR5QuestionNumber();
+      } else {
+        document.getElementById('quesNumber').value = '1';
+      }
       
       window.clearR2Image();
       for (let i = 1; i <= 5; i++) {
@@ -1618,6 +1678,7 @@
         document.getElementById('quesNumber').value = index;
         document.getElementById('quesContent').value = q.cau_hoi || '';
         document.getElementById('quesAnswer').value = q.dap_an || '';
+        document.getElementById('editIndex').value = index;
         document.getElementById('quesContent').focus();
       }
     };
@@ -1646,15 +1707,17 @@
     };
 
     window.editR2Question = function(data) {
-      const imgUrl = data['cnv']?.image || data[1]?.image || '';
+      const r2 = data || allQuestionsData.round_2;
+      if (!r2) return;
+      const imgUrl = r2['cnv']?.image || r2[1]?.image || '';
       document.getElementById('r2_image').value = imgUrl;
       window.updateR2ImagePreview(imgUrl);
       for (let i = 1; i <= 5; i++) {
-        document.getElementById(`r2_q${i}`).value = data[i]?.cau_hoi || '';
-        document.getElementById(`r2_a${i}`).value = data[i]?.dap_an || '';
+        document.getElementById(`r2_q${i}`).value = r2[i]?.cau_hoi || '';
+        document.getElementById(`r2_a${i}`).value = r2[i]?.dap_an || '';
       }
-      document.getElementById('r2_q_cnv').value = data['cnv']?.cau_hoi || '';
-      document.getElementById('r2_a_cnv').value = data['cnv']?.dap_an || '';
+      document.getElementById('r2_q_cnv').value = r2['cnv']?.cau_hoi || '';
+      document.getElementById('r2_a_cnv').value = r2['cnv']?.dap_an || '';
       document.getElementById('r2_q1').focus();
     };
 
@@ -1669,6 +1732,7 @@
     window.deleteR2 = function() {
       if (confirm(`Bạn có chắc chắn muốn xóa toàn bộ bộ đề Vòng 2 không?`)) {
         remove(ref(db, `questions/round_2`)).then(() => {
+          window.resetForm();
           alert("🗑️ Đã xóa Vòng 2 thành công!");
         });
       }
@@ -1682,81 +1746,85 @@
       let count = 0;
 
       if (roundKey === 'round_2') {
-          const r2 = allQuestionsData.round_2;
-          if (r2 && Object.keys(r2).length > 0) {
-              count = 6;
-              const cnvImage = r2['cnv']?.image || r2[1]?.image || '';
-              html += `<div class="question-card" style="flex-direction: column; align-items: stretch; background: #1e1b4b; border-color: #6366f1;">`;
-              html += `<div style="display: flex; justify-content: space-between; border-bottom: 1px solid #4338ca; padding-bottom: 8px; margin-bottom: 8px;">`;
-              html += `<div style="color: #a5b4fc; font-weight: bold; font-size: 14px;">BỘ ĐỀ VƯỢT CHƯỚNG NGẠI VẬT</div>`;
-              html += `<div>
-                          <button class="q-btn" onclick="editR2Question()">Sửa Bộ Đề</button>
-                          <button class="q-btn del" onclick="deleteR2()">Xóa Toàn Bộ</button>
-                       </div>`;
-              html += `</div>`;
+        const r2 = allQuestionsData.round_2;
+        if (r2 && Object.keys(r2).length > 0) {
+          count = 6;
+          const cnvImage = r2['cnv']?.image || r2[1]?.image || '';
+          html += `<div class="question-card" style="flex-direction: column; align-items: stretch; background: #1e1b4b; border-color: #6366f1;">`;
+          html += `<div style="display: flex; justify-content: space-between; border-bottom: 1px solid #4338ca; padding-bottom: 8px; margin-bottom: 8px;">`;
+          html += `<div style="color: #a5b4fc; font-weight: bold; font-size: 14px;">BỘ ĐỀ VƯỢT CHƯỚNG NGẠI VẬT</div>`;
+          html += `<div>
+                      <button class="q-btn" onclick="editR2Question()">Sửa Bộ Đề</button>
+                      <button class="q-btn del" onclick="deleteR2()">Xóa Toàn Bộ</button>
+                   </div>`;
+          html += `</div>`;
 
-              if (cnvImage) {
-                  html += `<div style="margin-bottom: 8px;"><img src="${escapeHtml(cnvImage)}" alt="Ảnh CNV" style="max-width: 240px; width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; border: 1px solid #4f46e5;"></div>`;
-              }
-              
-              for(let i=1; i<=5; i++) {
-                  if(r2[i]) html += `<div style="font-size: 12px; color: #cbd5e1; margin-bottom: 4px;"><b>Hàng ${i}:</b> ${escapeHtml(r2[i].cau_hoi)} <span style="color:#34d399">(Đ/A: ${escapeHtml(r2[i].dap_an)})</span></div>`;
-              }
-              if(r2['cnv']) html += `<div style="font-size: 13px; color: #fca5a5; margin-top: 6px; border-top: 1px solid #4338ca; padding-top: 6px;"><b>CNV:</b> ${escapeHtml(r2['cnv'].cau_hoi)} <span style="color:#facc15">(Đ/A: ${escapeHtml(r2['cnv'].dap_an)})</span></div>`;
-              
-              html += `</div>`;
+          if (cnvImage) {
+            html += `<div style="margin-bottom: 8px;"><img src="${escapeHtml(cnvImage)}" alt="Ảnh CNV" style="max-width: 240px; width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; border: 1px solid #4f46e5;"></div>`;
           }
+          
+          for (let i = 1; i <= 5; i++) {
+            if (r2[i]) {
+              html += `<div style="font-size: 12px; color: #cbd5e1; margin-bottom: 4px;"><b>Hàng ${i}:</b> ${escapeHtml(r2[i].cau_hoi)} <span style="color:#34d399">(Đ/A: ${escapeHtml(r2[i].dap_an)})</span></div>`;
+            }
+          }
+          if (r2['cnv']) {
+            html += `<div style="font-size: 13px; color: #fca5a5; margin-top: 6px; border-top: 1px solid #4338ca; padding-top: 6px;"><b>CNV:</b> ${escapeHtml(r2['cnv'].cau_hoi)} <span style="color:#facc15">(Đ/A: ${escapeHtml(r2['cnv'].dap_an)})</span></div>`;
+          }
+          
+          html += `</div>`;
+        }
       } else if (roundKey === 'round_3') {
-          const r3 = allQuestionsData.round_3 || {};
-          for (let idx = 1; idx <= 4; idx++) {
-              const q = r3[idx];
-              if (q !== null && q !== undefined) {
-                  count++;
-                  const dur = Number(q.thoi_gian ?? q.time ?? q.duration) || (idx <= 2 ? 20 : 30);
-                  const rawUrl = String(q.video || q.vid || q.media || q.url || q.file || q.image || q.img || q.hinh_anh || '').trim();
-                  const declaredType = String(q.media_type || q.mediaType || q.type || '').toLowerCase();
-                  const mType = resolveR3MediaType(rawUrl, declaredType);
+        const r3 = allQuestionsData.round_3 || {};
+        for (let idx = 1; idx <= 4; idx++) {
+          const q = r3[idx];
+          if (q !== null && q !== undefined) {
+            count++;
+            const dur = Number(q.thoi_gian ?? q.time ?? q.duration) || (idx <= 2 ? 20 : 30);
+            const rawUrl = String(q.video || q.vid || q.media || q.url || q.file || q.image || q.img || q.hinh_anh || '').trim();
+            const declaredType = String(q.media_type || q.mediaType || q.type || '').toLowerCase();
+            const mType = resolveR3MediaType(rawUrl, declaredType);
 
-                  const rawAnsUrl = String(q.answer_media || q.ans_media || q.media_dap_an || q.answerMedia || '').trim();
-                  const declaredAnsType = String(q.answer_media_type || q.ans_media_type || q.answerMediaType || '').toLowerCase();
-                  const ansMType = resolveR3MediaType(rawAnsUrl, declaredAnsType);
+            const rawAnsUrl = String(q.answer_media || q.ans_media || q.media_dap_an || q.answerMedia || '').trim();
+            const declaredAnsType = String(q.answer_media_type || q.ans_media_type || q.answerMediaType || '').toLowerCase();
+            const ansMType = resolveR3MediaType(rawAnsUrl, declaredAnsType);
 
-                  let badgeHtml = `<span class="q-badge txt">CHỈ TEXT</span>`;
-                  let thumbsHtml = '';
+            let badgeHtml = `<span class="q-badge txt">CHỈ TEXT</span>`;
+            let thumbsHtml = '';
 
-                  if (mType === 'video' && rawUrl) {
-                      badgeHtml = `<span class="q-badge vid">VIDEO</span>`;
-                      thumbsHtml += `<div class="q-thumb-item"><video class="q-thumb" src="${escapeHtml(rawUrl)}" muted preload="metadata"></video><span class="q-thumb-tag">ĐỀ</span></div>`;
-                  } else if (mType === 'image' && rawUrl) {
-                      badgeHtml = `<span class="q-badge img">HÌNH ẢNH</span>`;
-                      thumbsHtml += `<div class="q-thumb-item"><img class="q-thumb" src="${escapeHtml(rawUrl)}" alt="Media câu ${idx}"><span class="q-thumb-tag">ĐỀ</span></div>`;
-                  }
+            if (mType === 'video' && rawUrl) {
+              badgeHtml = `<span class="q-badge vid">VIDEO</span>`;
+              thumbsHtml += `<div class="q-thumb-item"><video class="q-thumb" src="${escapeHtml(rawUrl)}" muted preload="metadata"></video><span class="q-thumb-tag">ĐỀ</span></div>`;
+            } else if (mType === 'image' && rawUrl) {
+              badgeHtml = `<span class="q-badge img">HÌNH ẢNH</span>`;
+              thumbsHtml += `<div class="q-thumb-item"><img class="q-thumb" src="${escapeHtml(rawUrl)}" alt="Media câu ${idx}"><span class="q-thumb-tag">ĐỀ</span></div>`;
+            }
 
-                  if (ansMType === 'video' && rawAnsUrl) {
-                      badgeHtml += `<span class="q-badge ans-media">VIDEO Đ/A</span>`;
-                      thumbsHtml += `<div class="q-thumb-item is-ans"><video class="q-thumb" src="${escapeHtml(rawAnsUrl)}" muted preload="metadata"></video><span class="q-thumb-tag" style="color:#4ade80;">Đ/A</span></div>`;
-                  } else if (ansMType === 'image' && rawAnsUrl) {
-                      badgeHtml += `<span class="q-badge ans-media">ẢNH Đ/A</span>`;
-                      thumbsHtml += `<div class="q-thumb-item is-ans"><img class="q-thumb" src="${escapeHtml(rawAnsUrl)}" alt="Media Đ/A câu ${idx}"><span class="q-thumb-tag" style="color:#4ade80;">Đ/A</span></div>`;
-                  }
+            if (ansMType === 'video' && rawAnsUrl) {
+              badgeHtml += `<span class="q-badge ans-media">VIDEO Đ/A</span>`;
+              thumbsHtml += `<div class="q-thumb-item is-ans"><video class="q-thumb" src="${escapeHtml(rawAnsUrl)}" muted preload="metadata"></video><span class="q-thumb-tag" style="color:#4ade80;">Đ/A</span></div>`;
+            } else if (ansMType === 'image' && rawAnsUrl) {
+              badgeHtml += `<span class="q-badge ans-media">ẢNH Đ/A</span>`;
+              thumbsHtml += `<div class="q-thumb-item is-ans"><img class="q-thumb" src="${escapeHtml(rawAnsUrl)}" alt="Media Đ/A câu ${idx}"><span class="q-thumb-tag" style="color:#4ade80;">Đ/A</span></div>`;
+            }
 
-                  const qTextDisplay = q.cau_hoi ? escapeHtml(q.cau_hoi) : '<i style="color:#94a3b8;">(Câu hỏi chỉ có media)</i>';
+            const qTextDisplay = q.cau_hoi ? escapeHtml(q.cau_hoi) : '<i style="color:#94a3b8;">(Câu hỏi chỉ có media)</i>';
 
-                  html += `
-                    <div class="question-card">
-                      ${thumbsHtml ? `<div class="q-thumbs-wrap">${thumbsHtml}</div>` : ''}
-                      <div class="q-info">
-                        <div class="q-title"><b>Câu ${idx} (${dur}s):</b> ${qTextDisplay} ${badgeHtml}</div>
-                        <div class="q-ans">Đáp án: ${escapeHtml(q.dap_an || '(Xem media đáp án)')}</div>
-                      </div>
-                      <div class="q-actions">
-                        <button class="q-btn" onclick="editQuestion('round_3', ${idx})">Sửa</button>
-                        <button class="q-btn del" onclick="deleteQuestion('round_3', ${idx})">Xóa</button>
-                      </div>
-                    </div>
-                  `;
-              }
+            html += `
+              <div class="question-card">
+                ${thumbsHtml ? `<div class="q-thumbs-wrap">${thumbsHtml}</div>` : ''}
+                <div class="q-info">
+                  <div class="q-title"><b>Câu ${idx} (${dur}s):</b> ${qTextDisplay} ${badgeHtml}</div>
+                  <div class="q-ans">Đáp án: ${escapeHtml(q.dap_an || '(Xem media đáp án)')}</div>
+                </div>
+                <div class="q-actions">
+                  <button class="q-btn" onclick="editQuestion('round_3', ${idx})">Sửa</button>
+                  <button class="q-btn del" onclick="deleteQuestion('round_3', ${idx})">Xóa</button>
+                </div>
+              </div>
+            `;
           }
+        }
       } else if (roundKey === 'round_4') {
         for (let p = 1; p <= 4; p++) {
           const pName = playersData[p]?.name?.trim() || `Thí sinh ${p}`;
@@ -1808,33 +1876,40 @@
           `;
         }
       } else {
-        let targetRound = 'round_1';
-        if (roundKey === 'round_3' || roundKey === 'round_5') targetRound = roundKey;
-        
-        const qList = allQuestionsData[targetRound] || [];
-        qList.forEach((q, idx) => {
-          if (q !== null && q !== undefined) {
+        const targetRound = (roundKey === 'round_5') ? 'round_5' : 'round_1';
+        const rawQData = allQuestionsData[targetRound];
+        const entries = (rawQData && typeof rawQData === 'object')
+          ? Object.entries(rawQData).sort((a, b) => Number(a[0]) - Number(b[0]))
+          : [];
+
+        for (const [idx, q] of entries) {
+          if (q && typeof q === 'object') {
             count++;
             html += `
               <div class="question-card">
                 <div class="q-info">
-                  <div class="q-title"><b>Câu ${idx}:</b> ${escapeHtml(q.cau_hoi)}</div>
+                  <div class="q-title"><b>Câu ${escapeHtml(idx)}:</b> ${escapeHtml(q.cau_hoi)}</div>
                   <div class="q-ans">Đáp án: ${escapeHtml(q.dap_an)}</div>
                 </div>
                 <div class="q-actions">
-                  <button class="q-btn" onclick="editQuestion(${idx}, \`${String(q.cau_hoi).replace(/`/g, '\\`')}\`, \`${String(q.dap_an).replace(/`/g, '\\`')}\`)">Sửa</button>
-                  <button class="q-btn del" onclick="deleteQuestion('${targetRound}', ${idx})">Xóa</button>
+                  <button class="q-btn" onclick="editQuestion('${targetRound}', '${escapeHtml(idx)}')">Sửa</button>
+                  <button class="q-btn del" onclick="deleteQuestion('${targetRound}', '${escapeHtml(idx)}')">Xóa</button>
                 </div>
               </div>
             `;
           }
-        });
+        }
       }
 
       container.innerHTML = html || '<div style="text-align: center; color: #64748b; margin-top: 40px;">Chưa có câu hỏi nào.</div>';
-      document.getElementById('totalQuesCount').innerText = roundKey === 'round_4'
-        ? `Tổng số: ${count}/24 câu`
-        : `Tổng số: ${count} câu`;
+
+      if (roundKey === 'round_4') {
+        document.getElementById('totalQuesCount').innerText = `Tổng số: ${count}/24 câu`;
+      } else if (roundKey === 'round_5') {
+        document.getElementById('totalQuesCount').innerText = `Tổng số: ${count}/12 câu (Tối đa 12 câu)`;
+      } else {
+        document.getElementById('totalQuesCount').innerText = `Tổng số: ${count} câu`;
+      }
     }
 
     window.addEventListener('load', () => {

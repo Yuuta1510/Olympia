@@ -126,6 +126,27 @@
                 <video id="r4_star" src="../graphic/r4_star.webm" playsinline preload="auto"></video>
             </div>
         </div>
+        
+        <div id="round5-ui" class="round-ui" style="display: none;">
+            <!-- Ảnh đồ họa nền câu hỏi phụ (xuất hiện đồng loạt, không animation) -->
+            <img id="r5_ques_img" class="r5-graphic-layer" src="../graphic/r5_ques.png" alt="Đồ họa Câu hỏi phụ" />
+
+            <!-- Video & Nhạc đếm ngược 15s (pause khi bấm chuông, chạy tiếp nếu sai) -->
+            <video id="r5_15s_video" class="r5-graphic-layer" src="../graphic/r5_15s.webm" playsinline preload="auto"></video>
+            <audio id="audio_r5_15s" src="../sounds/r5_15s.mp3" preload="auto"></audio>
+
+            <!-- Danh sách 2 - 8 thí sinh tham gia Câu hỏi phụ -->
+            <div id="r5-players-container"></div>
+
+            <!-- Nội dung câu hỏi phụ -->
+            <div id="r5-question-text"></div>
+
+            <!-- Đồ họa bấm chuông + Tên thí sinh bấm chuông -->
+            <div id="r5-buzzer-overlay">
+                <img id="r5_buzzer_img" src="../graphic/r5_buzzer.png" alt="Bấm chuông" />
+                <div id="r5-buzzer-name"></div>
+            </div>
+        </div>
 
         <script type="module">
             import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -262,7 +283,7 @@
                 'R2': 'Round2',
                 'R3': 'Round3',
                 'R4': 'Round4',
-                'SF': 'SubFinal'
+                'R5': 'Round5'
             };
 
             let currentLoadedTab = 'R1';
@@ -285,6 +306,9 @@
 
                 const r4Ui = document.getElementById('round4-ui');
                 if (r4Ui) r4Ui.style.display = (tabCode === 'R4') ? 'block' : 'none';
+                
+                const r5Ui = document.getElementById('round5-ui');
+                if (r5Ui) r5Ui.style.display = (tabCode === 'R5') ? 'block' : 'none';
 
                 const cssLink = document.getElementById('livestream-css');
                 if (cssLink) {
@@ -327,7 +351,8 @@
                 'R2_Wrong.mp3', 'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
                 'R4_15s.mp3', 'R4_20s.mp3', 'R4_20sPrac.mp3', 'R4_30s.mp3',
                 'R4_30sPrac.mp3', 'R4_40sPrac.mp3', 'R4_60sPrac.mp3', 'R4_Begin.mp3',
-                'R4_End.mp3', 'R4_Intro.mp3', 'R4_Star.mp3'
+                'R4_End.mp3', 'R4_Intro.mp3', 'R4_Star.mp3',
+                'R5_ShowQues.mp3', 'R5_15s.mp3', 'R5_Buzzed.mp3'
             ];
             const SOUND_FILES = soundFileNames.reduce((files, fileName) => {
                 files[soundIdForFileName(fileName)] = `../sounds/${fileName}`;
