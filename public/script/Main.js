@@ -19,49 +19,49 @@ const DEFAULT_FONT = '"UTM Avo", Arial, sans-serif';
 const VALID_PROJECTOR_BG_KEYS = ['R0', 'R1', 'R2', 'R3', 'R4'];
 
 const LT1_SOURCES = [
-    '../graphic/main_lowerthird.webm',
-    '../graphic/main_lowerthird.webm',
-    '/graphic/main_lowerthird.webm',
-    'graphic/main_lowerthird.webm',
-    'Graphic/main_lowerthird.webm',
+    '../graphic/o27/main_lowerthird.webm',
+    '../graphic/o27/main_lowerthird.webm',
+    '/graphic/o27/main_lowerthird.webm',
+    'graphic/o27/main_lowerthird.webm',
+    'graphic/o27/main_lowerthird.webm',
     'main_lowerthird.webm',
     'main_lowerthird.webm'
 ];
 
 const LT2_SOURCES = [
-    '../graphic/main_credit.webm',
-    '/graphic/main_credit.webm',
-    'graphic/main_credit.webm',
-    'Graphic/main_credit.webm',
+    '../graphic/o27/main_credit.webm',
+    '/graphic/o27/main_credit.webm',
+    'graphic/o27/main_credit.webm',
+    'graphic/o27/main_credit.webm',
     'main_credit.webm',
 ];
 
 const LS_POINT_SUMMARY_SOURCES = [
-    '../graphic/main_pointsummary.webm',
-    '/graphic/main_pointsummary.webm',
-    'graphic/main_pointsummary.webm',
-    'Graphic/main_pointsummary.webm',
+    '../graphic/o27/main_pointsummary.webm',
+    '/graphic/o27/main_pointsummary.webm',
+    'graphic/o27/main_pointsummary.webm',
+    'graphic/o27/main_pointsummary.webm',
     'main_pointsummary.webm',
 ];
 
 const PROJ_POINT_SUMMARY_SOURCES = [
-    '../graphic/pro_main_pointsummary.webm',
-    '/graphic/pro_main_pointsummary.webm',
-    'graphic/pro_main_pointsummary.webm',
-    'Graphic/pro_main_pointsummary.webm',
+    '../graphic/o27/pro_main_pointsummary.webm',
+    '/graphic/o27/pro_main_pointsummary.webm',
+    'graphic/o27/pro_main_pointsummary.webm',
+    'graphic/o27/pro_main_pointsummary.webm',
     'pro_main_pointsummary.webm',
 ];
 
 const PROJ_TOTAL_SOURCES = [
-    '../graphic/pro_main_total.webm',
-    '/graphic/pro_main_total.webm',
-    'graphic/pro_main_total.webm',
-    'Graphic/pro_main_total.webm',
+    '../graphic/o27/pro_main_total.webm',
+    '/graphic/o27/pro_main_total.webm',
+    'graphic/o27/pro_main_total.webm',
+    'graphic/o27/pro_main_total.webm',
     'pro_main_total.webm',
-    '../graphic/main_total.webm',
-    '/graphic/main_total.webm',
-    'graphic/main_total.webm',
-    'Graphic/main_total.webm',
+    '../graphic/o27/main_total.webm',
+    '/graphic/o27/main_total.webm',
+    'graphic/o27/main_total.webm',
+    'graphic/o27/main_total.webm',
     'main_total.webm',
 ];
 
@@ -110,11 +110,11 @@ function setProjectorThumbnail(bgKey = 'R0', forceRefresh = false) {
     const kUpper = normalizedKey;
     const kLower = normalizedKey.toLowerCase();
     const localSources = [
-        `../graphic/${kUpper}_thumbnail.png`,
-        `../graphic/${kLower}_thumbnail.png`,
-        `/graphic/${kUpper}_thumbnail.png`,
-        `graphic/${kUpper}_thumbnail.png`,
-        `Graphic/${kUpper}_thumbnail.png`,
+        `../graphic/o27/${kUpper}_thumbnail.png`,
+        `../graphic/o27/${kLower}_thumbnail.png`,
+        `/graphic/o27/${kUpper}_thumbnail.png`,
+        `graphic/o27/${kUpper}_thumbnail.png`,
+        `graphic/o27/${kUpper}_thumbnail.png`,
         `${kUpper}_thumbnail.png`,
         `${kLower}_thumbnail.png`
     ];
@@ -153,13 +153,13 @@ function initMainLivestreamDOM() {
     // Chỉ nạp và chạy Intro Main ở màn Projector; chạy xong video tự động ẩn đi
     if (onProjector && introVid) {
         setVideoSourceWithFallback(introVid, [
-            '../graphic/intro.webm',
-            '../graphic/Intro.webm',
-            '/graphic/intro.webm',
-            'graphic/intro.webm',
-            'Graphic/Intro.webm',
+            '../graphic/o27/intro.webm',
+            '../graphic/o27/Intro.webm',
+            '/graphic/o27/intro.webm',
+            'graphic/o27/intro.webm',
+            'graphic/o27/Intro.webm',
             'Intro.webm',
-            'Graphic/intro.webm',
+            'graphic/o27/intro.webm',
             'intro.webm'
         ]);
         if (!introVid.dataset.mainEndedBound) {
@@ -270,11 +270,11 @@ function setImageSourceWithFallback(imgEl, playerIndex, customAvatarUrl = '') {
     ).trim();
 
     const localSources = [
-        `../graphic/main_player${playerIndex}.png`,
-        `../graphic/main_player${playerIndex}.png`,
-        `/graphic/main_player${playerIndex}.png`,
-        `graphic/main_player${playerIndex}.png`,
-        `Graphic/main_player${playerIndex}.png`,
+        `../graphic/main/main_player${playerIndex}.png`,
+        `../graphic/main/main_player${playerIndex}.png`,
+        `/graphic/main/main_player${playerIndex}.png`,
+        `graphic/main/main_player${playerIndex}.png`,
+        `graphic/main/main_player${playerIndex}.png`,
         `main_player${playerIndex}.png`,
         `main_player${playerIndex}.png`
     ];

@@ -229,8 +229,8 @@ const unsubCmds = onValue(ref(db, 'games/commands'), async (snapshot) => {
         if (videoEl) {
             const isProjector = isProjectorScreen();
 
-            const fileNormal = isProjector ? '../graphic/pro_r1_showques.webm' : '../graphic/r1_showques.webm';
-            const fileTime   = isProjector ? '../graphic/pro_r1_showquestime.webm' : '../graphic/r1_showquestime.webm';
+            const fileNormal = isProjector ? '../graphic/o27/pro_r1_showques.webm' : '../graphic/o27/r1_showques.webm';
+            const fileTime   = isProjector ? '../graphic/o27/pro_r1_showquestime.webm' : '../graphic/o27/r1_showquestime.webm';
 
             videoEl.src = data.isTimeLimited ? fileTime : fileNormal;
             videoEl.style.display = 'block';
@@ -256,12 +256,12 @@ const unsubCmds = onValue(ref(db, 'games/commands'), async (snapshot) => {
             currentVideoDuration = reqDuration;
 
             if (timeEl) {
-                timeEl.src = `../graphic/r1_${reqDuration}s.webm`;
+                timeEl.src = `../graphic/o27/r1_${reqDuration}s.webm`;
                 timeEl.playbackRate = 1.0;
                 timeEl.onerror = () => {
                     console.warn(`Không tìm thấy video ${reqDuration}s.webm, Fallback về 60s.webm`);
                     timeEl.onerror = null;
-                    timeEl.src = `../graphic/r1_60s.webm`;
+                    timeEl.src = `../graphic/o27/r1_60s.webm`;
                     timeEl.playbackRate = 60 / reqDuration;
                     if (!timeEl.paused || data.action === 'play_turn_time') timeEl.play().catch(e => console.error(e));
                 };

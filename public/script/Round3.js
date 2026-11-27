@@ -356,7 +356,7 @@ function triggerTimerAndQuestionVideo() {
     // Đồng hồ: <= 20s dùng 20s.webm chỉnh speed; > 20s dùng 30s.webm chỉnh speed
     if (timerVid) {
         const isShort = duration <= 20;
-        const targetSrc = isShort ? '../graphic/r3_20s.webm' : '../graphic/r3_30s.webm';
+        const targetSrc = isShort ? '../graphic/o27/r3_20s.webm' : '../graphic/o27/r3_30s.webm';
         const targetRate = isShort ? (20 / duration) : (30 / duration);
 
         const applyRateAndPlay = () => {
@@ -587,7 +587,7 @@ function bindR3VideoFallbacks() {
         ansVideo.dataset.fallbackBound = 'true';
         ansVideo.addEventListener('error', () => {
             if (!ansVideo.src.endsWith('r3_showans.webm')) {
-                ansVideo.src = '../graphic/r3_showans.webm';
+                ansVideo.src = '../graphic/o27/r3_showans.webm';
             }
         });
     }

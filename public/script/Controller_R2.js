@@ -124,7 +124,7 @@ function updateR2UI() {
 
     const targetImg = document.querySelector('#r2-controller-ui .r2-ctrl-target-img');
     if (targetImg) {
-        const nextSrc = r2DataState.cnv_image || '../graphic/r2_target.png';
+        const nextSrc = r2DataState.cnv_image || '../graphic/o27/r2_target.png';
         if (targetImg.getAttribute('src') !== nextSrc) {
             targetImg.style.display = 'block';
             targetImg.src = nextSrc;

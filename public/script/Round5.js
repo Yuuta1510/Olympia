@@ -4,8 +4,8 @@ import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10
 const app = getApp();
 const db = getDatabase(app);
 
-const PLAYER_BAR_IMG = '../graphic/r5_player.png';
-const BUZZED_BAR_IMG = '../graphic/r5_buzzer.png';
+const PLAYER_BAR_IMG = '../graphic/o27/r5_player.png';
+const BUZZED_BAR_IMG = '../graphic/o27/r5_buzzer.png';
 
 // =========================================================================
 // 1. THAM CHIẾU DOM TRÊN LIVESTREAM.HTML

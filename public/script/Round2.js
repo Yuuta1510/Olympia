@@ -169,7 +169,7 @@ function renderPageLogic() {
 
     const mainImg = document.querySelector('#r2-page-1 .r2-main-img');
     if (mainImg) {
-        const nextSrc = mockR2Data.cnv_image || '../graphic/r2_target.png';
+        const nextSrc = mockR2Data.cnv_image || '../graphic/o27/r2_target.png';
         if (mainImg.getAttribute('src') !== nextSrc) {
             mainImg.src = nextSrc;
         }
@@ -408,7 +408,7 @@ function bindR2VideoFallback() {
 
     ansVideo.addEventListener('error', () => {
         if (!ansVideo.src.endsWith('r2_showans.webm')) {
-            ansVideo.src = '../graphic/r2_showans.webm';
+            ansVideo.src = '../graphic/o27/r2_showans.webm';
         }
     });
 }
