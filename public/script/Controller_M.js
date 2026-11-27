@@ -196,6 +196,10 @@ window.updatePlayerInfoDB = function(index, infoStr) {
   update(ref(db, `games/players/${index}`), { info: String(infoStr ?? '') });
 };
 
+window.updatePlayerFullNameDB = function(index, fullNameStr) {
+  update(ref(db, `games/players/${index}`), { fullName: String(fullNameStr ?? '').trim() });
+};
+
 window.adjustMainPlayerScore = function(index, delta) {
   const scoreInput = document.getElementById(`mainCfgScore-${index}`);
   const currentVal = scoreInput
@@ -252,11 +256,11 @@ function setPlayerAvatarPreviewFallback(imgEl, playerIndex, customUrl = '') {
   imgEl.style.display = 'block';
 
   const localSources = [
-    `../graphic/main_player${playerIndex}.png`,
-    `../graphic/main_player${playerIndex}.png`,
-    `/graphic/main_player${playerIndex}.png`,
-    `graphic/main_player${playerIndex}.png`,
-    `Graphic/main_player${playerIndex}.png`,
+    `../graphic/main/main_player${playerIndex}.png`,
+    `../graphic/main/main_player${playerIndex}.png`,
+    `/graphic/main/main_player${playerIndex}.png`,
+    `graphic/main/main_player${playerIndex}.png`,
+    `graphic/main/main_player${playerIndex}.png`,
     `main_player${playerIndex}.png`,
     `main_player${playerIndex}.png`
   ];
@@ -349,6 +353,7 @@ window.handlePlayerAvatarUpload = function(playerIndex, inputEl) {
         const currentP = latestPlayersData?.[playerIndex] || {};
         await update(ref(db, `games/players/${playerIndex}`), {
           name: currentP.name || `PLAYER ${playerIndex}`,
+          fullName: currentP.fullName ?? '',
           score: Number(currentP.score) || 0,
           info: currentP.info ?? '',
           avatarUrl: downloadURL,
@@ -549,15 +554,18 @@ window.saveAndCloseMainConfig = async function() {
 
   for (let i = 1; i <= 4; i++) {
     const nameInput = document.getElementById(`mainCfgName-${i}`);
+    const fullNameInput = document.getElementById(`mainCfgFullName-${i}`);
     const scoreInput = document.getElementById(`mainCfgScore-${i}`);
     const infoInput = document.getElementById(`mainCfgInfo-${i}`);
 
     const currentP = latestPlayersData?.[i] || {};
     const nameVal = nameInput ? (nameInput.value.trim() || `PLAYER ${i}`) : (currentP.name || `PLAYER ${i}`);
+    const fullNameVal = fullNameInput ? fullNameInput.value.trim() : String(currentP.fullName ?? '');
     const scoreVal = scoreInput ? (Number(scoreInput.value) || 0) : (Number(currentP.score) || 0);
     const infoVal = infoInput ? String(infoInput.value ?? '') : String(currentP.info ?? '');
 
     updates[`games/players/${i}/name`] = nameVal;
+    updates[`games/players/${i}/fullName`] = fullNameVal;
     updates[`games/players/${i}/score`] = scoreVal;
     updates[`games/players/${i}/info`] = infoVal;
     if (currentP.avatarUrl === undefined) {
@@ -597,12 +605,14 @@ function populateMainConfigModalUI() {
   for (let i = 1; i <= 4; i++) {
     const p = latestPlayersData?.[i] || {};
     const nameInput = document.getElementById(`mainCfgName-${i}`);
+    const fullNameInput = document.getElementById(`mainCfgFullName-${i}`);
     const scoreInput = document.getElementById(`mainCfgScore-${i}`);
     const infoInput = document.getElementById(`mainCfgInfo-${i}`);
     const imgEl = document.getElementById(`mainCfgAvatarImg-${i}`);
     const statusEl = document.getElementById(`mainCfgAvatarStatus-${i}`);
 
     if (nameInput) nameInput.value = p.name !== undefined && p.name !== null ? p.name : `PLAYER ${i}`;
+    if (fullNameInput) fullNameInput.value = p.fullName !== undefined && p.fullName !== null ? p.fullName : '';
     if (scoreInput) scoreInput.value = Number(p.score) || 0;
     if (infoInput) infoInput.value = p.info !== undefined && p.info !== null ? p.info : '';
     if (imgEl) setPlayerAvatarPreviewFallback(imgEl, i, p.avatarUrl || '');
@@ -699,11 +709,11 @@ function setControllerThumbFallback(imgEl, bgKey) {
   const customUrl = customGameThumbnails?.[kUpper] || customGameThumbnails?.[bgKey] || '';
 
   const localSources = [
-    `../graphic/${kUpper}_thumbnail.png`,
-    `../graphic/${kLower}_thumbnail.png`,
-    `/graphic/${kUpper}_thumbnail.png`,
-    `graphic/${kUpper}_thumbnail.png`,
-    `Graphic/${kUpper}_thumbnail.png`,
+    `../graphic/o27/${kUpper}_thumbnail.png`,
+    `../graphic/o27/${kLower}_thumbnail.png`,
+    `/graphic/o27/${kUpper}_thumbnail.png`,
+    `graphic/o27/${kUpper}_thumbnail.png`,
+    `graphic/o27/${kUpper}_thumbnail.png`,
     `${kUpper}_thumbnail.png`,
     `${kLower}_thumbnail.png`
   ];
@@ -1282,6 +1292,12 @@ function bindMainConfigModalEvents() {
     }, { signal });
   });
 
+  document.querySelectorAll('.main-cfg-fullname-input').forEach((input) => {
+    input.addEventListener('change', () => {
+      window.updatePlayerFullNameDB(Number(input.dataset.playerIndex), input.value);
+    }, { signal });
+  });
+
   document.querySelectorAll('.main-cfg-score-step').forEach((btn) => {
     btn.addEventListener('click', () => {
       window.adjustMainPlayerScore(Number(btn.dataset.playerIndex), Number(btn.dataset.delta));
@@ -1517,20 +1533,20 @@ function setupPreviewVideoFrame(videoType = 'lt1') {
 
   const sources = videoType === 'lt2'
     ? [
-        '../graphic/main_credit.webm',
-        '../graphic/main_credit.webm',
-        '/graphic/main_credit.webm',
-        'graphic/main_credit.webm',
-        'Graphic/main_credit.webm',
+        '../graphic/o27/main_credit.webm',
+        '../graphic/o27/main_credit.webm',
+        '/graphic/o27/main_credit.webm',
+        'graphic/o27/main_credit.webm',
+        'graphic/o27/main_credit.webm',
         'main_credit.webm',
         'main_credit.webm'
       ]
     : [
-        '../graphic/main_lowerthird.webm',
-        '../graphic/main_lowerthird.webm',
-        '/graphic/main_lowerthird.webm',
-        'graphic/main_lowerthird.webm',
-        'Graphic/main_lowerthird.webm',
+        '../graphic/o27/main_lowerthird.webm',
+        '../graphic/o27/main_lowerthird.webm',
+        '/graphic/o27/main_lowerthird.webm',
+        'graphic/o27/main_lowerthird.webm',
+        'graphic/o27/main_lowerthird.webm',
         'main_lowerthird.webm',
         'main_lowerthird.webm'
       ];
@@ -2334,12 +2350,14 @@ const unsubPlayers = onValue(ref(db, 'games/players'), (snapshot) => {
 
       if (isMainModalOpen) {
         const mName = document.getElementById(`mainCfgName-${i}`);
+        const mFullName = document.getElementById(`mainCfgFullName-${i}`);
         const mScore = document.getElementById(`mainCfgScore-${i}`);
         const mInfo = document.getElementById(`mainCfgInfo-${i}`);
         const mAvatarImg = document.getElementById(`mainCfgAvatarImg-${i}`);
         const mAvatarStatus = document.getElementById(`mainCfgAvatarStatus-${i}`);
 
         if (mName && document.activeElement !== mName) mName.value = players[i].name ?? '';
+        if (mFullName && document.activeElement !== mFullName) mFullName.value = players[i].fullName ?? '';
         if (mScore && document.activeElement !== mScore) mScore.value = players[i].score ?? 0;
         if (mInfo && document.activeElement !== mInfo) mInfo.value = players[i].info ?? '';
         if (mAvatarImg && activeStorageUploads === 0) {
