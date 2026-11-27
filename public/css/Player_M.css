@@ -1,0 +1,55 @@
+/* =====================================================================
+   PLAYER_M.CSS - GIAO DIỆN PHẦN MAIN TRÊN MÀN THÍ SINH
+   Chỉ hiển thị tên 4 thí sinh và điểm 4 thí sinh, không thao tác
+   ===================================================================== */
+
+#player-view-M {
+  display: grid;
+  width: 82%;
+  height: 78%;
+  margin: auto;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, 1fr);
+  gap: 16px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.player-main-card {
+  display: grid;
+  grid-template-columns: 1fr clamp(160px, 18vw, 240px);
+  background-color: var(--card-bg);
+  border: 2px solid var(--white);
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+
+.player-main-name {
+  background: linear-gradient(90deg, var(--cyan), var(--cyan-deep));
+  border-right: 2px solid var(--white);
+  color: var(--navy-text);
+  font-size: clamp(24px, 2.6vw, 42px);
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.player-main-score {
+  background-color: var(--blue-dark);
+  color: var(--yellow-score);
+  font-size: clamp(36px, 4vw, 68px);
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  min-width: 0;
+}

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player - Màn Hình Thí Sinh</title>
+  <link
+    id="player-round-css"
+    rel="stylesheet"
+    href="../css/Player_M.css"
+    onerror="if(!this.dataset.fb){this.dataset.fb='1';this.href='Player_M.css';}"
+  />
+  <style>
+    :root {
+      --font-main: "UTM Avo", Arial, sans-serif;
+      --bg-dark: #050a18;
+      --card-bg: #070d1f;
+      --blue-dark: #0b004b;
+      --cyan: #00dafc;
+      --cyan-deep: #007cbe;
+      --navy-text: #0d0055;
+      --yellow-score: #ffd500;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      color: var(--white);
+      font-family: var(--font-main);
+    }
+
+    /* =====================================================================
+       MÀN HÌNH NHẬP SỐ THỨ TỰ THÍ SINH (1 - 4) KHI MỚI VÀO TRANG
+       ===================================================================== */
+    #player-entry-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+
+    .entry-box {
+      width: 100%;
+      max-width: 420px;
+      background-color: #0b132b;
+      border: 2px solid var(--cyan);
+      border-radius: 10px;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .entry-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .entry-subtitle {
+      font-size: 14px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    #seatNumberInput {
+      width: 140px;
+      height: 64px;
+      background-color: #020617;
+      border: 2px solid var(--white);
+      border-radius: 8px;
+      color: var(--yellow-score);
+      font-family: var(--font-main);
+      font-size: 34px;
+      font-weight: 900;
+      text-align: center;
+      outline: none;
+    }
+
+    #seatNumberInput:focus {
+      border-color: var(--cyan);
+    }
+
+    #seatNumberInput::-webkit-outer-spin-button,
+    #seatNumberInput::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    #seatNumberInput[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    #seatConfirmBtn {
+      width: 100%;
+      height: 46px;
+      background: linear-gradient(90deg, var(--cyan), var(--cyan-deep));
+      border: none;
+      border-radius: 6px;
+      color: var(--navy-text);
+      font-family: var(--font-main);
+      font-size: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    #seatConfirmBtn:hover {
+      filter: brightness(1.08);
+    }
+
+    #seatErrorMsg {
+      min-height: 18px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #f87171;
+    }
+
+    /* =====================================================================
+       KHUNG CHỨA CHÍNH CỦA 6 PHẦN GAME
+       ===================================================================== */
+    #player-app {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .player-round-view {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <!-- BƯỚC 1: NHẬP SỐ THỨ TỰ NGƯỜI CHƠI (1 - 4) -->
+  <div id="player-entry-overlay">
+    <div class="entry-box">
+      <div class="entry-title">Nhập số thứ tự thí sinh</div>
+      <div class="entry-subtitle">Vui lòng nhập vị trí của bạn (từ 1 đến 4) để vào màn hình thi đấu</div>
+      <input
+        type="number"
+        id="seatNumberInput"
+        min="1"
+        max="4"
+        inputmode="numeric"
+        placeholder="1-4"
+        autofocus
+      />
+      <button type="button" id="seatConfirmBtn">XÁC NHẬN</button>
+      <div id="seatErrorMsg"></div>
+    </div>
+  </div>
+
+  <!-- BƯỚC 2: KHU VỰC HIỂN THỊ THEO TỪNG PHẦN (6 PHẦN) -->
+  <main id="player-app">
+    <!-- PHẦN 1: MAIN (CHỈ HIỆN TÊN VÀ ĐIỂM CỦA 4 THÍ SINH) -->
+    <section class="player-round-view" id="player-view-M">
+      <div class="player-main-card">
+        <div class="player-main-name" id="playerMainName-1">P1</div>
+        <div class="player-main-score" id="playerMainScore-1">0</div>
+      </div>
+
+      <div class="player-main-card">
+        <div class="player-main-name" id="playerMainName-2">P2</div>
+        <div class="player-main-score" id="playerMainScore-2">0</div>
+      </div>
+
+      <div class="player-main-card">
+        <div class="player-main-name" id="playerMainName-3">P3</div>
+        <div class="player-main-score" id="playerMainScore-3">0</div>
+      </div>
+
+      <div class="player-main-card">
+        <div class="player-main-name" id="playerMainName-4">P4</div>
+        <div class="player-main-score" id="playerMainScore-4">0</div>
+      </div>
+    </section>
+
+    <!-- CÁC PHẦN TIẾP THEO (SẼ NẠP CODE SAU) -->
+    <section class="player-round-view" id="player-view-R1"></section>
+    <section class="player-round-view" id="player-view-R2"></section>
+    <section class="player-round-view" id="player-view-R3"></section>
+    <section class="player-round-view" id="player-view-R4"></section>
+    <section class="player-round-view" id="player-view-TB"></section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
+      authDomain: "olympia-d2f44.firebaseapp.com",
+      databaseURL: "https://olympia-d2f44-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "olympia-d2f44",
+      storageBucket: "olympia-d2f44.firebasestorage.app",
+      messagingSenderId: "18063059793",
+      appId: "1:18063059793:web:5dad7ce59006e779988170",
+      measurementId: "G-XVER3NDTXY"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const VALID_TABS = ["M", "R1", "R2", "R3", "R4", "TB"];
+    const TOTAL_PLAYERS = 4;
+
+    // Trạng thái dùng chung cho toàn bộ 6 phần của màn Player
+    window.PlayerState = {
+      db,
+      playerIndex: null,
+      activeTab: "M",
+      players: {
+        1: { name: "P1", score: 0 },
+        2: { name: "P2", score: 0 },
+        3: { name: "P3", score: 0 },
+        4: { name: "P4", score: 0 }
+      }
+    };
+
+    async function loadRoundModule(tabCode) {
+      const cssEl = document.getElementById("player-round-css");
+      if (cssEl) {
+        delete cssEl.dataset.fb;
+        cssEl.onerror = function () {
+          if (!this.dataset.fb) {
+            this.dataset.fb = "1";
+            this.href = `Player_${tabCode}.css`;
+          }
+        };
+        cssEl.href = `../css/Player_${tabCode}.css`;
+      }
+
+      const version = Date.now();
+      try {
+        await import(`../script/Player_${tabCode}.js?v=${version}`);
+      } catch (err) {
+        try {
+          await import(`./Player_${tabCode}.js?v=${version}`);
+        } catch (fallbackErr) {
+          console.warn(`Chưa tìm thấy script cho phần ${tabCode}:`, fallbackErr);
+        }
+      }
+    }
+
+    window.switchPlayerTab = async function (rawTabCode) {
+      const tabCode = String(rawTabCode || "").trim().toUpperCase();
+      if (!VALID_TABS.includes(tabCode)) return;
+
+      if (typeof window.cleanupCurrentRound === "function") {
+        window.cleanupCurrentRound();
+      }
+
+      window.PlayerState.activeTab = tabCode;
+
+      VALID_TABS.forEach((code) => {
+        const viewEl = document.getElementById(`player-view-${code}`);
+        if (viewEl) {
+          viewEl.style.display = code === tabCode ? "" : "none";
+        }
+      });
+
+      await loadRoundModule(tabCode);
+
+      if (typeof window.renderActivePlayerRound === "function") {
+        window.renderActivePlayerRound();
+      }
+    };
+
+    // Xử lý xác nhận số thứ tự người chơi (1 - 4)
+    const seatInput = document.getElementById("seatNumberInput");
+    const seatConfirmBtn = document.getElementById("seatConfirmBtn");
+    const seatErrorMsg = document.getElementById("seatErrorMsg");
+    const entryOverlay = document.getElementById("player-entry-overlay");
+    const playerApp = document.getElementById("player-app");
+
+    async function confirmSeatNumber() {
+      const raw = seatInput.value.trim();
+      const num = Number(raw);
+
+      if (!raw || !Number.isInteger(num) || num < 1 || num > TOTAL_PLAYERS) {
+        seatErrorMsg.textContent = `Vui lòng nhập số thứ tự hợp lệ từ 1 đến ${TOTAL_PLAYERS}.`;
+        seatInput.focus();
+        seatInput.select();
+        return;
+      }
+
+      seatErrorMsg.textContent = "";
+      window.PlayerState.playerIndex = num;
+
+      entryOverlay.style.display = "none";
+      playerApp.style.display = "flex";
+
+      await window.switchPlayerTab(window.PlayerState.activeTab || "M");
+    }
+
+    seatConfirmBtn.addEventListener("click", confirmSeatNumber);
+    seatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        confirmSeatNumber();
+      }
+    });
+
+    // Lắng nghe realtime danh sách 4 thí sinh từ Firebase
+    onValue(ref(db, "games/players"), (snapshot) => {
+      if (snapshot.exists()) {
+        window.PlayerState.players = snapshot.val();
+      }
+      if (
+        window.PlayerState.playerIndex !== null &&
+        typeof window.renderActivePlayerRound === "function"
+      ) {
+        window.renderActivePlayerRound();
+      }
+    });
+
+    // Lắng nghe lệnh chuyển phần (M, R1, R2, R3, R4, TB) từ Controller
+    let isInitialCommand = true;
+    onValue(ref(db, "games/commands"), (snapshot) => {
+      if (isInitialCommand) {
+        isInitialCommand = false;
+        return;
+      }
+      if (!snapshot.exists()) return;
+      const data = snapshot.val() || {};
+      const nextTab = data.tab || (data.action === "switch_tab" ? data.value : null);
+
+      if (nextTab && VALID_TABS.includes(String(nextTab).toUpperCase())) {
+        const normalizedTab = String(nextTab).toUpperCase();
+        if (normalizedTab !== window.PlayerState.activeTab) {
+          if (window.PlayerState.playerIndex !== null) {
+            window.switchPlayerTab(normalizedTab);
+          } else {
+            window.PlayerState.activeTab = normalizedTab;
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
