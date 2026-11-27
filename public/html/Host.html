@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+    />
+    <title>Olympia - Host</title>
+    <style>
+      :root {
+        --navy-header: #000080;
+        --blue-badge: #000099;
+        --blue-dark: #0b004b;
+        --yellow-border: #ffff00;
+        --white: #ffffff;
+        --black: #000000;
+        --emerald: #4ade80;
+        --gold: #facc15;
+        --cyan: #38bdf8;
+        --red-turn: #cc0000;
+        --border-muted: #475569;
+        --font-main: "UTM Avo", Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background-color: var(--black);
+        color: var(--white);
+        font-family: var(--font-main);
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--black);
+        padding: 12px;
+        gap: 10px;
+        transform-origin: top left;
+        flex-shrink: 0;
+        overflow: hidden;
+      }
+
+      /* THANH TIÊU ĐỀ VÒNG THI TRÊN CÙNG */
+      .host-top-bar {
+        width: 100%;
+        height: 50px;
+        background-color: var(--navy-header);
+        border: 2px solid var(--white);
+        border-radius: 6px;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-shrink: 0;
+      }
+
+      .host-round-title {
+        font-size: clamp(18px, 1.8vw, 26px);
+        font-weight: 900;
+        color: var(--yellow-border);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        white-space: nowrap;
+      }
+
+      .host-round-sub {
+        font-size: clamp(14px, 1.3vw, 20px);
+        font-weight: 800;
+        color: var(--white);
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* VÙNG NỘI DUNG CHÍNH CHO TỪNG VÒNG */
+      .host-stage {
+        flex: 1;
+        width: 100%;
+        min-height: 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .round-view {
+        display: none;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        min-width: 0;
+      }
+
+      /* KHUNG CHUẨN DÙNG CHUNG */
+      .h-box {
+        background-color: var(--black);
+        border: 1.5px solid var(--white);
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        min-width: 0;
+        overflow: hidden;
+      }
+
+      .h-box-header {
+        background-color: var(--white);
+        color: var(--black);
+        padding: 7px 16px;
+        font-size: clamp(14px, 1.25vw, 18px);
+        font-weight: 900;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+
+      .h-box-header.is-answer {
+        background-color: #16a34a;
+        color: var(--white);
+      }
+
+      .h-box-header.is-navy {
+        background-color: var(--navy-header);
+        color: var(--yellow-border);
+        border-bottom: 1.5px solid var(--white);
+      }
+
+      .h-text-scroll {
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
+        padding: 14px 18px;
+        overflow-y: auto;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        white-space: pre-wrap;
+        line-height: 1.38;
+      }
+
+      /* =====================================================================
+         BẢNG ĐIỂM THÍ SINH (DỌC & NGANG)
+         ===================================================================== */
+      .score-col-vertical {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 100%;
+        min-height: 0;
+      }
+
+      .score-card-v {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        border: 2px solid #4f5050;
+        border-radius: 6px;
+        overflow: hidden;
+        background-color: var(--blue-dark);
+      }
+
+      .score-card-v.is-active {
+        background-color: var(--red-turn);
+        border-color: var(--yellow-border);
+      }
+
+      .score-card-v-name {
+        background: linear-gradient(90deg, #00dafc, #007cbe);
+        border-bottom: 2px solid #13007d;
+        height: 44px;
+        padding: 0 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(16px, 1.4vw, 22px);
+        font-weight: 900;
+        color: #0d0055;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-shrink: 0;
+      }
+
+      .score-card-v.is-active .score-card-v-name {
+        background: var(--yellow-border);
+        color: var(--black);
+      }
+
+      .score-card-v-val {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(36px, 3.6vw, 62px);
+        font-weight: 900;
+        color: var(--white);
+      }
+
+      .score-row-horizontal {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        height: 104px;
+        flex-shrink: 0;
+      }
+
+      .score-card-h {
+        display: flex;
+        flex-direction: column;
+        border: 2px solid #4f5050;
+        border-radius: 6px;
+        overflow: hidden;
+        background-color: var(--blue-dark);
+      }
+
+      .score-card-h.is-active {
+        background-color: var(--red-turn);
+        border-color: var(--yellow-border);
+      }
+
+      .score-card-h-name {
+        background: linear-gradient(90deg, #00dafc, #007cbe);
+        border-bottom: 2px solid #13007d;
+        height: 36px;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(15px, 1.3vw, 20px);
+        font-weight: 900;
+        color: #0d0055;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-shrink: 0;
+      }
+
+      .score-card-h.is-active .score-card-h-name {
+        background: var(--yellow-border);
+        color: var(--black);
+      }
+
+      .score-card-h-val {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(30px, 2.8vw, 48px);
+        font-weight: 900;
+        color: var(--white);
+      }
+
+      /* THANH CUỘN */
+      .custom-scroll::-webkit-scrollbar {
+        width: 7px;
+      }
+      .custom-scroll::-webkit-scrollbar-track {
+        background: #0f172a;
+        border-radius: 4px;
+      }
+      .custom-scroll::-webkit-scrollbar-thumb {
+        background: #475569;
+        border-radius: 4px;
+      }
+    </style>
+    <link id="host-round-css" rel="stylesheet" href="../css/Host_R1.css" />
+  </head>
+  <body>
+    <div class="container" id="mainContainer">
+      <!-- THANH HIỂN THỊ VÒNG THI -->
+      <div class="host-top-bar">
+        <div class="host-round-title" id="hostRoundTitle">VÒNG 1: KHỞI ĐỘNG</div>
+        <div class="host-round-sub" id="hostRoundSub"></div>
+      </div>
+
+      <div class="host-stage">
+        <!-- ===============================================================
+             1. MAIN: 4 THÍ SINH XẾP 1 CỘT
+             =============================================================== -->
+        <div class="round-view" id="host-view-M">
+          <div class="main-player-card" id="mainCard-1">
+            <div class="main-avatar-col">
+              <div class="main-avatar-wrap">
+                <img id="mainAvatar-1" alt="Avatar TS 1" />
+                <span class="main-avatar-fallback" id="mainFallback-1">TS 1</span>
+              </div>
+            </div>
+            <div class="main-name-bar">
+              <div class="main-player-name" id="mainName-1">P1</div>
+            </div>
+            <div class="main-player-info custom-scroll" id="mainInfo-1"></div>
+            <div class="main-score-col">
+              <span class="main-score-label">ĐIỂM</span>
+              <div class="main-player-score" id="mainScore-1">0</div>
+            </div>
+          </div>
+
+          <div class="main-player-card" id="mainCard-2">
+            <div class="main-avatar-col">
+              <div class="main-avatar-wrap">
+                <img id="mainAvatar-2" alt="Avatar TS 2" />
+                <span class="main-avatar-fallback" id="mainFallback-2">TS 2</span>
+              </div>
+            </div>
+            <div class="main-name-bar">
+              <div class="main-player-name" id="mainName-2">P2</div>
+            </div>
+            <div class="main-player-info custom-scroll" id="mainInfo-2"></div>
+            <div class="main-score-col">
+              <span class="main-score-label">ĐIỂM</span>
+              <div class="main-player-score" id="mainScore-2">0</div>
+            </div>
+          </div>
+
+          <div class="main-player-card" id="mainCard-3">
+            <div class="main-avatar-col">
+              <div class="main-avatar-wrap">
+                <img id="mainAvatar-3" alt="Avatar TS 3" />
+                <span class="main-avatar-fallback" id="mainFallback-3">TS 3</span>
+              </div>
+            </div>
+            <div class="main-name-bar">
+              <div class="main-player-name" id="mainName-3">P3</div>
+            </div>
+            <div class="main-player-info custom-scroll" id="mainInfo-3"></div>
+            <div class="main-score-col">
+              <span class="main-score-label">ĐIỂM</span>
+              <div class="main-player-score" id="mainScore-3">0</div>
+            </div>
+          </div>
+
+          <div class="main-player-card" id="mainCard-4">
+            <div class="main-avatar-col">
+              <div class="main-avatar-wrap">
+                <img id="mainAvatar-4" alt="Avatar TS 4" />
+                <span class="main-avatar-fallback" id="mainFallback-4">TS 4</span>
+              </div>
+            </div>
+            <div class="main-name-bar">
+              <div class="main-player-name" id="mainName-4">P4</div>
+            </div>
+            <div class="main-player-info custom-scroll" id="mainInfo-4"></div>
+            <div class="main-score-col">
+              <span class="main-score-label">ĐIỂM</span>
+              <div class="main-player-score" id="mainScore-4">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             2. VÒNG 1: KHỞI ĐỘNG
+             =============================================================== -->
+        <div class="round-view" id="host-view-R1">
+          <div class="host-timer-5s-overlay" id="hostTimer5sOverlay">
+            <div class="host-timer-5s-value" id="hostTimer5sValue">5</div>
+          </div>
+
+          <div class="r1-left-col">
+            <div class="h-box r1-ques-box">
+              <div class="h-box-header">
+                <span id="r1HeaderMeta">LƯỢT RIÊNG 1 - CÂU HỎI 1/6</span>
+                <span id="r1HeaderTime">THỜI GIAN: VÔ HẠN</span>
+              </div>
+              <div class="h-text-scroll r1-ques-text custom-scroll" id="r1QuestionText">Đang tải câu hỏi...</div>
+            </div>
+
+            <div class="h-box r1-ans-box">
+              <div class="h-box-header is-answer">
+                <span>ĐÁP ÁN</span>
+              </div>
+              <div class="h-text-scroll r1-ans-text custom-scroll" id="r1AnswerText">...</div>
+            </div>
+          </div>
+
+          <div class="score-col-vertical">
+            <div class="score-card-v" id="r1ScoreCard-1">
+              <div class="score-card-v-name" id="r1PName-1">P1</div>
+              <div class="score-card-v-val" id="r1PScore-1">0</div>
+            </div>
+            <div class="score-card-v" id="r1ScoreCard-2">
+              <div class="score-card-v-name" id="r1PName-2">P2</div>
+              <div class="score-card-v-val" id="r1PScore-2">0</div>
+            </div>
+            <div class="score-card-v" id="r1ScoreCard-3">
+              <div class="score-card-v-name" id="r1PName-3">P3</div>
+              <div class="score-card-v-val" id="r1PScore-3">0</div>
+            </div>
+            <div class="score-card-v" id="r1ScoreCard-4">
+              <div class="score-card-v-name" id="r1PName-4">P4</div>
+              <div class="score-card-v-val" id="r1PScore-4">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             3. VÒNG 2: VƯỢT CHƯỚNG NGẠI VẬT (GIỐNG CONTROLLER_R2 KHÔNG NÚT)
+             =============================================================== -->
+        <div class="round-view" id="host-view-R2">
+          <!-- 1. KHUNG ẢNH 16:9 - GÓC TRÊN TRÁI -->
+          <div class="r2-host-image-area">
+            <img
+              class="r2-host-target-img"
+              id="hostR2TargetImg"
+              src="../graphic/o27/r2_target.png"
+              alt="Chướng ngại vật"
+            />
+            <div class="r2-host-piece" id="host-r2-cp-1"></div>
+            <div class="r2-host-lbl" id="host-r2-lbl-1">1</div>
+            <div class="r2-host-piece" id="host-r2-cp-2"></div>
+            <div class="r2-host-lbl" id="host-r2-lbl-2">2</div>
+            <div class="r2-host-piece" id="host-r2-cp-3"></div>
+            <div class="r2-host-lbl" id="host-r2-lbl-3">3</div>
+            <div class="r2-host-piece" id="host-r2-cp-4"></div>
+            <div class="r2-host-lbl" id="host-r2-lbl-4">4</div>
+            <div class="r2-host-piece" id="host-r2-cp-5"></div>
+            <div class="r2-host-lbl" id="host-r2-lbl-5">5</div>
+          </div>
+
+          <!-- 2. HÀNG NGANG - GÓC TRÊN GIỮA -->
+          <div class="r2-host-rows-area">
+            <div class="r2-host-cnv-title">
+              <span id="hostR2CnvTitle">CHƯỚNG NGẠI VẬT CÓ 0 CHỮ CÁI</span>
+              <span class="r2-host-cnv-keyword" id="hostR2CnvKeyword">---</span>
+            </div>
+
+            <div class="r2-host-row-wrapper" data-row-index="0">
+              <div class="r2-host-row" id="hostR2Tiles-0"></div>
+              <div class="r2-host-row-number" id="hostR2RowNum-0">1</div>
+            </div>
+
+            <div class="r2-host-row-wrapper" data-row-index="1">
+              <div class="r2-host-row" id="hostR2Tiles-1"></div>
+              <div class="r2-host-row-number" id="hostR2RowNum-1">2</div>
+            </div>
+
+            <div class="r2-host-row-wrapper" data-row-index="2">
+              <div class="r2-host-row" id="hostR2Tiles-2"></div>
+              <div class="r2-host-row-number" id="hostR2RowNum-2">3</div>
+            </div>
+
+            <div class="r2-host-row-wrapper" data-row-index="3">
+              <div class="r2-host-row" id="hostR2Tiles-3"></div>
+              <div class="r2-host-row-number" id="hostR2RowNum-3">4</div>
+            </div>
+
+            <div class="r2-host-row-wrapper" data-row-index="4">
+              <div class="r2-host-row" id="hostR2Tiles-4"></div>
+              <div class="r2-host-row-number center-row" id="hostR2RowNum-4">TT</div>
+            </div>
+          </div>
+
+          <!-- 3. KHUNG CÂU HỎI - GÓC DƯỚI TRÁI -->
+          <div class="r2-host-question">
+            <div class="r2-host-q-meta">
+              <span id="hostR2QuesHeader">CHƯA CHỌN HÀNG NGANG</span>
+              <span class="r2-host-15s-badge" id="hostR2Timer15Badge">⏱ ĐANG CHẠY 15S</span>
+            </div>
+            <div class="custom-scroll" id="host-r2-q-text"></div>
+            <div class="r2-host-buzzer-corner" id="hostR2BuzzerCorner"></div>
+          </div>
+
+          <!-- 4. BẢNG ĐIỂM THÍ SINH (2X2) - GÓC DƯỚI GIỮA PHẢI -->
+          <div class="r2-host-score-grid">
+            <div class="r2-h-score-card" id="host-r2-score-0">
+              <div class="r2-h-score-name" id="host-r2-score-name-0">P1</div>
+              <div class="r2-h-score-val" id="host-r2-score-val-0">0</div>
+            </div>
+            <div class="r2-h-score-card" id="host-r2-score-1">
+              <div class="r2-h-score-name" id="host-r2-score-name-1">P2</div>
+              <div class="r2-h-score-val" id="host-r2-score-val-1">0</div>
+            </div>
+            <div class="r2-h-score-card" id="host-r2-score-2">
+              <div class="r2-h-score-name" id="host-r2-score-name-2">P3</div>
+              <div class="r2-h-score-val" id="host-r2-score-val-2">0</div>
+            </div>
+            <div class="r2-h-score-card" id="host-r2-score-3">
+              <div class="r2-h-score-name" id="host-r2-score-name-3">P4</div>
+              <div class="r2-h-score-val" id="host-r2-score-val-3">0</div>
+            </div>
+          </div>
+
+          <!-- 5. PANEL ĐÁP ÁN THÍ SINH - CỘT PHẢI -->
+          <div class="r2-host-answers-panel">
+            <div class="r2-host-ans-header">ĐÁP ÁN THÍ SINH</div>
+            <div class="r2-host-ans-list">
+              <div class="r2-host-ans-card" id="host-r2-ans-card-0">
+                <div class="r2-host-ans-card-top">
+                  <div class="r2-host-ans-player" id="host-r2-ans-name-0">1. P1</div>
+                  <span class="r2-host-ans-status" id="host-r2-ans-status-0">TRỐNG</span>
+                </div>
+                <div class="r2-host-ans-box" id="host-r2-ans-text-0"></div>
+              </div>
+
+              <div class="r2-host-ans-card" id="host-r2-ans-card-1">
+                <div class="r2-host-ans-card-top">
+                  <div class="r2-host-ans-player" id="host-r2-ans-name-1">2. P2</div>
+                  <span class="r2-host-ans-status" id="host-r2-ans-status-1">TRỐNG</span>
+                </div>
+                <div class="r2-host-ans-box" id="host-r2-ans-text-1"></div>
+              </div>
+
+              <div class="r2-host-ans-card" id="host-r2-ans-card-2">
+                <div class="r2-host-ans-card-top">
+                  <div class="r2-host-ans-player" id="host-r2-ans-name-2">3. P3</div>
+                  <span class="r2-host-ans-status" id="host-r2-ans-status-2">TRỐNG</span>
+                </div>
+                <div class="r2-host-ans-box" id="host-r2-ans-text-2"></div>
+              </div>
+
+              <div class="r2-host-ans-card" id="host-r2-ans-card-3">
+                <div class="r2-host-ans-card-top">
+                  <div class="r2-host-ans-player" id="host-r2-ans-name-3">4. P4</div>
+                  <span class="r2-host-ans-status" id="host-r2-ans-status-3">TRỐNG</span>
+                </div>
+                <div class="r2-host-ans-box" id="host-r2-ans-text-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             4. VÒNG 3: TĂNG TỐC (GIỐNG CONTROLLER_R3 KHÔNG NÚT ĐIỀU KHIỂN)
+             =============================================================== -->
+        <div class="round-view" id="host-view-R3">
+          <!-- CỘT TRÁI: 2 KHUNG XẾP DỌC TỶ LỆ CHIỀU CAO 3:7 (TEXT CÂU HỎI & MEDIA) -->
+          <div class="r3-host-left-col">
+            <!-- KHUNG 1 (TỶ LỆ 3): TEXT CÂU HỎI -->
+            <div class="r3-host-question-box">
+              <div class="r3-host-q-header">
+                <div class="r3-host-q-tabs">
+                  <span class="r3-host-q-tab active" id="host-r3-q-tab-1">CÂU 1 (20s)</span>
+                  <span class="r3-host-q-tab" id="host-r3-q-tab-2">CÂU 2 (20s)</span>
+                  <span class="r3-host-q-tab" id="host-r3-q-tab-3">CÂU 3 (30s)</span>
+                  <span class="r3-host-q-tab" id="host-r3-q-tab-4">CÂU 4 (30s)</span>
+                </div>
+                <div class="r3-host-q-answer-badge">
+                  <span>ĐÁP ÁN:</span>
+                  <strong id="host-r3-correct-ans">---</strong>
+                </div>
+              </div>
+
+              <div class="r3-host-q-body custom-scroll">
+                <div id="host-r3-q-text">Đang tải câu hỏi Vòng 3...</div>
+              </div>
+            </div>
+
+            <!-- KHUNG 2 (TỶ LỆ 7): MEDIA CÂU HỎI / ĐÁP ÁN -->
+            <div class="r3-host-media-box">
+              <div class="r3-host-media-badges">
+                <span class="r3-host-media-type-badge" id="host-r3-media-type">CHƯA CÓ MEDIA</span>
+                <span class="r3-host-timer-badge" id="host-r3-timer-display">THỜI GIAN: 20.0s</span>
+              </div>
+
+              <div class="r3-host-media-stage">
+                <img id="host-r3-preview-img" alt="Media câu hỏi" />
+                <video id="host-r3-preview-vid" playsinline muted></video>
+                <div id="host-r3-media-empty">Không có hình ảnh / video cho câu hỏi này</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CỘT PHẢI: QUAN SÁT ĐÁP ÁN, THỜI GIAN & ĐIỂM THÍ SINH -->
+          <div class="r3-host-right-col">
+            <div class="r3-host-ans-header">
+              <span>ĐÁP ÁN &amp; THỜI GIAN THÍ SINH</span>
+              <span class="r3-host-score-rule">40 - 30 - 20 - 10</span>
+            </div>
+
+            <div class="r3-host-ans-list custom-scroll">
+              <div class="r3-host-ans-card" id="host-r3-ans-card-0">
+                <div class="r3-host-ans-top">
+                  <div class="r3-host-player-info">
+                    <span class="r3-host-player-name" id="host-r3-player-name-0">1. P1</span>
+                    <span class="r3-host-player-score" id="host-r3-player-score-0">0đ</span>
+                  </div>
+                  <div class="r3-host-time-rank">
+                    <span class="r3-host-earn-badge" id="host-r3-earn-0">+0</span>
+                    <div class="r3-host-time-box" id="host-r3-time-0">--</div>
+                    <span class="r3-host-time-unit">s</span>
+                  </div>
+                </div>
+                <div class="r3-host-ans-bottom">
+                  <div class="r3-host-ans-box" id="host-r3-ans-0"></div>
+                  <span class="r3-host-judge-badge" id="host-r3-judge-0"></span>
+                </div>
+              </div>
+
+              <div class="r3-host-ans-card" id="host-r3-ans-card-1">
+                <div class="r3-host-ans-top">
+                  <div class="r3-host-player-info">
+                    <span class="r3-host-player-name" id="host-r3-player-name-1">2. P2</span>
+                    <span class="r3-host-player-score" id="host-r3-player-score-1">0đ</span>
+                  </div>
+                  <div class="r3-host-time-rank">
+                    <span class="r3-host-earn-badge" id="host-r3-earn-1">+0</span>
+                    <div class="r3-host-time-box" id="host-r3-time-1">--</div>
+                    <span class="r3-host-time-unit">s</span>
+                  </div>
+                </div>
+                <div class="r3-host-ans-bottom">
+                  <div class="r3-host-ans-box" id="host-r3-ans-1"></div>
+                  <span class="r3-host-judge-badge" id="host-r3-judge-1"></span>
+                </div>
+              </div>
+
+              <div class="r3-host-ans-card" id="host-r3-ans-card-2">
+                <div class="r3-host-ans-top">
+                  <div class="r3-host-player-info">
+                    <span class="r3-host-player-name" id="host-r3-player-name-2">3. P3</span>
+                    <span class="r3-host-player-score" id="host-r3-player-score-2">0đ</span>
+                  </div>
+                  <div class="r3-host-time-rank">
+                    <span class="r3-host-earn-badge" id="host-r3-earn-2">+0</span>
+                    <div class="r3-host-time-box" id="host-r3-time-2">--</div>
+                    <span class="r3-host-time-unit">s</span>
+                  </div>
+                </div>
+                <div class="r3-host-ans-bottom">
+                  <div class="r3-host-ans-box" id="host-r3-ans-2"></div>
+                  <span class="r3-host-judge-badge" id="host-r3-judge-2"></span>
+                </div>
+              </div>
+
+              <div class="r3-host-ans-card" id="host-r3-ans-card-3">
+                <div class="r3-host-ans-top">
+                  <div class="r3-host-player-info">
+                    <span class="r3-host-player-name" id="host-r3-player-name-3">4. P4</span>
+                    <span class="r3-host-player-score" id="host-r3-player-score-3">0đ</span>
+                  </div>
+                  <div class="r3-host-time-rank">
+                    <span class="r3-host-earn-badge" id="host-r3-earn-3">+0</span>
+                    <div class="r3-host-time-box" id="host-r3-time-3">--</div>
+                    <span class="r3-host-time-unit">s</span>
+                  </div>
+                </div>
+                <div class="r3-host-ans-bottom">
+                  <div class="r3-host-ans-box" id="host-r3-ans-3"></div>
+                  <span class="r3-host-judge-badge" id="host-r3-judge-3"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             5. VÒNG 4: VỀ ĐÍCH (GIỐNG CONTROLLER_R4 KHÔNG NÚT ĐIỀU KHIỂN)
+             =============================================================== -->
+        <div class="round-view" id="host-view-R4">
+          <!-- CỘT TRÁI: QUESTION-BOX & ANSWER-BOX -->
+          <div class="r4-left-col">
+            <!-- 1. QUESTION-BOX -->
+            <div class="r4-question-box">
+              <div class="r4-question-header">
+                <div class="r4-header-left">
+                  <span class="r4-header-turn" id="hostR4TurnBadge">CHƯA CHỌN TS:</span>
+                  <div class="r4-header-players" id="hostR4HeaderPlayers">
+                    <span class="r4-h-player" id="hostR4HeaderPlayer-1">P1</span>
+                    <span class="r4-h-player" id="hostR4HeaderPlayer-2">P2</span>
+                    <span class="r4-h-player" id="hostR4HeaderPlayer-3">P3</span>
+                    <span class="r4-h-player" id="hostR4HeaderPlayer-4">P4</span>
+                  </div>
+                  <span class="r4-header-divider">|</span>
+                  <span class="r4-header-ques" id="hostR4QuesNumText">CÂU 1/3</span>
+                  <span class="r4-header-divider">|</span>
+                  <div class="r4-header-qvals" id="hostR4HeaderQVals">
+                    <span class="r4-h-qval active" id="hostR4HeaderQVal-0">C1: 20đ</span>
+                    <span class="r4-h-qval" id="hostR4HeaderQVal-1">C2: 20đ</span>
+                    <span class="r4-h-qval" id="hostR4HeaderQVal-2">C3: 30đ</span>
+                  </div>
+                </div>
+
+                <div class="r4-header-right">
+                  <span class="r4-bank-code-badge" id="hostR4ActiveSlotCode">#1</span>
+                  <span class="r4-header-time" id="hostR4TimeBadge">15s</span>
+                </div>
+              </div>
+
+              <!-- Thanh hiển thị gói 3 cụm (mỗi cụm 2 mức 20 / 30) -->
+              <div class="r4-pack-bar">
+                <span class="r4-pack-label">GÓI CÂU HỎI:</span>
+                <div class="r4-pack-clusters" id="hostR4PackGrid">
+                  <div class="r4-pack-cluster" data-slot="0">
+                    <span class="r4-cluster-title">CÂU 1</span>
+                    <div class="r4-cluster-btns">
+                      <span class="r4-pack-cell" data-slot="0" data-level="1">20</span>
+                      <span class="r4-pack-cell" data-slot="0" data-level="2">30</span>
+                    </div>
+                  </div>
+                  <div class="r4-pack-cluster" data-slot="1">
+                    <span class="r4-cluster-title">CÂU 2</span>
+                    <div class="r4-cluster-btns">
+                      <span class="r4-pack-cell" data-slot="1" data-level="1">20</span>
+                      <span class="r4-pack-cell" data-slot="1" data-level="2">30</span>
+                    </div>
+                  </div>
+                  <div class="r4-pack-cluster" data-slot="2">
+                    <span class="r4-cluster-title">CÂU 3</span>
+                    <div class="r4-cluster-btns">
+                      <span class="r4-pack-cell" data-slot="2" data-level="1">20</span>
+                      <span class="r4-pack-cell" data-slot="2" data-level="2">30</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nội dung câu hỏi -->
+              <div class="r4-question-content custom-scroll" id="hostR4QuesText">
+                Đang tải câu hỏi Vòng 4...
+              </div>
+
+              <!-- Chỉ báo Ngôi sao hi vọng & Đồng hồ 5s giành quyền (không có nút bấm) -->
+              <div class="r4-question-footer">
+                <span class="r4-star-badge" id="hostR4StarBadge">⭐ NSHV</span>
+                <div class="r4-timer-5s-box" id="hostR4Timer5sBox">5</div>
+              </div>
+            </div>
+
+            <!-- 2. ANSWER-BOX -->
+            <div class="r4-answer-box">
+              <div class="r4-answer-content custom-scroll" id="hostR4AnsText">...</div>
+              <div class="r4-answer-footer">
+                <span class="r4-steal-status" id="hostR4StealStatusText">Đang khóa chuông</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CỘT PHẢI: BẢNG ĐIỂM 4 THÍ SINH GIỐNG CONTROLLER_R4 -->
+          <div class="r4-right-col">
+            <div class="r4-player-card" id="r4PlayerCard-1">
+              <div class="r4-p-name" id="r4PName-1">P1</div>
+              <div class="r4-p-score" id="r4PScore-1">0</div>
+            </div>
+            <div class="r4-player-card" id="r4PlayerCard-2">
+              <div class="r4-p-name" id="r4PName-2">P2</div>
+              <div class="r4-p-score" id="r4PScore-2">0</div>
+            </div>
+            <div class="r4-player-card" id="r4PlayerCard-3">
+              <div class="r4-p-name" id="r4PName-3">P3</div>
+              <div class="r4-p-score" id="r4PScore-3">0</div>
+            </div>
+            <div class="r4-player-card" id="r4PlayerCard-4">
+              <div class="r4-p-name" id="r4PName-4">P4</div>
+              <div class="r4-p-score" id="r4PScore-4">0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             6. VÒNG 5: CÂU HỎI PHỤ (GIỐNG CONTROLLER_R5 KHÔNG NÚT ĐIỀU KHIỂN)
+             =============================================================== -->
+        <div class="round-view" id="host-view-R5">
+          <div class="r5-qa-column">
+            <!-- BOX CÂU HỎI -->
+            <div class="r5-question-box">
+              <div class="r5-question-header">
+                <span class="r5-badge" id="hostR5RoundBadge">CÂU HỎI PHỤ</span>
+                <span class="r5-divider">-</span>
+                <span class="r5-badge" id="hostR5QuesBadge">CÂU HỎI 1/0</span>
+                <span class="r5-divider">-</span>
+                <span class="r5-badge" id="hostR5TimeBadge">THỜI GIAN: 15.0s</span>
+                <span class="r5-ques-vis-badge" id="hostR5QuesVisBadge">ĐANG ẨN CÂU HỎI</span>
+              </div>
+
+              <div class="r5-question-content custom-scroll" id="hostR5PreviewQuestion">
+                Đang tải câu hỏi phụ...
+              </div>
+            </div>
+
+            <!-- BOX ĐÁP ÁN -->
+            <div class="r5-answer-box">
+              <div class="r5-answer-info">
+                <div class="r5-answer-content custom-scroll" id="hostR5PreviewAnswer">...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CỘT PHẢI: DANH SÁCH THÍ SINH CÂU HỎI PHỤ (2 - 8 THÍ SINH) -->
+          <div class="r5-players-column">
+            <div class="r5-players-toolbar">
+              <span class="r5-players-count-label" id="hostR5PlayersCountLabel">THÍ SINH (2/8)</span>
+            </div>
+            <div class="r5-players-list custom-scroll" id="hostR5PlayersList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+      import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
+        authDomain: "olympia-d2f44.firebaseapp.com",
+        databaseURL: "https://olympia-d2f44-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "olympia-d2f44",
+        storageBucket: "olympia-d2f44.firebasestorage.app",
+        messagingSenderId: "18063059793",
+        appId: "1:18063059793:web:5dad7ce59006e779988170",
+        measurementId: "G-XVER3NDTXY"
+      };
+
+      const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+      const db = getDatabase(app);
+      window.firebaseDB = db;
+
+      const ROUND_NAMES = {
+        M: "MAIN - GIỚI THIỆU THÍ SINH",
+        R1: "VÒNG 1: KHỞI ĐỘNG",
+        R2: "VÒNG 2: VƯỢT CHƯỚNG NGẠI VẬT",
+        R3: "VÒNG 3: TĂNG TỐC",
+        R4: "VÒNG 4: VỀ ĐÍCH",
+        R5: "VÒNG 5: CÂU HỎI PHỤ"
+      };
+
+      const VIEW_DISPLAY_MODES = {
+        M: "grid",
+        R1: "grid",
+        R2: "block",
+        R3: "grid",
+        R4: "grid",
+        R5: "grid"
+      };
+
+      function normalizeTabCode(raw) {
+        const s = String(raw || "").trim().toUpperCase();
+        if (s === "M" || s === "MAIN") return "M";
+        if (s === "R1" || s === "ROUND_1" || s === "ROUND1") return "R1";
+        if (s === "R2" || s === "ROUND_2" || s === "ROUND2") return "R2";
+        if (s === "R3" || s === "ROUND_3" || s === "ROUND3") return "R3";
+        if (s === "R4" || s === "ROUND_4" || s === "ROUND4") return "R4";
+        if (s === "R5" || s === "ROUND_5" || s === "ROUND5" || s === "TIE_BREAKER") return "R5";
+        return ROUND_NAMES[s] ? s : "";
+      }
+
+      window.HostState = {
+        activeTab: "R1",
+        questions: {},
+        players: {
+          1: { name: "P1", fullName: "", score: 0, info: "", avatar: "" },
+          2: { name: "P2", fullName: "", score: 0, info: "", avatar: "" },
+          3: { name: "P3", fullName: "", score: 0, info: "", avatar: "" },
+          4: { name: "P4", fullName: "", score: 0, info: "", avatar: "" }
+        }
+      };
+
+      function readIndexedValue(source, playerNum) {
+        if (!source || typeof source !== "object") return undefined;
+        if (Array.isArray(source)) return source[playerNum - 1];
+        const isOneBased =
+          source["0"] === undefined &&
+          (source["1"] !== undefined ||
+            source["2"] !== undefined ||
+            source["3"] !== undefined ||
+            source["4"] !== undefined);
+        return isOneBased ? source[playerNum] : source[playerNum - 1];
+      }
+
+      window.HostUtils = {
+        normalizeNumberedMap(raw) {
+          const map = {};
+          if (!raw || typeof raw !== "object") return map;
+          for (const [k, v] of Object.entries(raw)) {
+            if (v !== null && v !== undefined && typeof v === "object") {
+              map[k] = v;
+            }
+          }
+          return map;
+        },
+
+        findQuestionByText(map, text) {
+          const target = String(text || "").trim();
+          if (!target || !map || typeof map !== "object") return null;
+          for (const [key, item] of Object.entries(map)) {
+            if (item && typeof item === "object") {
+              const qText = String(item.cau_hoi || item.question || "").trim();
+              if (qText && qText === target) {
+                return { key, item };
+              }
+            }
+          }
+          return null;
+        },
+
+        formatTimeVal(t) {
+          if (t === null || t === undefined || t === "") return "--";
+          const num = Number(t);
+          if (!Number.isFinite(num) || num <= 0) return "--";
+          return `${num.toFixed(2)}s`;
+        },
+
+        extractPlayerEntries(rawAns, rawTimes, rawJudgements, rawEarns) {
+          const result = {};
+
+          for (let p = 1; p <= 4; p++) {
+            const entry = readIndexedValue(rawAns, p);
+            let answer = "";
+            let time = null;
+            let judge = null;
+            let earn = null;
+
+            if (typeof entry === "string" || typeof entry === "number") {
+              answer = String(entry);
+            } else if (entry && typeof entry === "object") {
+              answer = String(
+                entry.answer ?? entry.dap_an ?? entry.text ?? entry.value ?? ""
+              );
+              if (entry.time !== undefined || entry.thoi_gian !== undefined) {
+                time = entry.time ?? entry.thoi_gian;
+              }
+              if (entry.right === true || entry.status === "right") judge = "right";
+              else if (
+                entry.wrong === true ||
+                entry.isWrong === true ||
+                entry.status === "wrong"
+              ) {
+                judge = "wrong";
+              }
+              if (entry.earn !== undefined) earn = entry.earn;
+            }
+
+            if (time === null) {
+              const tVal = readIndexedValue(rawTimes, p);
+              if (tVal !== undefined) time = tVal;
+            }
+
+            if (judge === null) {
+              const jVal = readIndexedValue(rawJudgements, p);
+              if (jVal === true || jVal === "right" || jVal === "correct") judge = "right";
+              else if (jVal === false || jVal === "wrong" || jVal === "incorrect") judge = "wrong";
+            }
+
+            if (earn === null) {
+              const eVal = readIndexedValue(rawEarns, p);
+              if (eVal !== undefined) earn = eVal;
+            }
+
+            result[p] = { answer, time, judge, earn };
+          }
+          return result;
+        },
+
+        syncAllScoreboards() {
+          for (let i = 1; i <= 4; i++) {
+            const p = window.HostState.players[i] || {};
+            const name = String(p.name || `P${i}`).trim() || `P${i}`;
+            const score = Number(p.score) || 0;
+
+            ["r1", "r4"].forEach((prefix) => {
+              const nEl = document.getElementById(`${prefix}PName-${i}`);
+              const sEl = document.getElementById(`${prefix}PScore-${i}`);
+              if (nEl) nEl.textContent = name;
+              if (sEl) sEl.textContent = String(score);
+            });
+
+            const r2NameEl = document.getElementById(`host-r2-score-name-${i - 1}`);
+            const r2ValEl = document.getElementById(`host-r2-score-val-${i - 1}`);
+            if (r2NameEl) r2NameEl.textContent = name;
+            if (r2ValEl) r2ValEl.textContent = String(score);
+
+            const r3NameEl = document.getElementById(`host-r3-player-name-${i - 1}`);
+            const r3ScoreEl = document.getElementById(`host-r3-player-score-${i - 1}`);
+            if (r3NameEl) r3NameEl.textContent = `${i}. ${name}`;
+            if (r3ScoreEl) r3ScoreEl.textContent = `${score}đ`;
+          }
+        }
+      };
+
+      let currentLoadedCssTab = "";
+      let currentLoadedJsTab = "";
+
+      function switchHostRound(tabCode) {
+        const tab = ROUND_NAMES[tabCode] ? tabCode : "R1";
+        window.HostState.activeTab = tab;
+
+        document.getElementById("hostRoundTitle").textContent = ROUND_NAMES[tab];
+        window.HostUtils.syncAllScoreboards();
+
+        let isCssSwitching = false;
+        if (currentLoadedCssTab !== tab) {
+          currentLoadedCssTab = tab;
+          const roundCssLink = document.getElementById("host-round-css");
+          const nextHref = `../css/Host_${tab}.css`;
+
+          if (roundCssLink && roundCssLink.getAttribute("href") !== nextHref) {
+            isCssSwitching = true;
+            const revealActiveView = () => {
+              if (window.HostState.activeTab !== tab) return;
+              const activeEl = document.getElementById(`host-view-${tab}`);
+              if (activeEl) activeEl.style.display = VIEW_DISPLAY_MODES[tab] || "block";
+            };
+            roundCssLink.onload = revealActiveView;
+            roundCssLink.onerror = revealActiveView;
+            roundCssLink.href = nextHref;
+          }
+        }
+
+        Object.entries(VIEW_DISPLAY_MODES).forEach(([code, displayMode]) => {
+          const el = document.getElementById(`host-view-${code}`);
+          if (!el) return;
+          if (code === tab) {
+            el.style.display = isCssSwitching ? "none" : displayMode;
+          } else {
+            el.style.display = "none";
+          }
+        });
+
+        if (currentLoadedJsTab !== tab) {
+          currentLoadedJsTab = tab;
+
+          if (typeof window.cleanupCurrentRound === "function") {
+            window.cleanupCurrentRound();
+            window.cleanupCurrentRound = null;
+          }
+          window.renderActiveHostRound = null;
+
+          const oldScript = document.getElementById("host-round-js");
+          if (oldScript) oldScript.remove();
+
+          const newScript = document.createElement("script");
+          newScript.id = "host-round-js";
+          newScript.type = "module";
+          newScript.src = `../script/Host_${tab}.js?t=${Date.now()}`;
+          document.body.appendChild(newScript);
+        } else if (typeof window.renderActiveHostRound === "function") {
+          window.renderActiveHostRound();
+        }
+      }
+
+      onValue(ref(db, "games/active_tab"), (snap) => {
+        if (!snap.exists()) return;
+        const val = snap.val();
+        const rawCode = typeof val === "string" ? val : val?.tab ?? val?.activeTab;
+        const code = normalizeTabCode(rawCode);
+        if (code && ROUND_NAMES[code]) {
+          switchHostRound(code);
+        }
+      });
+
+      onValue(ref(db, "questions"), (snap) => {
+        window.HostState.questions = snap.exists() ? snap.val() : {};
+        if (typeof window.renderActiveHostRound === "function") {
+          window.renderActiveHostRound();
+        }
+      });
+
+      onValue(ref(db, "games/players"), (snap) => {
+        if (!snap.exists()) return;
+        window.HostState.players = { ...window.HostState.players, ...(snap.val() || {}) };
+        window.HostUtils.syncAllScoreboards();
+        if (typeof window.renderActiveHostRound === "function") {
+          window.renderActiveHostRound();
+        }
+      });
+
+      window.addEventListener(
+        "keydown",
+        function (e) {
+          if (
+            (e.ctrlKey || e.metaKey) &&
+            (e.key === "+" ||
+              e.key === "-" ||
+              e.key === "=" ||
+              e.key === "_" ||
+              e.key === "0" ||
+              e.keyCode === 187 ||
+              e.keyCode === 189 ||
+              e.keyCode === 107 ||
+              e.keyCode === 109 ||
+              e.keyCode === 48 ||
+              e.keyCode === 96)
+          ) {
+            e.preventDefault();
+          }
+        },
+        { passive: false }
+      );
+
+      window.addEventListener(
+        "wheel",
+        function (e) {
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+          }
+        },
+        { passive: false }
+      );
+
+      function lockTruePhysicalSize() {
+        const dpr = window.devicePixelRatio || 1;
+        const inverseScale = 1 / dpr;
+        const container = document.getElementById("mainContainer");
+        if (container) {
+          container.style.transform = `scale(${inverseScale})`;
+          container.style.width = `${100 * dpr}vw`;
+          container.style.height = `${100 * dpr}vh`;
+        }
+      }
+
+      function watchDPRChange() {
+        lockTruePhysicalSize();
+        const mqString = `(resolution: ${window.devicePixelRatio}dppx)`;
+        window.matchMedia(mqString).addEventListener("change", watchDPRChange, { once: true });
+      }
+
+      window.addEventListener("resize", lockTruePhysicalSize);
+      window.addEventListener("load", watchDPRChange);
+      watchDPRChange();
+
+      switchHostRound(window.HostState.activeTab);
+    </script>
+  </body>
+</html>

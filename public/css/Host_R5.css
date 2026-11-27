@@ -1,0 +1,221 @@
+/* =========================================================================
+   6. VÒNG 5: CÂU HỎI PHỤ (ĐỒNG BỘ CONTROLLER_R5 - KHÔNG NÚT ĐIỀU KHIỂN)
+   ========================================================================= */
+
+#host-view-R5 {
+  display: none;
+  grid-template-columns: 1fr 290px;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.r5-qa-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* BOX CÂU HỎI */
+.r5-question-box {
+  flex: 1.45;
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.r5-question-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #000080;
+  border-bottom: 1.5px solid #ffffff;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
+.r5-badge {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffff00;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.r5-divider {
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+.r5-ques-vis-badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid #64748b;
+  background-color: #1e293b;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.r5-ques-vis-badge.is-shown {
+  border-color: #ffff00;
+  background-color: #1d4ed8;
+  color: #ffff00;
+}
+
+.r5-question-content {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 28px;
+  font-weight: bold;
+  line-height: 1.4;
+  color: #ffffff;
+  overflow-y: auto;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* BOX ĐÁP ÁN */
+.r5-answer-box {
+  flex: 1;
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  padding: 10px 14px;
+  gap: 12px;
+  min-height: 0;
+}
+
+.r5-answer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.r5-answer-content {
+  font-size: 34px;
+  font-weight: bold;
+  color: #34d399;
+  overflow-y: auto;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* CỘT PHẢI: DANH SÁCH 2 - 8 THÍ SINH */
+.r5-players-column {
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.r5-players-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+}
+
+.r5-players-count-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #38bdf8;
+}
+
+.r5-players-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.r5-player-card {
+  flex: 1;
+  min-height: 42px;
+  background-color: #000080;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Đang bấm chuông giành quyền trả lời */
+.r5-player-card.is-buzzed {
+  background-color: #cc0000;
+  border-color: #ffff00;
+  box-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+}
+
+/* Đã trả lời sai trong câu hỏi hiện tại (hết 1 lượt trả lời) */
+.r5-player-card.is-eliminated {
+  background-color: #1e293b;
+  border-color: #475569;
+  opacity: 0.5;
+}
+
+.r5-player-card.is-eliminated .r5-p-name {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+/* Chiến thắng Câu hỏi phụ */
+.r5-player-card.is-winner {
+  background-color: #059669;
+  border-color: #ffff00;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.8);
+}
+
+.r5-p-left {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.r5-p-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r5-p-sub {
+  font-size: 10px;
+  color: #cbd5e1;
+  text-transform: uppercase;
+}

@@ -1,0 +1,426 @@
+/* =========================================================================
+   HOST VÒNG 4: VỀ ĐÍCH (ĐỒNG BỘ BỐ CỤC CONTROLLER_R4 - KHÔNG NÚT ĐIỀU KHIỂN)
+   ========================================================================= */
+#host-view-R4 {
+  display: none;
+  grid-template-columns: 1fr 220px;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  color: #f8fafc;
+  font-family: "UTM Avo", Arial, sans-serif;
+}
+
+/* =========================================================================
+   1. CỘT TRÁI: QUESTION-BOX & ANSWER-BOX
+   ========================================================================= */
+.r4-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.r4-question-box,
+.r4-answer-box {
+  background-color: #000000;
+  border: 1.5px solid #ffffff;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 0;
+}
+
+.r4-question-box {
+  flex: 7;
+}
+
+.r4-answer-box {
+  flex: 3;
+}
+
+/* --- HEADER CỦA QUESTION-BOX --- */
+.r4-question-header {
+  background-color: #ffffff;
+  color: #000000;
+  min-height: 52px;
+  padding: 6px 14px;
+  font-weight: 900;
+  font-size: 17px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.r4-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.r4-header-divider {
+  color: #94a3b8;
+  font-weight: normal;
+}
+
+.r4-header-turn {
+  color: #000080;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.r4-header-players {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.r4-h-player {
+  background: #e2e8f0;
+  color: #0f172a;
+  border: 1.5px solid #64748b;
+  border-radius: 4px;
+  padding: 3px 9px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.r4-h-player.active {
+  background: #000080;
+  color: #facc15;
+  border-color: #000080;
+}
+
+.r4-h-player.played {
+  background: #cbd5e1;
+  color: #475569;
+  border-color: #16a34a;
+  box-shadow: inset 0 -2px 0 #16a34a;
+}
+
+.r4-header-ques {
+  color: #b91c1c;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.r4-header-qvals {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.r4-h-qval {
+  background: #e2e8f0;
+  color: #0f172a;
+  border: 1.5px solid #64748b;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.r4-h-qval.active {
+  background: #000080;
+  color: #facc15;
+  border-color: #000080;
+}
+
+.r4-h-qval.done-right {
+  border-color: #16a34a;
+  box-shadow: inset 0 -3px 0 #16a34a;
+}
+
+.r4-h-qval.done-wrong {
+  border-color: #dc2626;
+  box-shadow: inset 0 -3px 0 #dc2626;
+}
+
+.r4-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.r4-bank-code-badge {
+  background: #f1f5f9;
+  border: 1px solid #94a3b8;
+  border-radius: 4px;
+  padding: 4px 10px;
+  min-width: 48px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.r4-header-time {
+  background: #7f1d1d;
+  color: #ffffff;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 900;
+  min-width: 84px;
+  text-align: center;
+}
+
+/* --- THANH HIỂN THỊ GÓI 3 CỤM (MỖI CỤM 2 MỨC 20 / 30) --- */
+.r4-pack-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: #0b132b;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+}
+
+.r4-pack-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #38bdf8;
+  white-space: nowrap;
+}
+
+.r4-pack-clusters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  flex: 1;
+}
+
+.r4-pack-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #111c3a;
+  border: 1.5px solid #3b4d75;
+  border-radius: 5px;
+  padding: 4px 8px;
+}
+
+.r4-pack-cluster.has-choice {
+  border-color: #38bdf8;
+}
+
+.r4-cluster-title {
+  font-size: 13px;
+  font-weight: 900;
+  color: #93c5fd;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.r4-cluster-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  flex: 1;
+}
+
+.r4-pack-cell {
+  height: 32px;
+  background: #1e293b;
+  border: 1.5px solid #64748b;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.r4-pack-cell.selected {
+  background: linear-gradient(90deg, #7f1d1d, #dc2626);
+  border-color: #facc15;
+  color: #facc15;
+}
+
+/* --- NỘI DUNG CÂU HỎI & ĐÁP ÁN --- */
+.r4-question-content {
+  padding: 16px 20px;
+  font-size: 32px;
+  line-height: 1.4;
+  font-weight: bold;
+  color: #ffffff;
+  flex: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.r4-answer-content {
+  padding: 14px 20px;
+  font-size: 26px;
+  line-height: 1.35;
+  font-weight: bold;
+  color: #4ade80;
+  flex: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* --- THANH CHỈ BÁO GÓC DƯỚI QUESTION-BOX & ANSWER-BOX --- */
+.r4-question-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px 14px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.r4-answer-footer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px 14px;
+  flex-shrink: 0;
+}
+
+.r4-steal-status {
+  background: #0f172a;
+  border: 1.5px solid #475569;
+  border-radius: 3px;
+  padding: 0 12px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  color: #facc15;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.r4-star-badge {
+  height: 42px;
+  padding: 0 12px;
+  background: #1e293b;
+  border: 2px solid #eab308;
+  border-radius: 4px;
+  color: #facc15;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.r4-star-badge.active {
+  background: linear-gradient(135deg, #ca8a04, #facc15);
+  color: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.75);
+}
+
+.r4-timer-5s-box {
+  width: 44px;
+  height: 42px;
+  background-color: #000000;
+  border: 2.5px solid #facc15;
+  border-radius: 4px;
+  color: #facc15;
+  font-size: 24px;
+  font-weight: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+
+.r4-timer-5s-box.running {
+  background-color: #dc2626;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+/* =========================================================================
+   2. CỘT PHẢI: BẢNG ĐIỂM 4 THÍ SINH GIỐNG CONTROLLER_R4
+   ========================================================================= */
+.r4-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+}
+
+.r4-player-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #4f5050;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #0b004b;
+  user-select: none;
+  min-height: 0;
+}
+
+/* Thí sinh đang thi Về đích */
+.r4-player-card.is-main-player {
+  border-color: #00dafc;
+  background-color: #10197a;
+}
+
+/* Thí sinh bấm chuông giành quyền */
+.r4-player-card.is-buzzer-player {
+  background-color: #cc0000;
+  border-color: #cc0000;
+}
+
+.r4-player-card.is-played {
+  opacity: 0.72;
+}
+
+.r4-p-name {
+  background: linear-gradient(90deg, #00dafc, #007cbe);
+  border-bottom: 2px solid #13007d;
+  padding: 5px 6px 0px 6px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 900;
+  color: #0d0055;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  height: 50px;
+  flex-shrink: 0;
+}
+
+.r4-player-card.is-buzzer-player .r4-p-name {
+  background: var(--yellow-border, #ffff00);
+}
+
+.r4-p-score {
+  flex: 1;
+  padding: 15px 0px 0px 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 70px;
+  font-weight: bold;
+  color: var(--white, #ffffff);
+  line-height: 1;
+}

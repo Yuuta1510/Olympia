@@ -1,0 +1,66 @@
+/* =====================================================================
+   2. VÒNG 1: KHỞI ĐỘNG
+   ===================================================================== */
+#host-view-R1 {
+  display: none;
+  grid-template-columns: 1fr 240px;
+  gap: 12px;
+}
+
+.r1-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  min-width: 0;
+}
+
+.r1-ques-box {
+  flex: 7;
+}
+
+.r1-ans-box {
+  flex: 3;
+}
+
+.r1-ques-text {
+  font-size: clamp(24px, 2.5vw, 38px);
+  font-weight: 700;
+  color: var(--white);
+}
+
+.r1-ans-text {
+  font-size: clamp(24px, 2.4vw, 36px);
+  font-weight: 900;
+  color: var(--emerald);
+}
+
+/* =====================================================================
+   ĐỒNG HỒ ĐẾM NGƯỢC 5S TRÊN MÀN HÌNH HOST (CHỈ DÙNG Ở VÒNG 1)
+   ===================================================================== */
+.host-timer-5s-overlay {
+  position: absolute;
+  top: 60%;
+  left: 78%;
+  z-index: 999;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+  padding: 10px 26px 12px;
+  background: black;
+  color: white;
+  border: 3px solid white;
+  border-radius: 14px;
+  pointer-events: none;
+}
+
+.host-timer-5s-value {
+  font-size: 64px;
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1.05;
+  margin-top: 2px;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.75);
+}

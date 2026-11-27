@@ -1,0 +1,379 @@
+/* =====================================================================
+   HOST ROUND 3 - TĂNG TỐC (ĐỒNG BỘ GIAO DIỆN CONTROLLER_R3)
+   ===================================================================== */
+#host-view-R3 {
+  display: none;
+  grid-template-columns: 1fr 380px;
+  width: 100%;
+  height: 100%;
+  gap: 12px;
+  min-height: 0;
+  font-family: "UTM Avo", Arial, sans-serif;
+}
+
+/* =====================================================================
+   1. CỘT TRÁI: 2 KHUNG XẾP DỌC TỶ LỆ CHIỀU CAO 3:7 (TEXT CÂU HỎI & MEDIA)
+   ===================================================================== */
+.r3-host-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* KHUNG TEXT CÂU HỎI (CHIỀU CAO TỶ LỆ 3) */
+.r3-host-question-box {
+  flex: 3;
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  padding: 10px 14px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.r3-host-q-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+}
+
+.r3-host-q-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.r3-host-q-tab {
+  background-color: #1e293b;
+  color: #cbd5e1;
+  border: 1.5px solid #475569;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: "UTM Avo", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.r3-host-q-tab.active {
+  background-color: #000099;
+  border-color: #ffff00;
+  color: #ffff00;
+}
+
+.r3-host-q-answer-badge {
+  background-color: #052e16;
+  border: 1.5px solid #22c55e;
+  color: #86efac;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  white-space: nowrap;
+  max-width: 48%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r3-host-q-answer-badge strong {
+  color: #ffffff;
+  margin-left: 4px;
+}
+
+.r3-host-q-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 8px 4px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+#host-r3-q-text {
+  font-size: clamp(19px, 1.55vw, 24px);
+  font-weight: bold;
+  color: #ffffff;
+  line-height: 1.35;
+  text-align: left;
+  width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* KHUNG MEDIA (CHIỀU CAO TỶ LỆ 7) */
+.r3-host-media-box {
+  flex: 7;
+  background-color: #050811;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.r3-host-media-badges {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+}
+
+.r3-host-media-type-badge {
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid #38bdf8;
+  color: #38bdf8;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.r3-host-timer-badge {
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1.5px solid #facc15;
+  color: #facc15;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.r3-host-timer-badge.running {
+  background-color: #dc2626;
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.r3-host-media-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#host-r3-preview-img,
+#host-r3-preview-vid {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  display: none;
+}
+
+#host-r3-media-empty {
+  color: #64748b;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* =====================================================================
+   2. CỘT PHẢI: QUAN SÁT ĐÁP ÁN, THỜI GIAN & ĐIỂM THÍ SINH
+   ===================================================================== */
+.r3-host-right-col {
+  background-color: #0b1120;
+  border: 2px solid #ffffff;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+
+.r3-host-ans-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #000080;
+  border: 1.5px solid #38bdf8;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.r3-host-score-rule {
+  color: #facc15;
+  font-size: 12px;
+}
+
+.r3-host-ans-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.r3-host-ans-card {
+  flex: 1;
+  background-color: #111827;
+  border: 1.5px solid #334155;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.r3-host-ans-card.is-right {
+  background-color: #052e16;
+  border-color: #22c55e;
+}
+
+.r3-host-ans-card.is-wrong {
+  background-color: #450a0a;
+  border-color: #ef4444;
+}
+
+.r3-host-ans-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.r3-host-player-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.r3-host-player-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #38bdf8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r3-host-player-score {
+  font-size: 12.5px;
+  font-weight: bold;
+  color: #facc15;
+  background-color: #1e293b;
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.r3-host-time-rank {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.r3-host-earn-badge {
+  background-color: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 38px;
+  text-align: center;
+}
+
+.r3-host-earn-badge.has-points {
+  background-color: #16a34a;
+  border-color: #86efac;
+  color: #ffffff;
+}
+
+.r3-host-time-box {
+  width: 64px;
+  height: 26px;
+  background-color: #0f172a;
+  color: #facc15;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.r3-host-time-unit {
+  font-size: 12px;
+  font-weight: bold;
+  color: #cbd5e1;
+}
+
+.r3-host-ans-bottom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.r3-host-ans-box {
+  flex: 1;
+  height: 34px;
+  background-color: #0f172a;
+  color: #ffffff;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 0 10px;
+  font-size: 14.5px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r3-host-judge-badge {
+  display: none;
+  height: 34px;
+  padding: 0 10px;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.r3-host-judge-badge.right {
+  display: inline-flex;
+  background-color: #16a34a;
+}
+
+.r3-host-judge-badge.wrong {
+  display: inline-flex;
+  background-color: #dc2626;
+}

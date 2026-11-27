@@ -1,0 +1,460 @@
+/* =====================================================================
+   3. VÒNG 2: VƯỢT CHƯỚNG NGẠI VẬT (ĐỒNG BỘ BỐ CỤC CONTROLLER_R2)
+   ===================================================================== */
+#host-view-R2 {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #0f172a;
+  font-family: "UTM Avo", Arial, sans-serif;
+  overflow: hidden;
+  display: none;
+  border-radius: 6px;
+}
+
+/* ==========================================
+   1. KHUNG ẢNH 16:9 - GÓC TRÊN TRÁI
+   ========================================== */
+#host-view-R2 .r2-host-image-area {
+  position: absolute;
+  top: 5%;
+  left: 1.5%;
+  right: auto;
+  width: 32%;
+  height: 52.5%;
+  border: 3px solid #ffffff;
+  background: #000000;
+  overflow: hidden;
+}
+
+.r2-host-target-img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.r2-host-piece {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.r2-host-piece.hidden {
+  opacity: 0;
+}
+
+#host-r2-cp-1 { clip-path: polygon(0 0, 50% 0, 50% 25%, 25% 25%, 25% 50%, 0 50%); }
+#host-r2-cp-2 { clip-path: polygon(50% 0, 100% 0, 100% 50%, 75% 50%, 75% 25%, 50% 25%); }
+#host-r2-cp-3 { clip-path: polygon(75% 50%, 100% 50%, 100% 100%, 50% 100%, 50% 75%, 75% 75%); }
+#host-r2-cp-4 { clip-path: polygon(0 50%, 25% 50%, 25% 75%, 50% 75%, 50% 100%, 0 100%); }
+#host-r2-cp-5 { clip-path: polygon(25% 25%, 75% 25%, 75% 75%, 25% 75%); }
+
+.r2-host-lbl {
+  position: absolute;
+  color: #ffffff;
+  font-size: 40px;
+  font-weight: bold;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 10;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+  transform: translate(-50%, -50%);
+}
+
+.r2-host-lbl.hidden {
+  opacity: 0;
+}
+
+#host-r2-lbl-1 { top: 15%; left: 15%; }
+#host-r2-lbl-2 { top: 15%; left: 85%; }
+#host-r2-lbl-3 { top: 85%; left: 85%; }
+#host-r2-lbl-4 { top: 85%; left: 15%; }
+#host-r2-lbl-5 { top: 50%; left: 50%; }
+
+/* ==========================================
+   2. HÀNG NGANG - GÓC TRÊN GIỮA
+   ========================================== */
+#host-view-R2 .r2-host-rows-area {
+  position: absolute;
+  top: 5%;
+  left: auto;
+  right: 25%;
+  width: 40%;
+  height: 52.7%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
+  background: #0b1120;
+}
+
+.r2-host-cnv-title {
+  width: 100%;
+  height: 11%;
+  min-height: 36px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  background: #00aaff;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  text-transform: uppercase;
+}
+
+.r2-host-cnv-title > span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r2-host-cnv-keyword {
+  background-color: #0b004b;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  padding: 1px 10px;
+  font-size: 16px;
+  font-weight: 900;
+  color: #facc15;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.r2-host-row-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 95%;
+  transform: translate(20px, 5px);
+}
+
+.r2-host-row {
+  display: flex;
+  gap: 3px;
+  justify-content: flex-start;
+}
+
+.r2-host-char {
+  width: 48px;
+  height: 48px;
+  font-size: 28px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  transition: all 0.2s ease;
+}
+
+.r2-host-char.opened {
+  background: #facc15;
+  color: #000000;
+  border-color: #facc15;
+}
+
+.r2-host-char.selected {
+  background: #0ea5e9;
+  color: #000000;
+  border-color: #38bdf8;
+}
+
+.r2-host-char.cancelled {
+  background: #475569;
+  color: transparent;
+  border-color: #94a3b8;
+}
+
+.r2-host-char.unselected {
+  background: transparent;
+  color: transparent;
+}
+
+.r2-host-char.empty-hint {
+  display: none;
+}
+
+.r2-host-row-number {
+  width: 50px;
+  height: 50px;
+  font-size: 32px;
+  font-weight: bold;
+  background: #0ea5e9;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.r2-host-row-number.center-row {
+  background: #d97706;
+}
+
+/* ==========================================
+   3. CÂU HỎI (KHÔNG CÓ NÚT ĐIỀU KHIỂN) - GÓC DƯỚI TRÁI
+   ========================================== */
+#host-view-R2 .r2-host-question {
+  position: absolute;
+  bottom: 5%;
+  left: 1.5%;
+  right: auto;
+  width: 48%;
+  height: 35%;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffffff;
+  background: #0b1120;
+  padding: 15px 20px;
+  border-radius: 8px;
+  border: 2px solid #00b7ff;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.r2-host-q-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #38bdf8;
+  text-transform: uppercase;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 6px;
+  flex-shrink: 0;
+}
+
+.r2-host-15s-badge {
+  display: none;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #9333ea;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.r2-host-15s-badge.is-running {
+  display: inline-block;
+}
+
+#host-r2-q-text {
+  opacity: 0.3;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  line-height: 1.35;
+  transition: opacity 0.2s ease;
+}
+
+.r2-host-buzzer-corner {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  z-index: 15;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #991b1b, #dc2626);
+  border: 2px solid #facc15;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.65);
+  pointer-events: none;
+}
+
+/* ==========================================
+   4. BẢNG ĐIỂM THÍ SINH (2X2) - GÓC DƯỚI GIỮA PHẢI
+   ========================================== */
+#host-view-R2 .r2-host-score-grid {
+  position: absolute;
+  bottom: 5%;
+  left: auto;
+  right: 25%;
+  width: 25%;
+  height: 35%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.r2-h-score-card {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #4f5050;
+  border-radius: 6px;
+  background: #0b004b;
+  overflow: hidden;
+}
+
+.r2-h-score-card.buzzed {
+  border-color: #facc15;
+  box-shadow: 0 0 15px #facc15;
+}
+
+.r2-h-score-name {
+  background: linear-gradient(90deg, #00dafc, #007cbe);
+  height: 40px;
+  padding: 2px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #0d0055;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r2-h-score-val {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 55px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* ==========================================
+   5. PANEL ĐÁP ÁN THÍ SINH (CHỈ XEM) - CỘT PHẢI
+   ========================================== */
+#host-view-R2 .r2-host-answers-panel {
+  position: absolute;
+  top: 4%;
+  bottom: 4%;
+  right: 1.5%;
+  width: 22%;
+  background: rgba(15, 23, 42, 0.95);
+  border: 2px solid #38bdf8;
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  z-index: 20;
+}
+
+#host-view-R2 .r2-host-ans-header {
+  font-size: 14px;
+  font-weight: 800;
+  color: #38bdf8;
+  text-align: center;
+  text-transform: uppercase;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #334155;
+}
+
+#host-view-R2 .r2-host-ans-list {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+#host-view-R2 .r2-host-ans-card {
+  flex: 1;
+  background: #0b004b;
+  border: 1.5px solid #475569;
+  border-radius: 5px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+#host-view-R2 .r2-host-ans-card.buzzed {
+  border-color: #facc15;
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.45);
+}
+
+#host-view-R2 .r2-host-ans-card.wrong {
+  background: #2a0a12;
+  border-color: #ef4444;
+}
+
+#host-view-R2 .r2-host-ans-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+#host-view-R2 .r2-host-ans-player {
+  font-size: 14px;
+  font-weight: 800;
+  color: #facc15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#host-view-R2 .r2-host-ans-status {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #1e293b;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+#host-view-R2 .r2-host-ans-status.has-answer {
+  background: #166534;
+  color: #bbf7d0;
+}
+
+#host-view-R2 .r2-host-ans-box {
+  width: 100%;
+  min-height: 36px;
+  background: #020617;
+  color: #ffffff;
+  border: 1.5px solid #334155;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#host-view-R2 .r2-host-ans-card.wrong .r2-host-ans-box {
+  color: #fca5a5;
+  border-color: #dc2626;
+  text-decoration: line-through;
+}
