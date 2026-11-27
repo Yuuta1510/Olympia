@@ -31,7 +31,6 @@ const r4State = {
     slotQuestionOffset: [0, 0, 0], // Cho phép đổi câu hỏi trong ngân hàng đề
 
     waitBgShown: false,
-    playersShown: false,
     playersShown: false,          // Trạng thái tên & điểm thí sinh đang hiện trên Livestream
     questionShown: false,         // Trạng thái câu hỏi đang hiện trên Livestream
     starActive: false,
@@ -73,19 +72,33 @@ function sendR4Command(payload) {
 }
 
 function syncR4StateToDB() {
+    const activeQ = getQuestionForSlot(r4State.currentSlot);
     set(ref(db, 'games/r4_state'), {
         ptsLevel1: r4State.ptsLevel1,
         ptsLevel2: r4State.ptsLevel2,
+        timeLevel1: r4State.timeLevel1,
+        timeLevel2: r4State.timeLevel2,
+        stealTime: r4State.stealTime,
         activePlayer: r4State.activePlayer,
         turnOrder: r4State.turnOrder,
         completedPlayers: r4State.completedPlayers,
+        packChoices: r4State.packChoices,
         selectedPackIndices: r4State.selectedPackIndices,
         chosenValues: r4State.chosenValues,
         currentSlot: r4State.currentSlot,
+        slotStatuses: r4State.slotStatuses,
+        questionCode: activeQ.code,
+        questionText: activeQ.cau_hoi,
+        answerText: activeQ.dap_an,
+        mainTimerDisplayText: mainTimerDisplayText,
+        isStealTimerRunning: isStealTimerRunning,
+        stealTimeLeft: stealTimeLeft,
+        waitBgShown: r4State.waitBgShown,
         playersShown: r4State.playersShown,
         questionShown: r4State.questionShown,
         starActive: r4State.starActive,
         buzzerPlayer: r4State.buzzerPlayer,
+        buzzerGraded: r4State.buzzerGraded,
         buzzerLocked: r4State.buzzerLocked,
         stage: r4State.stage,
         timestamp: Date.now()
@@ -491,6 +504,7 @@ function startMainTimer() {
         action: 'r4_start_timer',
         duration: mainTimeLeft
     });
+    syncR4StateToDB();
 
     if (typeof window.playMusic === 'function') {
         if (mainTimeLeft === 15) window.playMusic('R4_15s.mp3', false, false);
@@ -504,10 +518,12 @@ function startMainTimer() {
         if (mainTimeLeft > 0) {
             mainTimerDisplayText = `${mainTimeLeft}s`;
             if (timeBadge) timeBadge.textContent = mainTimerDisplayText;
+            syncR4StateToDB();
         } else {
             mainTimerDisplayText = 'HẾT GIỜ!';
             if (timeBadge) timeBadge.textContent = mainTimerDisplayText;
             stopMainTimer(false, false);
+            syncR4StateToDB();
         }
     }, 1000);
 
@@ -527,6 +543,7 @@ function togglePauseMainTimer() {
     sendR4Command({
         action: isMainTimerPaused ? 'r4_pause_timer' : 'r4_resume_timer'
     });
+    syncR4StateToDB();
     updateMainTimerButtonUI();
 }
 
@@ -537,6 +554,7 @@ function resetMainTimer() {
     mainTimerDisplayText = `${mainTimeLeft}s`;
     const timeBadge = document.getElementById('r4TimeBadge');
     if (timeBadge) timeBadge.textContent = mainTimerDisplayText;
+    syncR4StateToDB();
 }
 
 function stopStealTimer() {
@@ -645,11 +663,6 @@ function handleUnifiedRight() {
             r4State.mainWrongDeducted = true;
         }
 
-        if (r4State.starActive) {
-            r4State.starActive = false;
-            sendR4Command({ action: 'r4_toggle_star', active: false });
-        }
-
         if (typeof window.playMusic === 'function') {
             window.playMusic('R4_Right.mp3', false, false);
         }
@@ -672,11 +685,6 @@ function handleUnifiedRight() {
 
     const reward = r4State.starActive ? pts * 2 : pts;
     addScoreToPlayer(r4State.activePlayer, reward);
-
-    if (r4State.starActive) {
-        r4State.starActive = false;
-        sendR4Command({ action: 'r4_toggle_star', active: false });
-    }
 
     if (typeof window.playMusic === 'function') {
         window.playMusic('R4_Right.mp3', false, false);
@@ -713,11 +721,6 @@ function handleUnifiedWrong() {
 
         const penalty = pts / 2;
         addScoreToPlayer(stealPlayer, -penalty);
-
-        if (r4State.starActive) {
-            r4State.starActive = false;
-            sendR4Command({ action: 'r4_toggle_star', active: false });
-        }
 
         if (typeof window.playMusic === 'function') {
             window.playMusic('R4_Wrong.mp3', false, false);
@@ -843,10 +846,6 @@ function switchToSlot(slotIdx) {
     r4State.currentSlot = targetSlot;
     r4State.mainWrongDeducted = false;
 
-    if (r4State.starActive) {
-        r4State.starActive = false;
-        sendR4Command({ action: 'r4_toggle_star', active: false });
-    }
     clearStealBuzz();
     stopStealTimer();
     resetMainTimer();
@@ -936,7 +935,6 @@ function bindR4Events() {
         r4State.stage = 'pack';
         r4State.playersShown = false;
         r4State.questionShown = false;
-        r4State.starActive = false;
         r4State.mainWrongDeducted = false;
         r4State.buzzerPlayer = null;
         r4State.buzzerGraded = false;
@@ -972,7 +970,6 @@ function bindR4Events() {
         r4State.slotStatuses = ['pending', 'pending', 'pending'];
         r4State.playersShown = false;
         r4State.questionShown = false;
-        r4State.starActive = false;
         r4State.mainWrongDeducted = false;
         r4State.buzzerPlayer = null;
         r4State.buzzerGraded = false;
@@ -1049,10 +1046,6 @@ function bindR4Events() {
     document.getElementById('r4BtnPrevSlot')?.addEventListener('click', () => {
         if (r4State.currentSlot <= 0) return;
 
-        if (r4State.starActive) {
-            r4State.starActive = false;
-            sendR4Command({ action: 'r4_toggle_star', active: false });
-        }
         clearStealBuzz();
         stopStealTimer();
 
@@ -1066,10 +1059,6 @@ function bindR4Events() {
 
     // 6. Nút CÂU TIẾP (TIẾP ▶)
     document.getElementById('r4BtnNextSlot')?.addEventListener('click', () => {
-        if (r4State.starActive) {
-            r4State.starActive = false;
-            sendR4Command({ action: 'r4_toggle_star', active: false });
-        }
         clearStealBuzz();
         stopStealTimer();
 
@@ -1086,6 +1075,7 @@ function bindR4Events() {
             r4State.stage = 'idle';
             r4State.playersShown = false;
             r4State.questionShown = false;
+            r4State.starActive = false;
             r4State.mainWrongDeducted = false;
             r4State.buzzerLocked = true;
             set(ref(db, 'games/r4_buzzer'), null);
@@ -1107,6 +1097,7 @@ function bindR4Events() {
         const s = r4State.currentSlot;
         r4State.slotQuestionOffset[s] = (r4State.slotQuestionOffset[s] || 0) - 1;
         syncQuestionToLivestreamIfShown();
+        syncR4StateToDB();
         renderR4ControllerUI();
     }, { signal });
 
@@ -1114,6 +1105,7 @@ function bindR4Events() {
         const s = r4State.currentSlot;
         r4State.slotQuestionOffset[s] = (r4State.slotQuestionOffset[s] || 0) + 1;
         syncQuestionToLivestreamIfShown();
+        syncR4StateToDB();
         renderR4ControllerUI();
     }, { signal });
 
@@ -1154,7 +1146,7 @@ function bindR4Events() {
         renderR4ControllerUI();
     }, { signal });
 
-    // Ngôi sao hi vọng & 5s giành quyền
+    // Ngôi sao hi vọng & 5s giành quyền (Chỉ toggle khi bấm nút sao)
     document.getElementById('r4BtnStar')?.addEventListener('click', () => {
         r4State.starActive = !r4State.starActive;
         if (r4State.starActive && typeof window.playMusic === 'function') {

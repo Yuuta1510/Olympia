@@ -60,9 +60,6 @@ function isProjectorScreen() {
            document.title.toLowerCase().includes('projector');
 }
 
-// =========================================================================
-// 2. HÀM CẬP NHẬT TEXT & SHAPE THÍ SINH
-// =========================================================================
 function renderProjectorPlayersBar(animateFadeIn = false) {
     const activeTextEl = document.getElementById('r4-proj-active-text');
     const activeShapeEl = document.getElementById('r4-proj-active-shape');
@@ -294,7 +291,6 @@ function updatePackSelection(selectedIndices = []) {
 function showQuesStage(payload, showPlayersAfterVid = false) {
     clearR4Timers();
     hidePackStage();
-    toggleStarVideo(false);
     stopTimerVideo();
 
     if (payload.players) {
@@ -386,7 +382,6 @@ function hideQuesStage() {
     const quesTextsWrap = document.getElementById('r4-ques-texts');
     const quesTextEl = document.getElementById('r4-question-text');
 
-    toggleStarVideo(false);
     stopTimerVideo();
     arePlayersShown = false;
 
@@ -437,8 +432,8 @@ function startTimerVideo(duration) {
     const dur = Math.max(1, Number(duration) || 15);
     const prefix = isProjectorScreen() ? 'pro_' : '';
     const targetSrc = dur === 15
-        ? `../graphic/${prefix}r4_15s.webm`
-        : `../graphic/${prefix}r4_20s.webm`;
+        ? `../graphic/o27/${prefix}r4_15s.webm`
+        : `../graphic/o27/${prefix}r4_20s.webm`;
     const rate = (dur === 15 || dur === 20) ? 1 : (20 / dur);
 
     timerVid.pause();
@@ -486,7 +481,7 @@ function stopTimerVideo() {
     timerVid.playbackRate = 1;
 }
 
-// Bước 6: Bật / tắt Ngôi sao hi vọng (r4_star.webm - không animation)
+// Bước 6: Bật / tắt Ngôi sao hi vọng (r4_star.webm - chỉ đổi khi Controller bấm nút sao)
 function toggleStarVideo(isActive) {
     const starVid = document.getElementById('r4_star');
     if (!starVid) return;
@@ -514,6 +509,7 @@ function resetAllR4Graphics() {
     hidePackStage();
     hideQuesStage();
     stopTimerVideo();
+    toggleStarVideo(false);
     toggleR4WaitBg(false);
     activePlayerIndex = null;
     buzzerPlayerIndex = null;
@@ -553,7 +549,7 @@ function initRound4Livestream() {
             case 'r4_hide_wait_bg':
                 toggleR4WaitBg(false);
                 break;
-                
+
             case 'r4_show_pack':
                 showPackStage(data.ptsLevel1, data.ptsLevel2, data.selectedIndices || []);
                 break;

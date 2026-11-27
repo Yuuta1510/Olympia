@@ -179,6 +179,7 @@ function buildRankedPlayersForProjector() {
 
 function sendR3Control() {
     const q = getCurrentQuestion();
+    const awards = calculateAwardPoints();
     const payload = {
         questionIndex: r3State.currentQuestionIndex,
         questionText: q.text,
@@ -187,6 +188,9 @@ function sendR3Control() {
         answerMediaUrl: q.answerMediaUrl,
         answerMediaType: q.answerMediaType,
         duration: q.duration,
+        durations: [...r3State.durations],
+        remainingTime: r3State.remainingTime,
+        timerStartTimestamp: r3State.timerStartTimestamp,
         showWaitBg: r3State.showWaitBg,
         showQuestion: r3State.showQuestion,
         showQuestionSeq: r3State.showQuestionSeq,
@@ -197,6 +201,14 @@ function sendR3Control() {
         page: r3State.currentPage,
         showAnswers: r3State.showAnswers,
         showAnswersSeq: r3State.showAnswersSeq,
+        playerStates: r3State.players.map((p, idx) => ({
+            name: p.name || `P${idx + 1}`,
+            score: Number(p.score) || 0,
+            answer: p.answer || "",
+            time: typeof p.time === 'number' && Number.isFinite(p.time) ? p.time : null,
+            status: p.status || "none",
+            award: awards[idx] || 0
+        })),
         rankedPlayers: buildRankedPlayersForProjector(),
         timestamp: Date.now()
     };

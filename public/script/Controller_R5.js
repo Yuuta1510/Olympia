@@ -725,9 +725,7 @@ function initControllerR5() {
             r5State.currentQuesIdx = r5State.questions.length - 1;
         }
 
-        if (r5State.isQuestionShown) {
-            syncR5StateToDB();
-        }
+        syncR5StateToDB();
         renderR5ControllerUI();
     }, (error) => {
         console.error('Lỗi tải câu hỏi từ questions/round_5:', error);
@@ -738,9 +736,10 @@ function initControllerR5() {
             const savedPlayers = snapshot.val();
             if (Array.isArray(savedPlayers) && savedPlayers.length >= R5_MIN_PLAYERS) {
                 r5State.players = savedPlayers.slice(0, R5_MAX_PLAYERS);
-                renderR5ControllerUI();
             }
         }
+        syncR5StateToDB();
+        renderR5ControllerUI();
     }, { onlyOnce: true });
 
     const unsubBuzzer = onValue(ref(db, 'games/r5_buzzer'), (snapshot) => {

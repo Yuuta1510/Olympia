@@ -9,11 +9,13 @@
 #round1-ui {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 1fr 220px; /* QA to bên trái, Bảng điểm 220px bên phải */
+  grid-template-columns: minmax(0, 1fr) 220px; /* QA to bên trái, Bảng điểm 220px bên phải */
   width: 100%;
   height: 100%;
   gap: 12px;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .qa-column {
@@ -21,6 +23,9 @@
   flex-direction: column;
   gap: 12px;
   height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* ==========================================================================
@@ -32,14 +37,17 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .question-box {
-  flex: 7; /* Cột câu hỏi cao hơn */
+  flex: 7 1 0%; /* Cột câu hỏi cao hơn, khóa cứng tỷ lệ */
 }
 
 .answer-box {
-  flex: 3;
+  flex: 3 1 0%; /* Khóa cứng tỷ lệ khung đáp án */
 }
 
 /* Header của Box Câu hỏi */
@@ -47,6 +55,8 @@
   background-color: var(--white);
   color: var(--black);
   height: 60px;
+  flex-shrink: 0;
+  min-width: 0;
   padding: 2px 0px 0px 15px;
   font-weight: bold;
   font-size: 30px;
@@ -94,8 +104,34 @@
   font-size: 40px;
   font-weight: bold;
   color: var(--white);
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
+  min-width: 0;
   overflow-y: auto;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.question-content::-webkit-scrollbar,
+.answer-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.question-content::-webkit-scrollbar-track,
+.answer-content::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+.question-content::-webkit-scrollbar-thumb,
+.answer-content::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.question-content::-webkit-scrollbar-thumb:hover,
+.answer-content::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 /* Vùng chứa nút bấm */
@@ -104,6 +140,7 @@
   justify-content: space-between;
   align-items: flex-end;
   padding: 10px 15px;
+  flex-shrink: 0;
 }
 
 .answer-actions {
@@ -212,10 +249,13 @@
   flex-direction: column;
   gap: 12px;
   height: 100%;
+  min-height: 0;
+  min-width: 0;
 }
 
 .player-vertical-card {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   border: 2px solid #4f5050;
@@ -249,6 +289,7 @@
   text-overflow: ellipsis;
   text-transform: uppercase;
   height: 50px;
+  flex-shrink: 0;
 }
 
 .player-vertical-card.is-turn .player-v-name {

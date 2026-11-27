@@ -179,12 +179,20 @@ function updateQAPreview() {
   const previewQues = document.getElementById('preview-question');
   const previewAns = document.getElementById('preview-answer');
 
-  if (round1Questions && round1Questions[currentQuesIndex]) {
-    if (previewQues) previewQues.innerText = round1Questions[currentQuesIndex].cau_hoi;
-    if (previewAns) previewAns.innerText = round1Questions[currentQuesIndex].dap_an;
-  } else {
-    if (previewQues) previewQues.innerText = "...";
-    if (previewAns) previewAns.innerText = "...";
+  const nextQuesText = (round1Questions && round1Questions[currentQuesIndex])
+    ? round1Questions[currentQuesIndex].cau_hoi
+    : "...";
+  const nextAnsText = (round1Questions && round1Questions[currentQuesIndex])
+    ? round1Questions[currentQuesIndex].dap_an
+    : "...";
+
+  if (previewQues && previewQues.innerText !== nextQuesText) {
+    previewQues.innerText = nextQuesText;
+    previewQues.scrollTop = 0;
+  }
+  if (previewAns && previewAns.innerText !== nextAnsText) {
+    previewAns.innerText = nextAnsText;
+    previewAns.scrollTop = 0;
   }
 
   let LR_Count = parseInt(lr_config.so_luot, 10);
