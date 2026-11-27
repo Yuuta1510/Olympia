@@ -151,10 +151,12 @@
         background-color: var(--black);
         padding: 10px;
         display: grid;
-        grid-template-columns: 1fr 220px;
+        grid-template-columns: minmax(0, 1fr) 220px;
         gap: 12px;
         flex: 1;
         min-height: 0;
+        min-width: 0;
+        overflow: hidden;
       }
 
       .music-grid {
@@ -451,7 +453,7 @@
           <!-- GIAO DIỆN VÒNG 2: VƯỢT CHƯỚNG NGẠI VẬT -->
           <div id="r2-controller-ui">
             <div class="r2-ctrl-image-area">
-              <img class="r2-ctrl-target-img" src="../graphic/r2_target.png" alt="Chướng ngại vật" />
+              <img class="r2-ctrl-target-img" src="../graphic/o27/r2_target.png" alt="Chướng ngại vật" />
               <div class="r2-ctrl-piece" id="r2-cp-1" data-piece-index="0"></div>
               <div class="r2-ctrl-lbl" id="r2-lbl-1">1</div>
               <div class="r2-ctrl-piece" id="r2-cp-2" data-piece-index="1"></div>
@@ -1085,6 +1087,7 @@
             <span>2. Thông tin thí sinh, điểm số, thông tin bổ sung &amp; Avatar (Firebase Storage)</span>
           </div>
           <div class="main-cfg-players-grid">
+            <!-- THÍ SINH 1 -->
             <div class="main-cfg-player-card">
               <div class="main-cfg-avatar-col">
                 <div class="main-cfg-avatar-box">
@@ -1101,11 +1104,14 @@
               <div class="main-cfg-fields-col">
                 <div class="main-cfg-row-2col">
                   <div class="main-cfg-field">
-                    <label for="mainCfgName-1">Tên Thí Sinh 1:</label>
-                    <input type="text" class="main-cfg-name-input" id="mainCfgName-1" data-player-index="1" placeholder="Nhập tên thí sinh 1..." />
+                    <label for="mainCfgName-1">
+                      <span>Tên hiển thị (TS 1)</span>
+                      <span class="main-cfg-role-tag is-game">GAME</span>
+                    </label>
+                    <input type="text" class="main-cfg-name-input" id="mainCfgName-1" data-player-index="1" placeholder="VD: Minh Anh" />
                   </div>
                   <div class="main-cfg-field">
-                    <label for="mainCfgScore-1">Điểm số:</label>
+                    <label for="mainCfgScore-1">Điểm số</label>
                     <div class="main-cfg-score-wrap">
                       <button type="button" class="main-cfg-score-step" data-player-index="1" data-delta="-10" title="Trừ 10 điểm">-10</button>
                       <input type="number" class="main-cfg-score-input" id="mainCfgScore-1" data-player-index="1" value="0" />
@@ -1113,13 +1119,26 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="main-cfg-field">
-                  <label for="mainCfgInfo-1">Thông tin:</label>
-                  <textarea class="main-cfg-info-input" id="mainCfgInfo-1" data-player-index="1"></textarea>
+                  <label for="mainCfgFullName-1">
+                    <span>Họ và tên đầy đủ</span>
+                    <span class="main-cfg-role-tag is-host">HOST</span>
+                  </label>
+                  <input type="text" class="main-cfg-fullname-input" id="mainCfgFullName-1" data-player-index="1" placeholder="VD: Nguyễn Hoàng Minh Anh (để trống sẽ lấy tên hiển thị)" />
+                </div>
+
+                <div class="main-cfg-field">
+                  <label for="mainCfgInfo-1">
+                    <span>Thông tin bổ sung</span>
+                    <span class="main-cfg-role-tag is-host">HOST</span>
+                  </label>
+                  <textarea class="main-cfg-info-input" id="mainCfgInfo-1" data-player-index="1" placeholder="Trường, lớp, thành tích..."></textarea>
                 </div>
               </div>
             </div>
 
+            <!-- THÍ SINH 2 -->
             <div class="main-cfg-player-card">
               <div class="main-cfg-avatar-col">
                 <div class="main-cfg-avatar-box">
@@ -1136,11 +1155,14 @@
               <div class="main-cfg-fields-col">
                 <div class="main-cfg-row-2col">
                   <div class="main-cfg-field">
-                    <label for="mainCfgName-2">Tên Thí Sinh 2:</label>
-                    <input type="text" class="main-cfg-name-input" id="mainCfgName-2" data-player-index="2" placeholder="Nhập tên thí sinh 2..." />
+                    <label for="mainCfgName-2">
+                      <span>Tên hiển thị (TS 2)</span>
+                      <span class="main-cfg-role-tag is-game">GAME</span>
+                    </label>
+                    <input type="text" class="main-cfg-name-input" id="mainCfgName-2" data-player-index="2" placeholder="VD: Minh Anh" />
                   </div>
                   <div class="main-cfg-field">
-                    <label for="mainCfgScore-2">Điểm số:</label>
+                    <label for="mainCfgScore-2">Điểm số</label>
                     <div class="main-cfg-score-wrap">
                       <button type="button" class="main-cfg-score-step" data-player-index="2" data-delta="-10" title="Trừ 10 điểm">-10</button>
                       <input type="number" class="main-cfg-score-input" id="mainCfgScore-2" data-player-index="2" value="0" />
@@ -1148,13 +1170,26 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="main-cfg-field">
-                  <label for="mainCfgInfo-2">Thông tin:</label>
-                  <textarea class="main-cfg-info-input" id="mainCfgInfo-2" data-player-index="2"></textarea>
+                  <label for="mainCfgFullName-2">
+                    <span>Họ và tên đầy đủ</span>
+                    <span class="main-cfg-role-tag is-host">HOST</span>
+                  </label>
+                  <input type="text" class="main-cfg-fullname-input" id="mainCfgFullName-2" data-player-index="2" placeholder="VD: Nguyễn Hoàng Minh Anh (để trống sẽ lấy tên hiển thị)" />
+                </div>
+
+                <div class="main-cfg-field">
+                  <label for="mainCfgInfo-2">
+                    <span>Thông tin bổ sung</span>
+                    <span class="main-cfg-role-tag is-host">HOST</span>
+                  </label>
+                  <textarea class="main-cfg-info-input" id="mainCfgInfo-2" data-player-index="2" placeholder="Trường, lớp, thành tích..."></textarea>
                 </div>
               </div>
             </div>
 
+            <!-- THÍ SINH 3 -->
             <div class="main-cfg-player-card">
               <div class="main-cfg-avatar-col">
                 <div class="main-cfg-avatar-box">
@@ -1171,11 +1206,14 @@
               <div class="main-cfg-fields-col">
                 <div class="main-cfg-row-2col">
                   <div class="main-cfg-field">
-                    <label for="mainCfgName-3">Tên Thí Sinh 3:</label>
-                    <input type="text" class="main-cfg-name-input" id="mainCfgName-3" data-player-index="3" placeholder="Nhập tên thí sinh 3..." />
+                    <label for="mainCfgName-3">
+                      <span>Tên hiển thị (TS 3)</span>
+                      <span class="main-cfg-role-tag is-game">GAME</span>
+                    </label>
+                    <input type="text" class="main-cfg-name-input" id="mainCfgName-3" data-player-index="3" placeholder="VD: Minh Anh" />
                   </div>
                   <div class="main-cfg-field">
-                    <label for="mainCfgScore-3">Điểm số:</label>
+                    <label for="mainCfgScore-3">Điểm số</label>
                     <div class="main-cfg-score-wrap">
                       <button type="button" class="main-cfg-score-step" data-player-index="3" data-delta="-10" title="Trừ 10 điểm">-10</button>
                       <input type="number" class="main-cfg-score-input" id="mainCfgScore-3" data-player-index="3" value="0" />
@@ -1183,13 +1221,26 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="main-cfg-field">
-                  <label for="mainCfgInfo-3">Thông tin:</label>
-                  <textarea class="main-cfg-info-input" id="mainCfgInfo-3" data-player-index="3"></textarea>
+                  <label for="mainCfgFullName-3">
+                    <span>Họ và tên đầy đủ</span>
+                    <span class="main-cfg-role-tag is-host">HOST</span>
+                  </label>
+                  <input type="text" class="main-cfg-fullname-input" id="mainCfgFullName-3" data-player-index="3" placeholder="VD: Nguyễn Hoàng Minh Anh (để trống sẽ lấy tên hiển thị)" />
+                </div>
+
+                <div class="main-cfg-field">
+                  <label for="mainCfgInfo-3">
+                    <span>Thông tin bổ sung</span>
+                    <span class="main-cfg-role-tag is-host">HOST</span>
+                  </label>
+                  <textarea class="main-cfg-info-input" id="mainCfgInfo-3" data-player-index="3" placeholder="Trường, lớp, thành tích..."></textarea>
                 </div>
               </div>
             </div>
 
+            <!-- THÍ SINH 4 -->
             <div class="main-cfg-player-card">
               <div class="main-cfg-avatar-col">
                 <div class="main-cfg-avatar-box">
@@ -1206,11 +1257,14 @@
               <div class="main-cfg-fields-col">
                 <div class="main-cfg-row-2col">
                   <div class="main-cfg-field">
-                    <label for="mainCfgName-4">Tên Thí Sinh 4:</label>
-                    <input type="text" class="main-cfg-name-input" id="mainCfgName-4" data-player-index="4" placeholder="Nhập tên thí sinh 4..." />
+                    <label for="mainCfgName-4">
+                      <span>Tên hiển thị (TS 4)</span>
+                      <span class="main-cfg-role-tag is-game">GAME</span>
+                    </label>
+                    <input type="text" class="main-cfg-name-input" id="mainCfgName-4" data-player-index="4" placeholder="VD: Minh Anh" />
                   </div>
                   <div class="main-cfg-field">
-                    <label for="mainCfgScore-4">Điểm số:</label>
+                    <label for="mainCfgScore-4">Điểm số</label>
                     <div class="main-cfg-score-wrap">
                       <button type="button" class="main-cfg-score-step" data-player-index="4" data-delta="-10" title="Trừ 10 điểm">-10</button>
                       <input type="number" class="main-cfg-score-input" id="mainCfgScore-4" data-player-index="4" value="0" />
@@ -1218,9 +1272,21 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="main-cfg-field">
-                  <label for="mainCfgInfo-4">Thông tin:</label>
-                  <textarea class="main-cfg-info-input" id="mainCfgInfo-4" data-player-index="4"></textarea>
+                  <label for="mainCfgFullName-4">
+                    <span>Họ và tên đầy đủ</span>
+                    <span class="main-cfg-role-tag is-host">HOST</span>
+                  </label>
+                  <input type="text" class="main-cfg-fullname-input" id="mainCfgFullName-4" data-player-index="4" placeholder="VD: Nguyễn Hoàng Minh Anh (để trống sẽ lấy tên hiển thị)" />
+                </div>
+
+                <div class="main-cfg-field">
+                  <label for="mainCfgInfo-4">
+                    <span>Thông tin bổ sung</span>
+                    <span class="main-cfg-role-tag is-host">HOST</span>
+                  </label>
+                  <textarea class="main-cfg-info-input" id="mainCfgInfo-4" data-player-index="4" placeholder="Trường, lớp, thành tích..."></textarea>
                 </div>
               </div>
             </div>
@@ -1642,7 +1708,7 @@
 
     <script type="module">
       import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-      import { getDatabase, ref, set, onValue, runTransaction, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+      import { getDatabase, ref, set, onValue, runTransaction, update, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
@@ -1810,6 +1876,28 @@
       });
 
       const playingState = {};
+      let soundCmdSeq = 0;
+
+      // Dọn dẹp hàng đợi lệnh cũ khi mở Controller
+      remove(ref(db, 'games/soundboard_queue')).catch(() => {});
+
+      function dispatchSoundCommand(payload) {
+        const now = Date.now();
+        const cmdId = `${now}_${++soundCmdSeq}`;
+        const cmdRef = ref(db, `games/soundboard_queue/${cmdId}`);
+        const fullPayload = {
+          ...payload,
+          cmdId,
+          timestamp: now
+        };
+
+        // Tự động xóa node sau 5s để giữ database luôn nhẹ
+        setTimeout(() => {
+          remove(cmdRef).catch(() => {});
+        }, 5000);
+
+        return set(cmdRef, fullPayload);
+      }
 
       window.playMusic = function(fileName, autoStop = false, playOver = false, playbackRate = 1) {
         const baseSoundId = soundIdForFileName(fileName);
@@ -1820,27 +1908,30 @@
           : 1;
 
         if (autoStop) {
-          runTransaction(statusRef, currentStatus => !currentStatus).then(result => {
-            const isPlaying = result.snapshot.val() === true;
-            return update(ref(db, 'games/soundboard'), {
-              soundId: baseSoundId,
-              file: fileUrl,
-              action: isPlaying ? 'play' : 'stop',
-              playbackRate: rate,
-              timestamp: Date.now()
-            });
+          const shouldStop = Boolean(playingState[baseSoundId]);
+          const nextPlaying = !shouldStop;
+          playingState[baseSoundId] = nextPlaying;
+          set(statusRef, nextPlaying);
+
+          return dispatchSoundCommand({
+            soundId: baseSoundId,
+            baseSoundId: baseSoundId,
+            file: fileUrl,
+            action: nextPlaying ? 'play' : 'stop',
+            playOver: false,
+            playbackRate: rate
           });
         } else {
+          playingState[baseSoundId] = true;
           set(statusRef, true);
-          const targetSoundId = playOver ? `${baseSoundId}_${Date.now()}` : baseSoundId;
 
-          return update(ref(db, 'games/soundboard'), {
-            soundId: targetSoundId,
+          return dispatchSoundCommand({
+            soundId: baseSoundId,
+            baseSoundId: baseSoundId,
             file: fileUrl,
             action: 'play',
-            playOver: playOver,
-            playbackRate: rate,
-            timestamp: Date.now()
+            playOver: Boolean(playOver),
+            playbackRate: rate
           });
         }
       };

@@ -50,8 +50,8 @@
 
         <!-- GIAO DIỆN VÒNG 1: KHỞI ĐỘNG -->
         <div id="round1-ui" class="round-ui">
-            <video id="graphic_r1" class="video-overlay" src="../graphic/r1_showques.webm" playsinline preload="auto"></video>
-            <video id="graphic_time" class="video-overlay" src="../graphic/r1_60s.webm" playsinline preload="auto"></video>
+            <video id="graphic_r1" class="video-overlay" src="../graphic/o27/r1_showques.webm" playsinline preload="auto"></video>
+            <video id="graphic_time" class="video-overlay" src="../graphic/o27/r1_60s.webm" playsinline preload="auto"></video>
             <audio id="audio_r1_clock" preload="auto"></audio>
 
             <div id="playerContainer"></div>
@@ -63,7 +63,7 @@
         <div id="round4-ui" class="round-ui" style="display: none;">
             <!-- Giai đoạn 1: Chọn gói câu hỏi -->
             <div id="r4-pack-stage">
-                <video id="r4_showpack" class="r4-video-layer" src="../graphic/r4_showpack.webm" playsinline preload="auto"></video>
+                <video id="r4_showpack" class="r4-video-layer" src="../graphic/o27/r4_showpack.webm" playsinline preload="auto"></video>
 
                 <!-- 6 shape hình bình hành gradient đỏ nằm dưới text và đè lên video -->
                 <div id="r4-pack-shapes">
@@ -88,7 +88,7 @@
 
             <!-- Giai đoạn 2: Câu hỏi & Thi đấu Về đích -->
             <div id="r4-ques-stage">
-                <video id="r4_showques" class="r4-video-layer" src="../graphic/r4_showques.webm" playsinline preload="auto"></video>
+                <video id="r4_showques" class="r4-video-layer" src="../graphic/o27/r4_showques.webm" playsinline preload="auto"></video>
                 <video id="r4_timer" class="r4-video-layer" playsinline preload="auto"></video>
 
                 <!-- Lớp shape nền đè lên video và nằm dưới text (z-index: 2) -->
@@ -123,16 +123,16 @@
                 <div id="r4-question-text"></div>
 
                 <!-- Video Ngôi sao hi vọng (không animation) -->
-                <video id="r4_star" src="../graphic/r4_star.webm" loop playsinline preload="auto"></video>
+                <video id="r4_star" src="../graphic/o27/r4_star.webm" loop playsinline preload="auto"></video>
             </div>
         </div>
 
         <div id="round5-ui" class="round-ui" style="display: none;">
             <!-- Ảnh đồ họa nền câu hỏi phụ (xuất hiện đồng loạt, không animation) -->
-            <img id="r5_ques_img" class="r5-graphic-layer" src="../graphic/r5_ques.png" alt="Đồ họa Câu hỏi phụ" />
+            <img id="r5_ques_img" class="r5-graphic-layer" src="../graphic/o27/r5_ques.png" alt="Đồ họa Câu hỏi phụ" />
 
             <!-- Video & Nhạc đếm ngược 15s (pause khi bấm chuông, chạy tiếp nếu sai) -->
-            <video id="r5_15s_video" class="r5-graphic-layer" src="../graphic/r5_15s.webm" playsinline preload="auto"></video>
+            <video id="r5_15s_video" class="r5-graphic-layer" src="../graphic/o27/r5_15s.webm" playsinline preload="auto"></video>
             <audio id="audio_r5_15s" src="../sounds/r5_15s.mp3" preload="auto"></audio>
 
             <!-- Danh sách 2 - 8 thí sinh tham gia Câu hỏi phụ -->
@@ -143,7 +143,7 @@
 
             <!-- Đồ họa bấm chuông + Tên thí sinh bấm chuông -->
             <div id="r5-buzzer-overlay">
-                <img id="r5_buzzer_img" src="../graphic/r5_buzzer.png" alt="Bấm chuông" />
+                <img id="r5_buzzer_img" src="../graphic/o27/r5_buzzer.png" alt="Bấm chuông" />
                 <div id="r5-buzzer-name"></div>
             </div>
         </div>
@@ -151,7 +151,7 @@
         <script type="module">
             import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
             import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
-            import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+            import { getDatabase, ref, onValue, set, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
             const firebaseConfig = {
                 apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
@@ -225,9 +225,11 @@
                 }
             }
 
+            let updateWebAudioMasterGain = null;
+
             function syncAllMediaVolume() {
-                if (typeof audioCache === 'object' && audioCache !== null) {
-                    Object.values(audioCache).forEach(applyScreenVolumeToMedia);
+                if (typeof updateWebAudioMasterGain === 'function') {
+                    updateWebAudioMasterGain(currentScreenVolume);
                 }
                 dynamicAudioSet.forEach(applyScreenVolumeToMedia);
                 document.querySelectorAll('audio, video').forEach(applyScreenVolumeToMedia);
@@ -275,7 +277,7 @@
             });
 
             // =====================================================================
-            // 1. ĐỒNG BỘ CHUYỂN TAB (MAIN, R1, R2, R3, R4, SF)
+            // 1. ĐỒNG BỘ CHUYỂN TAB (MAIN, R1, R2, R3, R4, R5)
             // =====================================================================
             const tabFileMap = {
                 'M': 'Main',
@@ -336,7 +338,7 @@
             });
 
             // =====================================================================
-            // 2. BỘ PHÁT NHẠC SOUNDBOARD TRỰC TIẾP TRÊN MÀN LIVESTREAM
+            // 2. BỘ PHÁT NHẠC WEB AUDIO API (PRE-DECODE PCM + CHỐNG NGỦ + HÀNG ĐỢI)
             // =====================================================================
             const soundIdForFileName = fileName => fileName.replace(/[^A-Za-z0-9_-]/g, '_');
             const soundFileNames = [
@@ -347,122 +349,264 @@
                 'Main_Introduction1.mp3', 'Main_Introduction2.mp3', 'Main_Introduction3.mp3',
                 'Main_Introduction4.mp3', 'Main_Introduction5.mp3', 'Main_PointSummary.mp3',
                 'R1_Bed1.mp3', 'R1_Bed2.mp3', 'R1_End.mp3', 'R1_Intro.mp3', 'R1_60s.mp3',
-                'R1_Start.mp3', 'R2_Intro.mp3', 'R2_Right.mp3', 'R2_RightObs.mp3',
-                'R2_Wrong.mp3', 'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
+                'R1_90s.mp3', 'R1_Start.mp3', 'R1_Buzzed.mp3',
+                'R2_Intro.mp3', 'R2_Right.mp3', 'R2_RightObs.mp3', 'R2_Wrong.mp3',
+                'R2_15s.mp3', 'R2_Buzzer.mp3', 'R2_ShowAns.mp3',
+                'R3_Intro.mp3', 'R3_Right.mp3', 'R3_Wrong.mp3',
+                'R3_10s.mp3', 'R3_20s.mp3', 'R3_30s.mp3', 'R3_40s.mp3',
+                'R3_ShowAns.mp3', 'R3_ShowQues.mp3',
                 'R4_15s.mp3', 'R4_20s.mp3', 'R4_20sPrac.mp3', 'R4_30s.mp3',
                 'R4_30sPrac.mp3', 'R4_40sPrac.mp3', 'R4_60sPrac.mp3', 'R4_Begin.mp3',
-                'R4_End.mp3', 'R4_Intro.mp3', 'R4_Star.mp3',
+                'R4_End.mp3', 'R4_Intro.mp3', 'R4_Star.mp3', 'R4_ShowPack.mp3',
+                'R4_ShowQues.mp3', 'R4_5s.mp3', 'R4_Right.mp3', 'R4_Wrong.mp3', 'R4_Buzzed.mp3',
                 'R5_ShowQues.mp3', 'R5_15s.mp3', 'R5_Buzzed.mp3'
             ];
+
             const SOUND_FILES = soundFileNames.reduce((files, fileName) => {
                 files[soundIdForFileName(fileName)] = `../sounds/${fileName}`;
                 return files;
             }, {});
 
-            const audioCache = {};
-            const activeSounds = {};
-            const soundCommandVersions = {};
-            const activePlaybackVersions = {};
-            const enableSoundBtn = document.getElementById('enableSoundBtn');
-            let pendingAudioPlayback = null;
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioCtx();
+            const masterGainNode = audioCtx.createGain();
+            masterGainNode.gain.value = currentScreenVolume;
+            masterGainNode.connect(audioCtx.destination);
 
-            function createAudioInstance(soundId, fileUrl) {
-                const audio = new Audio(fileUrl);
-                audio.preload = 'auto';
-                applyScreenVolumeToMedia(audio);
-                audio.onended = () => {
-                    if (!activeSounds[soundId] || activePlaybackVersions[soundId] !== soundCommandVersions[soundId]) return;
-                    activeSounds[soundId] = false;
-                    set(ref(db, `games/soundboard_status/${soundId}`), false);
-                };
-                return audio;
+            updateWebAudioMasterGain = (vol) => {
+                masterGainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+            };
+
+            // Sóng âm tĩnh 0Hz/gain=0 giữ card âm thanh luôn thức, tránh cắt xén 0.2s đầu
+            let keepAliveStarted = false;
+            function startAudioKeepAlive() {
+                if (keepAliveStarted || audioCtx.state !== 'running') return;
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const silentGain = audioCtx.createGain();
+                    silentGain.gain.value = 0;
+                    osc.frequency.value = 1;
+                    osc.connect(silentGain);
+                    silentGain.connect(audioCtx.destination);
+                    osc.start();
+                    keepAliveStarted = true;
+                } catch (e) {}
             }
 
-            Object.keys(SOUND_FILES).forEach(id => {
-                audioCache[id] = createAudioInstance(id, SOUND_FILES[id]);
-            });
-            syncAllMediaVolume();
+            const audioBufferCache = new Map();
+            const audioLoadPromises = new Map();
+            const activeSourceGroups = new Map();
+            const soundCommandVersions = {};
+            const enableSoundBtn = document.getElementById('enableSoundBtn');
+            let pendingQueue = [];
 
-            enableSoundBtn.addEventListener('click', () => {
-                const pending = pendingAudioPlayback;
-                if (!pending || soundCommandVersions[pending.soundId] !== pending.commandVersion) {
+            function resolveBaseSoundId(rawSoundId, fileUrl) {
+                if (fileUrl) {
+                    const cleanName = fileUrl.split('/').pop().split('?')[0];
+                    if (cleanName) return soundIdForFileName(cleanName);
+                }
+                return String(rawSoundId || '').replace(/_\d{13}$/, '');
+            }
+
+            async function getOrLoadAudioBuffer(cacheKey, fileUrl) {
+                if (!fileUrl) return null;
+                const resolvedUrl = new URL(fileUrl, document.baseURI).href;
+                const key = `${cacheKey}::${resolvedUrl}`;
+
+                if (audioBufferCache.has(key)) {
+                    return audioBufferCache.get(key);
+                }
+                if (audioLoadPromises.has(key)) {
+                    return audioLoadPromises.get(key);
+                }
+
+                const loadPromise = fetch(resolvedUrl)
+                    .then(res => {
+                        if (!res.ok) return null;
+                        return res.arrayBuffer();
+                    })
+                    .then(arrayBuf => {
+                        if (!arrayBuf) return null;
+                        return audioCtx.decodeAudioData(arrayBuf);
+                    })
+                    .then(decodedBuffer => {
+                        if (decodedBuffer) {
+                            audioBufferCache.set(key, decodedBuffer);
+                        }
+                        audioLoadPromises.delete(key);
+                        return decodedBuffer;
+                    })
+                    .catch(() => {
+                        audioLoadPromises.delete(key);
+                        return null;
+                    });
+
+                audioLoadPromises.set(key, loadPromise);
+                return loadPromise;
+            }
+
+            // Giải mã trước toàn bộ danh sách file MP3 vào RAM ngay khi mở trang
+            Object.entries(SOUND_FILES).forEach(([id, url]) => {
+                getOrLoadAudioBuffer(id, url);
+            });
+
+            function stopSoundGroup(baseSoundId, updateStatus = true) {
+                const group = activeSourceGroups.get(baseSoundId);
+                if (group) {
+                    group.forEach(src => {
+                        try {
+                            src.onended = null;
+                            src.stop(0);
+                            src.disconnect();
+                        } catch (e) {}
+                    });
+                    group.clear();
+                }
+                if (updateStatus) {
+                    set(ref(db, `games/soundboard_status/${baseSoundId}`), false);
+                }
+            }
+
+            async function unlockAudioEngine() {
+                if (audioCtx.state === 'suspended') {
+                    try {
+                        await audioCtx.resume();
+                    } catch (e) {}
+                }
+                if (audioCtx.state === 'running') {
+                    startAudioKeepAlive();
                     enableSoundBtn.hidden = true;
-                    pendingAudioPlayback = null;
+                    const toFlush = pendingQueue.slice();
+                    pendingQueue = [];
+                    for (const item of toFlush) {
+                        executeSoundCommand(item, true);
+                    }
+                }
+            }
+
+            enableSoundBtn.addEventListener('click', unlockAudioEngine);
+            document.addEventListener('pointerdown', unlockAudioEngine, { passive: true });
+            document.addEventListener('keydown', unlockAudioEngine, { passive: true });
+            if (audioCtx.state === 'running') {
+                startAudioKeepAlive();
+            }
+
+            async function executeSoundCommand(data, isFlushing = false) {
+                if (!data) return;
+                const rawSoundId = data.soundId || '';
+                const baseSoundId = data.baseSoundId || resolveBaseSoundId(rawSoundId, data.file);
+                if (!baseSoundId) return;
+
+                const fileUrl = data.file || SOUND_FILES[baseSoundId];
+                const shouldStop = data.action === 'stop';
+                const playOver = Boolean(data.playOver);
+                const rate = (Number.isFinite(Number(data.playbackRate)) && Number(data.playbackRate) > 0)
+                    ? Number(data.playbackRate)
+                    : 1;
+
+                const commandVersion = (soundCommandVersions[baseSoundId] || 0) + 1;
+                soundCommandVersions[baseSoundId] = commandVersion;
+
+                if (shouldStop) {
+                    pendingQueue = pendingQueue.filter(item => item.baseSoundId !== baseSoundId);
+                    stopSoundGroup(baseSoundId, true);
                     return;
                 }
 
-                // Gọi play trực tiếp trong thao tác click để trình duyệt cấp quyền phát tiếng.
-                pending.audio.currentTime = 0;
-                pending.audio.play().then(() => {
-                    if (soundCommandVersions[pending.soundId] !== pending.commandVersion) return;
-                    activeSounds[pending.soundId] = true;
-                    activePlaybackVersions[pending.soundId] = pending.commandVersion;
-                    pendingAudioPlayback = null;
-                    enableSoundBtn.hidden = true;
-                    set(ref(db, `games/soundboard_status/${pending.soundId}`), true);
-                }).catch(error => {
-                    console.warn(`Không thể bật âm thanh [${pending.fileUrl}] trên Livestream:`, error);
-                    enableSoundBtn.textContent = 'Không bật được âm thanh — nhấn để thử lại';
-                });
+                if (audioCtx.state === 'suspended') {
+                    try {
+                        await audioCtx.resume();
+                    } catch (e) {}
+                }
+
+                if (audioCtx.state !== 'running') {
+                    if (!isFlushing) {
+                        pendingQueue = pendingQueue.filter(item => playOver || item.baseSoundId !== baseSoundId);
+                        pendingQueue.push({ ...data, baseSoundId, commandVersion });
+                        if (pendingQueue.length > 6) pendingQueue.shift();
+                    }
+                    enableSoundBtn.textContent = `Bật âm thanh Livestream (${baseSoundId})`;
+                    enableSoundBtn.hidden = false;
+                    set(ref(db, `games/soundboard_status/${baseSoundId}`), false);
+                    return;
+                }
+
+                startAudioKeepAlive();
+
+                const buffer = await getOrLoadAudioBuffer(baseSoundId, fileUrl);
+                if (!buffer) {
+                    console.warn(`Không tải được file âm thanh [${fileUrl}] trên Livestream.`);
+                    set(ref(db, `games/soundboard_status/${baseSoundId}`), false);
+                    return;
+                }
+
+                // Bỏ qua nếu đã có lệnh mới hơn (stop/play khác) trong lúc đang tải file
+                if (soundCommandVersions[baseSoundId] !== commandVersion) {
+                    return;
+                }
+
+                if (!playOver) {
+                    stopSoundGroup(baseSoundId, false);
+                }
+
+                const source = audioCtx.createBufferSource();
+                source.buffer = buffer;
+                source.playbackRate.value = rate;
+                source.connect(masterGainNode);
+
+                if (!activeSourceGroups.has(baseSoundId)) {
+                    activeSourceGroups.set(baseSoundId, new Set());
+                }
+                const group = activeSourceGroups.get(baseSoundId);
+                group.add(source);
+
+                set(ref(db, `games/soundboard_status/${baseSoundId}`), true);
+
+                source.onended = () => {
+                    group.delete(source);
+                    try { source.disconnect(); } catch (e) {}
+                    if (group.size === 0) {
+                        set(ref(db, `games/soundboard_status/${baseSoundId}`), false);
+                    }
+                };
+
+                source.start(0);
+            }
+
+            // Reset trạng thái nút trên Controller khi Livestream vừa mở lại
+            set(ref(db, 'games/soundboard_status'), {});
+
+            const engineBootTime = Date.now() - 1000;
+            const processedCmdIds = new Set();
+
+            // 1. Lắng nghe hàng đợi lệnh chuẩn (không bao giờ rơi lệnh khi bấm nhanh)
+            onChildAdded(ref(db, 'games/soundboard_queue'), (snapshot) => {
+                if (!snapshot.exists()) return;
+                const data = snapshot.val();
+                if (!data) return;
+                const cmdId = data.cmdId || snapshot.key;
+                if (processedCmdIds.has(cmdId)) return;
+                if (data.timestamp && data.timestamp < engineBootTime) return;
+
+                processedCmdIds.add(cmdId);
+                if (processedCmdIds.size > 300) {
+                    const firstKey = processedCmdIds.values().next().value;
+                    processedCmdIds.delete(firstKey);
+                }
+                executeSoundCommand(data);
             });
 
+            // 2. Giữ tương thích ngược với các script ghi trực tiếp vào games/soundboard
             let isInitialSoundLoad = true;
-
             onValue(ref(db, 'games/soundboard'), (snapshot) => {
                 if (isInitialSoundLoad) {
                     isInitialSoundLoad = false;
                     return;
                 }
                 if (!snapshot.exists()) return;
-
                 const data = snapshot.val();
                 if (!data || !data.soundId) return;
-
-                const soundId = data.soundId;
-                const fileUrl = data.file || SOUND_FILES[soundId];
-                const resolvedFileUrl = fileUrl ? new URL(fileUrl, document.baseURI).href : '';
-
-                if (resolvedFileUrl && (!audioCache[soundId] || audioCache[soundId].src !== resolvedFileUrl)) {
-                    audioCache[soundId] = createAudioInstance(soundId, fileUrl);
-                }
-
-                const audio = audioCache[soundId];
-                if (!audio) return;
-
-                const shouldStop = data.action === 'stop';
-                const commandVersion = (soundCommandVersions[soundId] || 0) + 1;
-                soundCommandVersions[soundId] = commandVersion;
-                if (pendingAudioPlayback && pendingAudioPlayback.soundId === soundId) {
-                    pendingAudioPlayback = null;
-                    enableSoundBtn.hidden = true;
-                }
-
-                if (shouldStop) {
-                    activeSounds[soundId] = false;
-                    audio.pause();
-                    audio.currentTime = 0;
-                    set(ref(db, `games/soundboard_status/${soundId}`), false);
-                } else {
-                    activeSounds[soundId] = true;
-                    activePlaybackVersions[soundId] = commandVersion;
-                    audio.currentTime = 0;
-                    audio.play().then(() => {
-                        if (activeSounds[soundId] && soundCommandVersions[soundId] === commandVersion) {
-                            set(ref(db, `games/soundboard_status/${soundId}`), true);
-                        }
-                    }).catch(err => {
-                        console.warn(`Không thể phát nhạc [${fileUrl}] trên Livestream:`, err);
-                        if (soundCommandVersions[soundId] === commandVersion) {
-                            activeSounds[soundId] = false;
-                            set(ref(db, `games/soundboard_status/${soundId}`), false);
-                            if (err.name === 'NotAllowedError') {
-                                pendingAudioPlayback = { soundId, audio, commandVersion, fileUrl };
-                                enableSoundBtn.textContent = `Bật âm thanh để phát ${soundId}`;
-                                enableSoundBtn.hidden = false;
-                            }
-                        }
-                    });
-                }
+                executeSoundCommand(data);
             });
         </script>
 
