@@ -1,4 +1,3 @@
-/* Ẩn status bar nếu còn sót lại ở file nào khác */
 .status-bar-container {
   display: none !important;
 }
@@ -9,7 +8,7 @@
 #round1-ui {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px; /* QA to bên trái, Bảng điểm 220px bên phải */
+  grid-template-columns: minmax(0, 1fr) 220px;
   width: 100%;
   height: 100%;
   gap: 12px;
@@ -43,14 +42,13 @@
 }
 
 .question-box {
-  flex: 7 1 0%; /* Cột câu hỏi cao hơn, khóa cứng tỷ lệ */
+  flex: 7 1 0%;
 }
 
 .answer-box {
-  flex: 3 1 0%; /* Khóa cứng tỷ lệ khung đáp án */
+  flex: 3 1 0%;
 }
 
-/* Header của Box Câu hỏi */
 .question-header {
   background-color: var(--white);
   color: var(--black);
@@ -61,7 +59,7 @@
   font-weight: bold;
   font-size: 30px;
   display: flex;
-  justify-content: flex-start; /* Căn lề trái */
+  justify-content: flex-start;
   align-items: center;
   gap: 20px;
 }
@@ -134,7 +132,6 @@
   background: #64748b;
 }
 
-/* Vùng chứa nút bấm */
 .question-actions, .answer-actions {
   display: flex;
   justify-content: space-between;
@@ -154,22 +151,18 @@
   flex-wrap: wrap;
 }
 
-/* Nút bấm chức năng */
 .action-btn {
   background-color: var(--blue-badge);
   border: 1.5px solid var(--white);
   color: var(--white);
   font-weight: 800;
-
-  /* Cố định tuyệt đối kích cỡ của nút */
   width: 130px;
   height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0;
-  white-space: nowrap; /* Không cho chữ rớt dòng */
-
+  white-space: nowrap;
   cursor: pointer;
   font-family: var(--font-main);
   font-size: 13.5px;
@@ -182,7 +175,7 @@
 }
 
 .action-btn.dimmed {
-  background-color: #000033; /* Xanh nền tối lại */
+  background-color: #000033;
   border-color: #555555;
   color: #888888;
 }
@@ -191,11 +184,31 @@
   background-color: #000055;
 }
 
+/* Trạng thái nút Khóa / Mở chuông */
+.action-btn.buzzer-locked {
+  background-color: #3f1111;
+  border-color: #f87171;
+  color: #fca5a5;
+}
+
+.action-btn.buzzer-locked:hover {
+  background-color: #5c1919;
+}
+
+.action-btn.buzzer-open {
+  background-color: #065f46;
+  border-color: #34d399;
+  color: #ffffff;
+}
+
+.action-btn.buzzer-open:hover {
+  background-color: #047857;
+}
+
 .reset-graphic-btn {
   background-color: #cc0000;
 }
 
-/* Nút Điểm */
 .score-btn {
   font-size: 15px;
 }
@@ -216,7 +229,6 @@
   background-color: #990000;
 }
 
-/* Khung đếm ngược 5s */
 .timer-5s-box {
   width: 55px;
   height: 55px;
@@ -265,15 +277,13 @@
   background-color: #0b004b;
 }
 
-/* Di chuột lên thẻ: Đổi viền */
 .player-vertical-card:hover {
   border-color: #00dafc;
 }
 
-/* Trạng thái đang hoạt động (Đến lượt): Nền đỏ */
 .player-vertical-card.is-turn {
   background-color: #cc0000;
-  border-color: #cc0000; /* Bỏ viền vàng, chỉ giữ nền đỏ */
+  border-color: #cc0000;
 }
 
 .player-v-name {
@@ -297,14 +307,34 @@
 }
 
 .player-v-score {
-  height: 100px;
-  padding: 25px 0px 0px 0px;
+  flex: 1;
+  min-height: 0;
+  padding: 6px 0px 0px 0px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 70px;
+  font-size: 64px;
   font-weight: bold;
   color: var(--white);
+}
+
+.player-v-buzz-time {
+  min-height: 24px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffff00;
+  font-size: 15px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
+.player-v-buzz-time:empty {
+  display: none;
 }
 
 /* ==========================================================================

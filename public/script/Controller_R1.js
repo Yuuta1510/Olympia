@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getDatabase, ref, onValue, update, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD8kOt_miajR8UvjeRF6v9aYy-n1q4uCEE",
@@ -15,11 +15,22 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getDatabase(app);
 
+let serverTimeOffset = 0;
+const unsubServerOffset = onValue(ref(db, ".info/serverTimeOffset"), (snapshot) => {
+  if (snapshot.exists()) {
+    serverTimeOffset = Number(snapshot.val()) || 0;
+  }
+});
+
+function getServerNow() {
+  return Date.now() + serverTimeOffset;
+}
+
 const channel = {
   postMessage: function(data) {
     return update(ref(db, 'games/commands'), {
       ...data,
-      timestamp: Date.now()
+      timestamp: getServerNow()
     });
   }
 };
@@ -41,6 +52,123 @@ let turnTimerInterval = null;
 let lr_config = { so_luot: 4, so_cau: 6, thoi_gian: -1, diem_dung: 10, diem_sai: 0 };
 let lc_configs = [{ so_cau: 12, thoi_gian: -1, diem_dung: 10, diem_sai: -5 }];
 let round1EventsController = null;
+
+let isBuzzerEnabled = false;
+let buzzerOpenedAt = null;
+let lastHandledBuzzTimestamp = 0;
+let playerBuzzTimes = {};
+
+let turnTimerStartTimestamp = null;
+let turnTimerStartRemaining = -1;
+let timer5sStartTimestamp = null;
+
+function renderBuzzerLockButtonUI() {
+  const btn = document.getElementById('btn-toggle-buzzer');
+  if (!btn) return;
+  if (isBuzzerEnabled) {
+    btn.textContent = 'CHUÔNG: MỞ';
+    btn.classList.remove('buzzer-locked');
+    btn.classList.add('buzzer-open');
+  } else {
+    btn.textContent = 'CHUÔNG: KHÓA';
+    btn.classList.remove('buzzer-open');
+    btn.classList.add('buzzer-locked');
+  }
+}
+
+function renderPlayerBuzzTimesUI() {
+  for (let i = 1; i <= 4; i++) {
+    const timeEl = document.getElementById(`playerBtnBuzzTime-${i}`);
+    if (!timeEl) continue;
+    const sec = playerBuzzTimes[i];
+    if (typeof sec === 'number' && !isNaN(sec)) {
+      timeEl.textContent = `${sec.toFixed(2)}s`;
+    } else {
+      timeEl.textContent = '';
+    }
+  }
+}
+
+function resetRound1BuzzerDB(keepEnabled = isBuzzerEnabled) {
+  const now = getServerNow();
+  isBuzzerEnabled = Boolean(keepEnabled);
+  buzzerOpenedAt = isBuzzerEnabled ? now : null;
+  lastHandledBuzzTimestamp = Math.max(lastHandledBuzzTimestamp, now);
+  playerBuzzTimes = {};
+  renderBuzzerLockButtonUI();
+  renderPlayerBuzzTimesUI();
+
+  return set(ref(db, 'games/round_1_buzzer'), {
+    enabled: isBuzzerEnabled,
+    openedAt: buzzerOpenedAt,
+    locked: false,
+    playerIndex: null,
+    playerName: "",
+    buzzTimeSec: null,
+    quesIndex: currentQuesIndex,
+    timestamp: now
+  });
+}
+
+function toggleBuzzerLock() {
+  const now = getServerNow();
+  isBuzzerEnabled = !isBuzzerEnabled;
+  lastHandledBuzzTimestamp = Math.max(lastHandledBuzzTimestamp, now);
+  renderBuzzerLockButtonUI();
+
+  if (isBuzzerEnabled) {
+    // Mở chuông -> Xóa trạng thái chuông cũ và bắt đầu tính thời gian từ 0.00s
+    buzzerOpenedAt = now;
+    playerBuzzTimes = {};
+    renderPlayerBuzzTimesUI();
+
+    document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
+    activePlayerIndex = null;
+    channel.postMessage({ action: 'reset_buzzers', activePlayerIndex: null });
+
+    set(ref(db, 'games/round_1_buzzer'), {
+      enabled: true,
+      openedAt: now,
+      locked: false,
+      playerIndex: null,
+      playerName: "",
+      buzzTimeSec: null,
+      quesIndex: currentQuesIndex,
+      timestamp: now
+    });
+  } else {
+    // Khóa chuông -> Chỉ cập nhật trạng thái enabled/openedAt, không kích hoạt sự kiện bấm chuông
+    buzzerOpenedAt = null;
+    update(ref(db, 'games/round_1_buzzer'), {
+      enabled: false,
+      openedAt: null
+    });
+  }
+
+  syncRound1StateToDB();
+}
+
+function syncRound1StateToDB() {
+  const qText =
+    isQuestionShown && round1Questions && round1Questions[currentQuesIndex]
+      ? round1Questions[currentQuesIndex].cau_hoi
+      : "";
+
+  return set(ref(db, 'games/r1_state'), {
+    currentQuesIndex,
+    isQuestionShown,
+    questionText: qText,
+    activePlayerIndex,
+    turnTime: currentTurnTime,
+    remainingTime: currentRemainingTime,
+    isTurnTimePlaying,
+    timerStartedAt: isTurnTimePlaying ? turnTimerStartTimestamp : null,
+    timerStartRemaining: isTurnTimePlaying ? turnTimerStartRemaining : null,
+    isTimer5sRunning,
+    timer5sStartedAt: isTimer5sRunning ? timer5sStartTimestamp : null,
+    updatedAt: getServerNow()
+  });
+}
 
 window.updateNameDB = function(index, nameStr) {
   update(ref(db, `games/players/${index}`), { name: nameStr });
@@ -157,7 +285,19 @@ window.updateTurnStatusOptions = function() {
   }
 };
 
+function getTurnSignature(quesIndex) {
+  let LR_Count = parseInt(lr_config.so_luot, 10);
+  if (isNaN(LR_Count)) LR_Count = 4;
+  const A = parseInt(lr_config.so_cau, 10) || 0;
+
+  if (A > 0 && LR_Count > 0 && quesIndex <= (LR_Count * A)) {
+    return `rieng_${Math.ceil(quesIndex / A)}`;
+  }
+  return 'chung';
+}
+
 window.jumpToTurn = function(val) {
+  const prevTurnSig = getTurnSignature(currentQuesIndex);
   const LR_Count = parseInt(lr_config.so_luot, 10) || 4;
   const A = parseInt(lr_config.so_cau, 10) || 0;
 
@@ -172,7 +312,23 @@ window.jumpToTurn = function(val) {
     }
     currentQuesIndex = startIndex;
   }
+
+  if (getTurnSignature(currentQuesIndex) !== prevTurnSig) {
+    activePlayerIndex = null;
+    document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
+  }
+
   updateQAPreview();
+  resetRound1BuzzerDB(isBuzzerEnabled);
+  channel.postMessage({ action: 'reset_buzzers', activePlayerIndex });
+  if (isQuestionShown && round1Questions && round1Questions[currentQuesIndex]) {
+    channel.postMessage({
+      action: 'show_question',
+      text: round1Questions[currentQuesIndex].cau_hoi,
+      quesIndex: currentQuesIndex
+    });
+  }
+  syncRound1StateToDB();
 };
 
 function updateQAPreview() {
@@ -307,17 +463,22 @@ function isCommonQuestion(questionIndex) {
 }
 
 window.triggerAction = function(btn, keyStr) {
-  let resetBuzzersForNextQuestion = false;
   const btnWaitBg = document.getElementById('btn-wait-bg');
   const btnGraphic = document.getElementById('btn-graphic');
   const btnPlayers = document.getElementById('btn-players');
   const btnQuestion = document.getElementById('btn-question');
+  const isFromPlayerBuzz = btn?.dataset?.fromPlayerBuzz === '1';
 
   if (btn) {
     btn.classList.add('active');
     setTimeout(() => {
       btn.classList.remove('active');
     }, 50);
+  }
+
+  if (keyStr === 'tb') {
+    toggleBuzzerLock();
+    return;
   }
 
   if (keyStr >= '1' && keyStr <= '6') {
@@ -334,6 +495,7 @@ window.triggerAction = function(btn, keyStr) {
   } else if (keyStr === 'rb') {
     document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
     activePlayerIndex = null;
+    resetRound1BuzzerDB(isBuzzerEnabled);
   } else if (keyStr === 'r') {
     document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
     activePlayerIndex = null;
@@ -352,9 +514,16 @@ window.triggerAction = function(btn, keyStr) {
     const btnPlayTime = document.getElementById('btnPlayPauseTime');
     if (btnPlayTime) btnPlayTime.innerText = '▶';
     currentRemainingTime = currentTurnTime;
+    resetRound1BuzzerDB(false);
   }
 
-  if (keyStr >= '1' && keyStr <= '6' && isCommonQuestion(currentQuesIndex)) {
+  // Chỉ phát âm thanh bấm chuông khi thí sinh thực sự bấm chuông trên màn Player
+  if (
+    keyStr >= '1' &&
+    keyStr <= '6' &&
+    isFromPlayerBuzz &&
+    isCommonQuestion(currentQuesIndex)
+  ) {
     if (typeof window.playMusic === 'function') {
       window.playMusic('R1_Buzzed.mp3');
     }
@@ -362,17 +531,26 @@ window.triggerAction = function(btn, keyStr) {
 
   if (keyStr === 'p') {
     if (currentQuesIndex > 1) {
+      const prevTurnSig = getTurnSignature(currentQuesIndex);
       currentQuesIndex--;
+      if (getTurnSignature(currentQuesIndex) !== prevTurnSig) {
+        activePlayerIndex = null;
+        document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
+      }
       updateQAPreview();
+      resetRound1BuzzerDB(isBuzzerEnabled);
+      channel.postMessage({ action: 'reset_buzzers', activePlayerIndex });
     }
   } else if (keyStr === 'n') {
+    const prevTurnSig = getTurnSignature(currentQuesIndex);
     currentQuesIndex++;
-    updateQAPreview();
-    resetBuzzersForNextQuestion = isCommonQuestion(currentQuesIndex);
-    if (resetBuzzersForNextQuestion) {
+    if (getTurnSignature(currentQuesIndex) !== prevTurnSig || isCommonQuestion(currentQuesIndex)) {
       activePlayerIndex = null;
       document.querySelectorAll('.player-vertical-card').forEach(b => b.classList.remove('is-turn'));
     }
+    updateQAPreview();
+    resetRound1BuzzerDB(isBuzzerEnabled);
+    channel.postMessage({ action: 'reset_buzzers', activePlayerIndex });
   }
 
   if (keyStr === 'w') {
@@ -429,32 +607,29 @@ window.triggerAction = function(btn, keyStr) {
     }
   } else if (keyStr === 'n' || keyStr === 'p') {
     if (isQuestionShown && round1Questions && round1Questions[currentQuesIndex]) {
-      const showQuestion = () => channel.postMessage({
+      channel.postMessage({
         action: 'show_question',
         text: round1Questions[currentQuesIndex].cau_hoi,
         quesIndex: currentQuesIndex
       });
-      if (keyStr === 'n' && resetBuzzersForNextQuestion) {
-        channel.postMessage({ action: 'reset_buzzers' }).then(showQuestion);
-      } else {
-        showQuestion();
-      }
     }
   } else if (keyStr === 'r') {
     channel.postMessage({ action: 'reset_graphic' });
   } else if (keyStr === 'rb') {
-    channel.postMessage({ action: 'reset_buzzers' });
+    channel.postMessage({ action: 'reset_buzzers', activePlayerIndex: null });
   } else if (keyStr === 't5') {
     const timerBtn = document.getElementById('timer5s-display');
     if (isTimer5sRunning) {
       channel.postMessage({ action: 'stop_5s' });
       if (ctrlTimerInterval) clearInterval(ctrlTimerInterval);
       isTimer5sRunning = false;
+      timer5sStartTimestamp = null;
       if (timerBtn) {
         timerBtn.innerText = '5';
         timerBtn.classList.remove('running');
       }
     } else {
+      timer5sStartTimestamp = getServerNow();
       channel.postMessage({ action: 'start_5s' });
       isTimer5sRunning = true;
       if (ctrlTimerInterval) clearInterval(ctrlTimerInterval);
@@ -476,6 +651,8 @@ window.triggerAction = function(btn, keyStr) {
           }
           clearInterval(ctrlTimerInterval);
           isTimer5sRunning = false;
+          timer5sStartTimestamp = null;
+          syncRound1StateToDB();
           setTimeout(() => {
             if (!isTimer5sRunning && timerBtn) timerBtn.innerText = '5';
           }, 1500);
@@ -483,6 +660,8 @@ window.triggerAction = function(btn, keyStr) {
       }, 1000);
     }
   }
+
+  syncRound1StateToDB();
 };
 
 window.resetTurnTime = function() {
@@ -490,6 +669,8 @@ window.resetTurnTime = function() {
   if (isTurnTimePlaying) {
     clearInterval(turnTimerInterval);
     isTurnTimePlaying = false;
+    turnTimerStartTimestamp = null;
+    turnTimerStartRemaining = -1;
     const btnPlayTime = document.getElementById('btnPlayPauseTime');
     if (btnPlayTime) btnPlayTime.innerText = '▶';
   }
@@ -499,6 +680,7 @@ window.resetTurnTime = function() {
     timeSpan.innerText = `THỜI GIAN: ${currentRemainingTime.toFixed(1)}s`;
     window.compressBadgeText('timeText');
   }
+  syncRound1StateToDB();
 };
 
 window.toggleTurnTime = function() {
@@ -519,6 +701,8 @@ window.toggleTurnTime = function() {
 
     const startTime = Date.now();
     const startRemaining = currentRemainingTime;
+    turnTimerStartTimestamp = getServerNow();
+    turnTimerStartRemaining = startRemaining;
 
     if (turnTimerInterval) clearInterval(turnTimerInterval);
     turnTimerInterval = setInterval(() => {
@@ -532,8 +716,11 @@ window.toggleTurnTime = function() {
         if (timeSpan) timeSpan.innerText = 'HẾT GIỜ';
         clearInterval(turnTimerInterval);
         isTurnTimePlaying = false;
+        turnTimerStartTimestamp = null;
+        turnTimerStartRemaining = -1;
         if (btn) btn.innerText = '▶';
         channel.postMessage({ action: 'time_out' });
+        syncRound1StateToDB();
       }
       window.compressBadgeText('timeText');
     }, 50);
@@ -541,7 +728,11 @@ window.toggleTurnTime = function() {
     if (btn) btn.innerText = '▶';
     channel.postMessage({ action: 'pause_turn_time' });
     if (turnTimerInterval) clearInterval(turnTimerInterval);
+    turnTimerStartTimestamp = null;
+    turnTimerStartRemaining = -1;
   }
+
+  syncRound1StateToDB();
 };
 
 window.triggerScore = function(btn, type) {
@@ -744,6 +935,7 @@ const unsubQuestions = onValue(ref(db, 'questions/round_1'), (snapshot) => {
   if (snapshot.exists()) {
     round1Questions = snapshot.val();
     updateQAPreview();
+    syncRound1StateToDB();
   }
 });
 
@@ -770,6 +962,60 @@ const unsubRound1 = onValue(ref(db, 'games/round_1'), (snapshot) => {
       window.renderLuotChungConfigs();
     }
     updateQAPreview();
+    syncRound1StateToDB();
+  }
+});
+
+const unsubBuzzer = onValue(ref(db, 'games/round_1_buzzer'), (snapshot) => {
+  if (!snapshot.exists()) return;
+  const data = snapshot.val() || {};
+
+  if (typeof data.enabled === 'boolean') {
+    isBuzzerEnabled = data.enabled;
+    renderBuzzerLockButtonUI();
+  }
+  if (data.openedAt !== undefined) {
+    buzzerOpenedAt = data.openedAt;
+  }
+
+  if (!data.locked || !data.playerIndex) {
+    playerBuzzTimes = {};
+    renderPlayerBuzzTimesUI();
+    return;
+  }
+
+  const pIdx = Number(data.playerIndex);
+  if (pIdx >= 1 && pIdx <= 4) {
+    if (typeof data.buzzTimeSec === 'number' && !isNaN(data.buzzTimeSec)) {
+      playerBuzzTimes = { [pIdx]: data.buzzTimeSec };
+    } else if (data.openedAt && data.timestamp) {
+      const calcSec = Math.max(0, Number(((Number(data.timestamp) - Number(data.openedAt)) / 1000).toFixed(2)));
+      playerBuzzTimes = { [pIdx]: calcSec };
+    }
+    renderPlayerBuzzTimesUI();
+  }
+
+  // Chỉ xử lý tín hiệu bấm chuông khi chuông đang mở và câu hỏi trùng khớp
+  if (!data.enabled) return;
+  if (
+    data.quesIndex !== undefined &&
+    data.quesIndex !== null &&
+    Number(data.quesIndex) !== Number(currentQuesIndex)
+  ) {
+    return;
+  }
+
+  const ts = Number(data.timestamp) || 0;
+  if (pIdx < 1 || pIdx > 4 || ts <= lastHandledBuzzTimestamp) return;
+
+  lastHandledBuzzTimestamp = ts;
+  const targetBtn = document.getElementById(`playerBtn-${pIdx}`);
+  if (targetBtn) {
+    targetBtn.dataset.fromPlayerBuzz = '1';
+  }
+  window.triggerAction(targetBtn, String(pIdx));
+  if (targetBtn) {
+    delete targetBtn.dataset.fromPlayerBuzz;
   }
 });
 
@@ -779,6 +1025,8 @@ function initRound1() {
   window.compressBadgeText('roundText');
   window.compressBadgeText('quesText');
   window.compressBadgeText('timeText');
+  resetRound1BuzzerDB(false);
+  syncRound1StateToDB();
 }
 
 if (document.readyState === 'loading') {
@@ -791,6 +1039,8 @@ window.cleanupCurrentRound = () => {
   if (typeof unsubPlayers === 'function') unsubPlayers();
   if (typeof unsubQuestions === 'function') unsubQuestions();
   if (typeof unsubRound1 === 'function') unsubRound1();
+  if (typeof unsubBuzzer === 'function') unsubBuzzer();
+  if (typeof unsubServerOffset === 'function') unsubServerOffset();
 
   if (ctrlTimerInterval) {
     clearInterval(ctrlTimerInterval);

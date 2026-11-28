@@ -1,0 +1,359 @@
+/* =====================================================================
+   PLAYER_R1.CSS - GIAO DIỆN VÒNG 1 (KHỞI ĐỘNG) TRÊN MÀN THÍ SINH
+   ===================================================================== */
+
+#player-view-R1 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: clamp(12px, 2vh, 22px) clamp(14px, 2.4vw, 32px);
+  gap: clamp(12px, 1.8vh, 20px);
+  background: radial-gradient(circle at top, #0c1938 0%, var(--bg-dark) 85%);
+  user-select: none;
+}
+
+/* =====================================================================
+   1. THANH TIÊU ĐỀ KHỞI ĐỘNG & TÊN LƯỢT Ở GÓC TRÊN BÊN PHẢI
+   ===================================================================== */
+.r1-player-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.r1-round-title {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--cyan);
+  font-size: 50px;
+  font-weight: bold;
+  font-style: italic;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.r1-meta-badge {
+  position: absolute;
+  top: 5%;
+  right: 2%;
+  color: var(--cyan);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+/* =====================================================================
+   2. KHUNG NỘI DUNG CÂU HỎI
+   ===================================================================== */
+.r1-player-question-box {
+  flex: 1;
+  min-height: 0;
+  background-color: var(--card-bg);
+  border: 2px solid white;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.r1-player-question-label {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+  padding: 9px 20px;
+  font-size: clamp(14px, 1.25vw, 19px);
+  font-weight: 900;
+  color: var(--cyan);
+  text-transform: uppercase;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.r1-player-question-content {
+  flex: 1;
+  min-height: 0;
+  padding: 16px 22px 12px 22px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  white-space: pre-line;
+  font-size: 36px;
+  font-weight: bold;
+  line-height: 1.3;
+  color: var(--white);
+  overflow-y: auto;
+  overflow-wrap: break-word;
+}
+
+.r1-player-question-content.is-waiting {
+  color: #222222;
+}
+
+.r1-player-question-footer {
+  flex-shrink: 0;
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 8px 18px 14px 18px;
+}
+
+.r1-question-time-badge {
+  height: clamp(40px, 5.5vh, 50px);
+  min-width: 112px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: 2px solid white;
+  color: white;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.r1-timer-5s-pill {
+  display: none;
+  height: clamp(40px, 5.5vh, 50px);
+  min-width: 64px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 2px solid yellow;
+  color: yellow;
+  font-size: 24px;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  align-items: center;
+  justify-content: center;
+}
+
+.r1-timer-5s-pill.is-visible {
+  display: inline-flex;
+}
+
+/* =====================================================================
+   3. KHU VỰC DƯỚI KHUNG CÂU HỎI: ĐIỂM 4 THÍ SINH + NÚT BẤM CHUÔNG
+   ===================================================================== */
+.r1-player-bottom-bar {
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: clamp(10px, 1.4vw, 18px);
+}
+
+.r1-player-scoreboard {
+  flex: 1;
+  max-width: 720px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(6px, 0.8vw, 10px);
+}
+
+.r1-score-card {
+  background-color: rgb(16, 0, 88);
+  border: 3px solid rgb(85, 85, 85);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Thí sinh đang active đồng bộ với Controller */
+.r1-score-card.is-active {
+  border-color: #fff9da;
+  box-shadow: 0 0 12px #fff9da;
+}
+
+.r1-score-name {
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+  padding: 5px 8px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--cyan);
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r1-score-card.is-self .r1-score-name,
+.r1-score-name.is-self {
+  color: var(--white);
+}
+
+.r1-score-value {
+  flex: 1;
+  background-color: rgb(6, 0, 42);
+  color: var(--cyan);
+  font-size: 32px;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 6px;
+  line-height: 1.1;
+}
+
+.r1-score-card.is-self .r1-score-value,
+.r1-score-value.is-self {
+  color: var(--white);
+}
+
+.r1-player-buzz-btn {
+  flex-shrink: 0;
+  width: clamp(200px, 25vw, 340px);
+  min-height: clamp(62px, 9.5vh, 88px);
+  margin: 0;
+  background: linear-gradient(180deg, #f60000 0%, #6a0000 100%);
+  border: 3px solid var(--white);
+  border-radius: 14px;
+  color: var(--white);
+  font-family: var(--font-main);
+  font-size: 32px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  padding: 6px 14px;
+  line-height: 1.1;
+}
+
+.r1-player-buzz-btn.has-buzz-time {
+  font-size: clamp(21px, 2.1vw, 28px);
+}
+
+.r1-buzz-main-label {
+  display: block;
+  white-space: nowrap;
+}
+
+.r1-buzz-time-label {
+  display: block;
+  font-size: clamp(13px, 1.15vw, 16px);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.95;
+}
+
+.r1-buzz-time-label:empty {
+  display: none;
+}
+
+.r1-player-buzz-btn:hover:not(:disabled) {
+  filter: brightness(1.4);
+}
+
+.r1-player-buzz-btn:active:not(:disabled) {
+  filter: brightness(0.6);
+}
+
+/* Giành được quyền trả lời -> Đổi sang màu xanh */
+.r1-player-buzz-btn.is-buzzed-me {
+  background: linear-gradient(180deg, #11df5c 0%, #0b662c 100%);
+  border-color: #86efac;
+  color: var(--white);
+  cursor: default;
+}
+
+/* Thí sinh khác đã bấm chuông trước */
+.r1-player-buzz-btn.is-buzzed-other,
+.r1-player-buzz-btn:disabled:not(.is-buzzed-me):not(.is-locked) {
+  background: #0a101e;
+  border-color: #42474e;
+  color: #42474e;
+  cursor: not-allowed;
+}
+
+/* Controller khóa chuông */
+.r1-player-buzz-btn.is-locked {
+  background: #1e293b;
+  border-color: #64748b;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Lượt riêng (không dùng chuông) -> Làm mờ nút nhưng giữ nguyên vị trí */
+.r1-player-buzz-btn.is-dimmed {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.r1-player-buzz-info {
+  width: 100%;
+  min-height: 20px;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.r1-player-buzz-info.is-open {
+  color: var(--cyan);
+}
+
+.r1-player-buzz-info.is-locked {
+  color: #fbbf24;
+}
+
+.r1-player-buzz-info.is-me {
+  color: #4ade80;
+}
+
+.r1-player-buzz-info.is-other {
+  color: #cbd5e1;
+}
+
+@media (max-width: 768px) {
+  .r1-player-bottom-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .r1-player-scoreboard {
+    max-width: 100%;
+  }
+
+  .r1-buzzer-col {
+    width: 100%;
+  }
+
+  .r1-player-buzz-btn {
+    width: 100%;
+    min-height: 64px;
+  }
+}

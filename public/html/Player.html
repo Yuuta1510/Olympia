@@ -198,8 +198,48 @@
       </div>
     </section>
 
-    <!-- CÁC PHẦN TIẾP THEO (SẼ NẠP CODE SAU) -->
-    <section class="player-round-view" id="player-view-R1"></section>
+    <!-- PHẦN 2: VÒNG 1 - KHỞI ĐỘNG -->
+    <section class="player-round-view" id="player-view-R1">
+      <header class="r1-player-topbar">
+        <div class="r1-round-title" id="r1PlayerRoundTitle">KHỞI ĐỘNG</div>
+        <div class="r1-meta-badge" id="r1PlayerTurnText">LƯỢT RIÊNG - P1</div>
+      </header>
+
+      <div class="r1-player-question-box">
+        <div class="r1-player-question-label" id="r1PlayerQuestionLabel">CÂU HỎI 1/...</div>
+        <div class="r1-player-question-content is-waiting" id="r1PlayerQuestionText">
+          Chờ MC hiển thị câu hỏi...
+        </div>
+        <div class="r1-player-question-footer" id="r1PlayerQuestionFooter">
+          <div class="r1-timer-5s-pill" id="r1PlayerTimer5s">5s</div>
+          <div class="r1-question-time-badge" id="r1PlayerTimeText">VÔ HẠN</div>
+        </div>
+      </div>
+
+      <div class="r1-player-bottom-bar">
+        <div class="r1-player-scoreboard" id="r1PlayerScoreboard">
+          <div class="r1-score-card" id="r1ScoreCard-1">
+            <div class="r1-score-name" id="r1PlayerName-1">P1</div>
+            <div class="r1-score-value" id="r1PlayerScore-1">0</div>
+          </div>
+          <div class="r1-score-card" id="r1ScoreCard-2">
+            <div class="r1-score-name" id="r1PlayerName-2">P2</div>
+            <div class="r1-score-value" id="r1PlayerScore-2">0</div>
+          </div>
+          <div class="r1-score-card" id="r1ScoreCard-3">
+            <div class="r1-score-name" id="r1PlayerName-3">P3</div>
+            <div class="r1-score-value" id="r1PlayerScore-3">0</div>
+          </div>
+          <div class="r1-score-card" id="r1ScoreCard-4">
+            <div class="r1-score-name" id="r1PlayerName-4">P4</div>
+            <div class="r1-score-value" id="r1PlayerScore-4">0</div>
+          </div>
+        </div>
+
+        <button type="button" class="r1-player-buzz-btn" id="r1PlayerBuzzBtn">BẤM CHUÔNG</button>
+      </div>
+    </section>
+
     <section class="player-round-view" id="player-view-R2"></section>
     <section class="player-round-view" id="player-view-R3"></section>
     <section class="player-round-view" id="player-view-R4"></section>
@@ -227,7 +267,6 @@
     const VALID_TABS = ["M", "R1", "R2", "R3", "R4", "TB"];
     const TOTAL_PLAYERS = 4;
 
-    // Trạng thái dùng chung cho toàn bộ 6 phần của màn Player
     window.PlayerState = {
       db,
       playerIndex: null,
@@ -289,7 +328,6 @@
       }
     };
 
-    // Xử lý xác nhận số thứ tự người chơi (1 - 4)
     const seatInput = document.getElementById("seatNumberInput");
     const seatConfirmBtn = document.getElementById("seatConfirmBtn");
     const seatErrorMsg = document.getElementById("seatErrorMsg");
@@ -324,7 +362,6 @@
       }
     });
 
-    // Lắng nghe realtime danh sách 4 thí sinh từ Firebase
     onValue(ref(db, "games/players"), (snapshot) => {
       if (snapshot.exists()) {
         window.PlayerState.players = snapshot.val();
@@ -337,7 +374,6 @@
       }
     });
 
-    // Lắng nghe lệnh chuyển phần (M, R1, R2, R3, R4, TB) từ Controller
     let isInitialCommand = true;
     onValue(ref(db, "games/commands"), (snapshot) => {
       if (isInitialCommand) {
@@ -350,6 +386,26 @@
 
       if (nextTab && VALID_TABS.includes(String(nextTab).toUpperCase())) {
         const normalizedTab = String(nextTab).toUpperCase();
+        if (normalizedTab !== window.PlayerState.activeTab) {
+          if (window.PlayerState.playerIndex !== null) {
+            window.switchPlayerTab(normalizedTab);
+          } else {
+            window.PlayerState.activeTab = normalizedTab;
+          }
+        }
+      }
+    });
+
+    function normalizeTabCode(rawTab) {
+      const code = String(rawTab || "").trim().toUpperCase();
+      return code === "R5" ? "TB" : code;
+    }
+
+    onValue(ref(db, "games/active_tab"), (snapshot) => {
+      if (!snapshot.exists()) return;
+      const data = snapshot.val() || {};
+      const normalizedTab = normalizeTabCode(data.tab);
+      if (normalizedTab && VALID_TABS.includes(normalizedTab)) {
         if (normalizedTab !== window.PlayerState.activeTab) {
           if (window.PlayerState.playerIndex !== null) {
             window.switchPlayerTab(normalizedTab);
